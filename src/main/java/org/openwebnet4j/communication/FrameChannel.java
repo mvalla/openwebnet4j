@@ -36,10 +36,11 @@ public class FrameChannel {
     private OutputStream out;
     private InputStream in;
     private String name;
+    protected boolean handshakeCompleted = false;
 
     private final Logger logger = LoggerFactory.getLogger(FrameChannel.class);
 
-    public FrameChannel(InputStream in, OutputStream out, String name) {
+    protected FrameChannel(InputStream in, OutputStream out, String name) {
         this.name = name;
         this.out = out;
         this.in = in;
@@ -56,18 +57,24 @@ public class FrameChannel {
      * @throws IOException in case of problems while writing on the OutputStream
      */
     protected synchronized void sendFrame(String frame) throws IOException {
-        out.write(frame.getBytes());
-        out.flush();
-        logger.info("-FC-{} -------> {}", name, frame);
+        if (out != null) {
+            out.write(frame.getBytes());
+            out.flush();
+            logger.info("-FC-{} -------> {}", name, frame);
+        } else {
+            throw new IOException("Cannot sendFrame, OutputStream is null");
+        }
     }
 
     /**
-     * Returns the first frame String from the {@link readFrames} queue. If queue is empty, tries to read available data
-     * from InputStream and extract all frames terminated with "##" putting them in the queue.
-     * If no new frame can be read from InputStream, returns null.
+     * Returns the first frame String from the {@link readFrames} queue. If queue is empty, tries to read (blocking
+     * read) available data from InputStream and extract all frames terminated with "##" putting them in the
+     * {@link readFrames} queue.
+     * If no new frame can be read from InputStream because end of steam reached, returns null.
      *
-     * @return the first frame from receiving queue, or the first new frame read from InputStream, or null
-     * @throws IOException in case of problems while reading from InputStream
+     * @return the first frame already in the receiving queue, or the first new frame read from InputStream, or null if
+     *         end of steam reached
+     * @throws IOException in case of problems while reading frames from InputStream
      */
     protected String readFrames() throws IOException {
         if (readFrames.isEmpty()) { // no frames in queue, try reading from stream
@@ -76,7 +83,7 @@ public class FrameChannel {
             if (size > 0) {
                 String longFrame = new String(buf, 0, size);
                 logger.trace("-FC-{}   <---   {}", name, longFrame);
-                // this is a fix to handle an error of the gateway in the response to device info 2-UNITS
+                // FIXME this is a fix to handle an error of the gateway in the response to device info 2-UNITS
                 if (longFrame.contains("#9*66*")) { // it's a response to device info
                     // perform another read to receive the 2-UNITS info
                     if ((size = readUntilDelimiter(in, buf)) != -1) {

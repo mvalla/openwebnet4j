@@ -28,7 +28,7 @@ public abstract class OpenMessage {
 
     public static final String FRAME_ACK_NACK_BUSY_START = "*#*";
     public static final String FRAME_START = "*";
-    protected static final String FRAME_START_DIM = "*#";
+    public static final String FRAME_START_DIM = "*#";
     public static final String FRAME_END = "##";
 
     protected String frameValue;

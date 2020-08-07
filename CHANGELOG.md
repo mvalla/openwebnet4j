@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.0] - 2020-08-07
+
+### Added
+- Support for numeric (OPEN) and alphanumeric (HMAC) passwords
+
+### Changed
+- changed monKeepaliveTimer to schedule to avoid MON message flood after standby
+
+
 ## [0.1.0] - 2020-07-11
 
 First public version of openwebnet4j

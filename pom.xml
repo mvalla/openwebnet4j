@@ -5,12 +5,12 @@
 
 	<groupId>com.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.1.0</version>
-    <packaging>jar</packaging>
+	<version>0.2.0</version>
+	<packaging>jar</packaging>
 
 	<name>openwebnet4j OpenWebNet Java library</name>
-    <description>openwebnet4j is a Java library for the Open Web Net protocol</description>
-    <url>https://github.com/mvalla/openwebnet4j</url>
+	<description>openwebnet4j is a Java library for the Open Web Net protocol</description>
+	<url>https://github.com/mvalla/openwebnet4j</url>
 
 	<scm>
 		<url>https://github.com/mvalla/openwebnet4j.git</url>
@@ -44,8 +44,8 @@
 		<dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
-			<version>3.15.0</version> 
-			 <!-- <version>5.0.2</version> -->
+			<version>3.15.0</version>
+			<!-- <version>5.0.2</version> -->
 		</dependency>
 
 		<!-- ==== BUNDLE ==== -->
@@ -75,6 +75,21 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<plugin>
@@ -134,4 +149,15 @@
 
 		</plugins>
 	</build>
+	
+	<distributionManagement>
+        <repository>
+            <id>bintray-mvalla-maven</id>
+            <name>mvalla-maven</name>
+            <!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url>  -->
+            <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url>  
+            
+        </repository>
+    </distributionManagement>
+
 </project>

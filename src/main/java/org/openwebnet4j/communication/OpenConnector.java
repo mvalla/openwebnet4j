@@ -163,8 +163,6 @@ public abstract class OpenConnector {
             logger.debug("{} STARTED", getName());
             while (!stopRequested) {
                 try {
-                    // blocking read, returns null if end of steam reached, throws IOException in case of problems while
-                    // reading from InputStream
                     fr = monChannel.readFrames();
                     if (fr == null) {
                         logger.debug("{} readFrame() returned null", getName());
@@ -196,7 +194,7 @@ public abstract class OpenConnector {
      * Called when MON connection is disconnected
      */
     protected void handleMonDisconnect(OWNException e) {
-        logger.debug("##OPEN-conn## handleMonDisconnect() OWNException={}", e);
+        logger.debug("##OPEN-conn## handleMonDisconnect() OWNException={}", e.getMessage());
         isMonConnected = false;
         if (monChannel != null) {
             monChannel.disconnect();
@@ -217,7 +215,6 @@ public abstract class OpenConnector {
             monRcvThread = null;
         }
         logger.debug("##OPEN-conn## ... closing all streams ...");
-        // close FrameChannels (streams)
         if (cmdChannel != null) {
             cmdChannel.disconnect();
         }
