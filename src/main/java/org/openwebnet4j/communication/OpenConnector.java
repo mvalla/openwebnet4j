@@ -42,6 +42,8 @@ public abstract class OpenConnector {
     protected boolean isCmdConnected = false;
     protected boolean isMonConnected = false;
 
+    protected long lastCmdFrameSentTs = -1;
+
     protected OWNReceiveThread monRcvThread;
 
     protected ConnectorListener listener;
@@ -69,6 +71,15 @@ public abstract class OpenConnector {
      */
     public boolean isCmdConnected() {
         return isCmdConnected;
+    }
+
+    /**
+     * Get timestamp of last CMD frame sent successfully
+     *
+     * @returns long timestamp
+     */
+    public long getLastCmdFrameSentTs() {
+        return lastCmdFrameSentTs;
     }
 
     /**

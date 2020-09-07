@@ -47,9 +47,9 @@ public class BUSConnector extends OpenConnector {
     /*
      * TIMEOUTS AND TIMERS
      * ===================
-     * OWN gateway closes MON connection after 105s if no keepalive message is sent by client
+     * OWN gateway closes a MON connection after 105s if no keepalive message is sent by client
      * --> we send a keepalive message (ACK) every MON_KEEPALIVE_TIMER on MON socket to keep it alive
-     * OWN gateway closes CMD connection after 120s if no new command is sent by client
+     * OWN gateway closes a CMD connection after 120s if no new command is sent by client
      * --> we check if existing CMD connection can be re-used, otherwise we create a new one
      *
      * Also, we use:
@@ -167,8 +167,9 @@ public class BUSConnector extends OpenConnector {
     private Response sendCmdAndReadResp(String frame) throws IOException, FrameException {
         // TODO add timeout? or CMD_SOCKET_READ_TIMEOUT is enough?
         Response res = new Response(BaseOpenMessage.parse(frame));
-        logger.info("BUS-CMD ====>>>> {}", frame);
         cmdChannel.sendFrame(frame);
+        lastCmdFrameSentTs = System.currentTimeMillis();
+        logger.info("BUS-CMD ====>>>> {}", frame);
         String fr;
         while (!res.hasFinalResponse()) {
             logger.trace("now reading new frame...");

@@ -164,16 +164,23 @@ public abstract class OpenGateway implements ConnectorListener {
      * @return the {@link Response} messages received as response
      * @throws OWNException on send/response reading error
      */
-    public void sendHighPriority(OpenMessage msg) throws OWNException {
+    public Response sendHighPriority(OpenMessage msg) throws OWNException {
         // TODO sendHighPriority method
-        logger.info("------< sendHighPriority NOT YET IMPLEMENTED >------");
-        logger.info("------< using normal SEND... >------");
-        send(msg);
+        logger.debug("------< sendHighPriority NOT YET IMPLEMENTED, using normal SEND >------");
+        return send(msg);
     }
 
     protected Response sendInternal(OpenMessage msg) throws OWNException {
         return connector.sendCommandSynch(msg.getFrameValue());
     }
+
+    /**
+     * Returns true if CMD connection is ready to send messages (connector must be connected and in case of BUS
+     * connection checks if a CMD was sent recently < 120sec)
+     *
+     * @return boolean
+     */
+    public abstract boolean isCmdConnectionReady();
 
     @Override
     public void onMessage(OpenMessage message) {

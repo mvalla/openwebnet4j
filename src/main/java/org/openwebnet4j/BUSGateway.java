@@ -123,4 +123,14 @@ public class BUSGateway extends OpenGateway {
         return "BUS_" + host + ":" + port;
     }
 
+    @Override
+    public boolean isCmdConnectionReady() {
+        long now = System.currentTimeMillis();
+        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 } /* class */

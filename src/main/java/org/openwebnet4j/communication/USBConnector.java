@@ -202,6 +202,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         // TODO add timeout?
         currentResponse = new Response(BaseOpenMessage.parse(frame));
         cmdChannel.sendFrame(frame);
+        lastCmdFrameSentTs = System.currentTimeMillis();
         logger.info("USB-CMD ====>>>> {}", frame);
         try {
             logger.debug("##USB-conn## [{}] waiting for response to complete...", Thread.currentThread().getName());

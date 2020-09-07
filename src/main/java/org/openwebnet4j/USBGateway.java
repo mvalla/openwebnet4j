@@ -166,4 +166,9 @@ public class USBGateway extends OpenGateway {
     public String toString() {
         return "USB_" + serialPortName;
     }
-} /* class */
+
+    @Override
+    public boolean isCmdConnectionReady() {
+        return (isConnected && connector.isCmdConnected());
+    }
+}

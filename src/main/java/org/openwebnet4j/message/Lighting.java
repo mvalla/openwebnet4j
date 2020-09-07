@@ -23,7 +23,7 @@ import java.util.Map;
 import org.openwebnet4j.OpenDeviceType;
 
 /**
- * OpenWebNet Lighting messages
+ * OpenWebNet Lighting messages (WHO=1)
  *
  * @author M. Valla - Initial contribution
  */
