@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
@@ -53,6 +54,24 @@ public class MessageTest {
             assertEquals(2, lightMsg.getCommandParams()[1]);
             assertEquals(3, lightMsg.getCommandParams()[2]);
             System.out.println(lightMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testAutomation() {
+        Automation automMsg;
+        try {
+            automMsg = (Automation) BaseOpenMessage.parse("*2*1000#0*55##");
+            assertNotNull(automMsg);
+            assertTrue(automMsg.isCommand());
+            assertTrue(automMsg.isCommandTranslation());
+            assertEquals("55", automMsg.getWhere().value());
+            assertEquals(Automation.WHAT.STOP, automMsg.getWhat());
+            assertTrue(automMsg.isStop());
+            assertFalse(automMsg.isUp());
+            System.out.println(automMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();
         }

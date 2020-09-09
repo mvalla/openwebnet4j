@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] - 2020-09-09
+
+### Added
+- Support for WHO=2 Automation
+- OpenConnector.getLastCmdFrameSentTs() and OpenGateway.isCmdConnectionReady()
+
 ## [0.2.0] - 2020-08-07
 
 ### Added

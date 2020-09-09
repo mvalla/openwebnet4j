@@ -214,6 +214,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case LIGHTING:
                 baseopenmsg = new Lighting(frame);
                 break;
+            case AUTOMATION:
+                baseopenmsg = new Automation(frame);
+                break;
             default:
                 break;
         }
@@ -300,10 +303,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Check if message is a command translation (*WHO*1000#WHAT*...##)
      *
-     * @return true if the WHAT part is prefixed with command translation 1000#
+     * @return true if the WHAT part is prefixed with command translation: 1000#
+     * @throws FrameException
      */
     public boolean isCommandTranslation() throws FrameException {
-        if (what == null) {
+        if (isCommand && what == null) {
             parseWhat();
         }
         return commandTranslation;
@@ -313,6 +317,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Returns message command parameters (*WHO*WHAT#Par1#Par2...#ParN*...), or null if no parameters are present
      *
      * @return int[] of command parameters, or null if no parameters
+     * @throws FrameException
      */
     public int[] getCommandParams() throws FrameException {
         if (what == null) {
@@ -325,6 +330,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Returns an array with DIM parameters PAR1..PARN (*#WHO*DIM#PAR1..#PARN*...##)
      *
      * @return a int[] of DIM parameters
+     * @throws FrameException
      */
     public int[] getDimParams() throws FrameException {
         if (dim == null) {
@@ -349,6 +355,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Returns and array with DIM values
      *
      * @return a String[] of DIM values
+     * @throws FrameException
      */
     public String[] getDimValues() throws FrameException {
         if (dim == null) {

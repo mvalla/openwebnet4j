@@ -17,6 +17,7 @@ package org.openwebnet4j;
 import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
+import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Where;
@@ -104,6 +105,20 @@ public class BUSGateway extends OpenGateway {
                         Where w = lmsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, lmsg));
                     }
+                }
+            }
+            // DISCOVER AUTOMATION - request status for all automations: *#2*0##
+            logger.debug("##BUS## ----- AUTOMATION discovery");
+            res = sendInternal(Automation.requestStatus(WhereLightAutom.GENERAL.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof Automation) {
+                    Automation amsg = ((Automation) msg);
+                    OpenDeviceType type = amsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = amsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
+                    }
+
                 }
             }
         } catch (OWNException e) {

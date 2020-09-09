@@ -12,6 +12,7 @@ Supported features:
 Supported frames:
 
 * `WHO=1` Lighting
+* `WHO=2` Automation
 * `WHO=13` Gateway Management
 
 Supported Open Web Net gateways:
@@ -22,7 +23,7 @@ Supported Open Web Net gateways:
 
 - [x] Support numeric passwords (OPEN handshake)
 - [x] Support alphanumeric passwords (HMAC handshake)
-- [ ] Add `WHO=2` Automation (shutters)
+- [x] Support for `WHO=2` Automation (shutters)
 - [ ] Add other `WHOs` (Energy, Thermo, CEN/CEN+, AUX, etc.)
 - [ ] extend OpenConnector.listener to multiple listeners
 - [ ] ZigBee: check isOldFirmware and related gw bugfixes
@@ -34,7 +35,7 @@ Supported Open Web Net gateways:
     <dependency>
       <groupId>com.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.2.0</version>
+      <version>0.3.0</version>
     </dependency>
 ```
 
