@@ -173,6 +173,15 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
+     * OpenWebNet message request for gateway model <b>*#13**15##</b>.
+     *
+     * @return GatewayMgmt message
+     */
+    public static GatewayMgmt requestModel() {
+        return new GatewayMgmt(format(FORMAT_DIMENSION, WHO, "", DIM.MODEL.value()));
+    }
+
+    /**
      * OpenWebNet message request for gateway firmware version <b>*#13**16##</b>.
      *
      * @return GatewayMgmt message
