@@ -303,7 +303,7 @@ public class BUSConnector extends OpenConnector {
             // STEP-2: NO_AUTH - Free beer and party, the connection is unauthenticated!
             frCh.handshakeCompleted = true;
             logger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
-        } else if (fr.matches("\\*#\\d{8,12}##")) {
+        } else if (fr.matches("\\*#\\d{7,12}##")) {
             // STEP-2: OPEN_AUTH passwd nonce received
             doOPENHandshake(fr, frCh);
             frCh.handshakeCompleted = true;
@@ -312,8 +312,9 @@ public class BUSConnector extends OpenConnector {
             doHMACHandshake(fr, frCh);
             frCh.handshakeCompleted = true;
         } else {
-            logger.warn("(HS) ... STEP-2: cannot authenticate with gateway");
-            throw new OWNAuthException("Handshake failed: cannot authenticate with gateway");
+            logger.warn("(HS) ... STEP-2: cannot authenticate with gateway (unexpected answer: {})", fr);
+            throw new OWNAuthException(
+                    "Cannot authenticate with gateway: handshake failed at STEP-2 (unexpected answer: " + fr + ")");
         }
     }
 

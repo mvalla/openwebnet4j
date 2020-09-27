@@ -1,10 +1,20 @@
 # Changelog
 
+## [0.3.1] - TODO====2020-09-09
+
+### Added
+- GatewayManagement.requestModel()
+
+### Fixed
+- add support for OPEN password nonce with less than 8 digits [Fixes #1]
+
+
 ## [0.3.0] - 2020-09-09
 
 ### Added
 - Support for WHO=2 Automation
 - OpenConnector.getLastCmdFrameSentTs() and OpenGateway.isCmdConnectionReady()
+
 
 ## [0.2.0] - 2020-08-07
 
