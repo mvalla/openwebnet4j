@@ -15,11 +15,13 @@
 package org.openwebnet4j.communication;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.openwebnet4j.message.AckOpenMessage;
 import org.openwebnet4j.message.FrameException;
+import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +173,7 @@ public abstract class OpenConnector {
         @Override
         public void run() {
             String fr;
-            logger.debug("{} STARTED", getName());
+            logger.debug("{} - STARTED", getName());
             while (!stopRequested) {
                 try {
                     fr = monChannel.readFrames();
@@ -184,15 +186,44 @@ public abstract class OpenConnector {
                     } else {
                         processFrame(fr);
                     }
+                } catch (SocketTimeoutException st) {
+                    logger.debug("{} - got SocketTimeoutException", getName());
+                    if (stopRequested) {
+                        logger.debug("{} - stopRequested, do nothing.", getName());
+                    } else {
+                        if (!isMonConnected) {
+                            logger.debug("{} - MON is not connected, do nothing.", getName());
+                        } else {
+                            logger.debug("{} - sending CMD message to see if gw is still reachable...", getName());
+                            try {
+                                Response res = sendCommandSynchInternal(GatewayMgmt.requestModel().getFrameValue());
+                                if (res.isSuccess()) {
+                                    logger.debug("{} - gw is still reachable!", getName());
+                                } else {
+                                    handleMonDisconnect(new OWNException(
+                                            getName() + " - gw response while checking if still reachable: " + res,
+                                            st));
+                                    break;
+                                }
+                            } catch (IOException | FrameException e) {
+                                logger.info("{} - Exception while checking if gw is still reachable: {}", getName(),
+                                        e.getMessage());
+                                handleMonDisconnect(new OWNException(getName()
+                                        + " - exception while checking if gw is still reachable: " + e.getMessage(),
+                                        e));
+                                break;
+                            }
+                        }
+                    }
                 } catch (IOException e) {
-                    logger.debug("{} got IOException: {}", getName(), e.getMessage());
+                    logger.info("{} - got IOException: {}", getName(), e.getMessage());
                     if (!stopRequested) {
                         handleMonDisconnect(new OWNException(getName() + " got IOException: " + e.getMessage(), e));
                         break;
                     }
                 }
             }
-            logger.debug("{} thread STOPPED", getName());
+            logger.debug("{} - thread STOPPED", getName());
         }
 
         protected synchronized void stopReceiving() {

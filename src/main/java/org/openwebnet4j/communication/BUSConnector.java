@@ -56,7 +56,7 @@ public class BUSConnector extends OpenConnector {
      * - SOCKET_CONNECT_TIMEOUT when opening a new socket connection to the gateway
      * - CMD_SOCKET_READ_TIMEOUT to wait for an answer on a CMD socket
      * - MON_SOCKET_READ_TIMEOUT to wait for new events from MON socket, if it expires something could be wrong with the
-     * connection with gateway not receiving events anymore, so we close the connection and create a new one
+     * MON connection with gateway not receiving events anymore, so we send a CMD to check if gw is still reachable
      * - HANDSHAKE_TIMEOUT to wait for the handshake process to be completed
      */
     final static int SOCKET_CONNECT_TIMEOUT = 5000; // (ms) time to wait while connecting a new socket to the

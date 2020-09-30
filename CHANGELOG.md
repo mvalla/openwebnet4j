@@ -7,6 +7,7 @@
 
 ### Fixed
 - add support for OPEN password nonce with less than 8 digits [Fixes #1]
+- added check to verify gw is still reachable after MON rcv timetout expires before closing MON connection
 
 
 ## [0.3.0] - 2020-09-09
