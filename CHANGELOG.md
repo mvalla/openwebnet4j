@@ -1,9 +1,10 @@
 # Changelog
 
-## [0.3.1] - TODO====2020-09-09
+## [0.3.1] - 2020-10-03
 
 ### Added
 - GatewayManagement.requestModel()
+- detection of green switch (WHAT 34/39). Limit dimmers detection to WHAT=2-10 values.
 
 ### Fixed
 - add support for OPEN password nonce with less than 8 digits [Fixes #1]

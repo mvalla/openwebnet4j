@@ -45,7 +45,10 @@ public class Lighting extends BaseOpenMessage {
         DIMMER_100(10), // dimmer level=10
         DIMMER_UP(30), // dimmer up one level
         DIMMER_DOWN(31), // dimmer down one level
-        DIMMER_TOGGLE(32); // toggle
+        DIMMER_TOGGLE(32), // toggle
+        // green switch
+        MOVEMENT_DETECTED(34),
+        END_MOVEMENT_DETECTED(39);
 
         private static Map<Integer, WHAT> mapping;
 
@@ -279,9 +282,9 @@ public class Lighting extends BaseOpenMessage {
         if (isCommand()) { // ignore status/dimension frames for detecting device type
             OpenDeviceType type = null;
             What w = getWhat();
-            if (w == WHAT.OFF || w == WHAT.ON) {
+            if (w == WHAT.OFF || w == WHAT.ON || w == WHAT.MOVEMENT_DETECTED || w == WHAT.END_MOVEMENT_DETECTED) {
                 type = OpenDeviceType.SCS_ON_OFF_SWITCH;
-            } else {
+            } else if (w.value() >= 2 && w.value() <= 10) {
                 type = OpenDeviceType.SCS_DIMMER_SWITCH;
             }
             return type;
