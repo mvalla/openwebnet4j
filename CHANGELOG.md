@@ -4,6 +4,7 @@
 
 ### Added
 - `message`, `message.event`, `keepalive`, and `handshake` sub-logs for BUSConnector
+- checkFirmwareVersion() check to USBConnector
 
 ### Fixed
 - Response to device info 2-UNITS for buggy ZigBee gateways

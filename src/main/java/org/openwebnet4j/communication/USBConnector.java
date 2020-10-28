@@ -20,8 +20,10 @@ import java.util.TooManyListenersException;
 
 import org.openwebnet4j.message.AckOpenMessage;
 import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.Dim;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
+import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.slf4j.Logger;
@@ -46,6 +48,18 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private static final int SERIAL_SPEED = 19200; // UART baud as declared in the OWN specs
 
     private final Logger logger = LoggerFactory.getLogger(USBConnector.class);
+    private final Logger msgLogger = LoggerFactory.getLogger(logger.getName() + ".message");
+    private final Logger eventLogger = LoggerFactory.getLogger(logger.getName() + ".message.event");
+    private final Logger hsLogger = LoggerFactory.getLogger(logger.getName() + ".handshake");
+
+    private boolean isOldFirmware = false;
+    private boolean hasAutomationBug = false;
+    private String firmwareVersion = null;
+    private static final String AUTOMATION_BUG_FIRMWARE_VERSION = "1.2.0"; // firmware versions <= than this are
+                                                                           // affected by inverted Automation bug
+    private static final String OLD_FIRMWARE_VERSION = "1.2.3"; // firmware versions <= than this are affected by
+                                                                // Dimension response bug
+
     private final String portName; // the serial port name we are connecting to
     private NRSerialPort serialPort; // the serial port, once connected
 
@@ -70,6 +84,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         logger.debug("##USB-conn## Opening CMD connection to USB ZigBee Gateway on serial port {}...", portName);
         if (serialPort == null) {
             connectUSBDongle(portName);
+            checkFirmwareVersion();
         }
         isCmdConnected = true;
         logger.info("##USB-conn## ============ CMD CONNECTED ============");
@@ -84,6 +99,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         logger.debug("##USB-conn## Opening MON connection to USB ZigBee Gateway on serial port {}...", portName);
         if (serialPort == null) {
             connectUSBDongle(portName);
+            checkFirmwareVersion();
         }
         try {
             // send supervisor to receive all events from devices
@@ -95,6 +111,47 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         logger.info("##USB-conn## ============ MON CONNECTED ============");
     }
 
+    private void checkFirmwareVersion() throws OWNException {
+        try {
+            Response res = sendCommandSynchInternal(GatewayMgmt.requestFirmwareVersion().getFrameValue());
+            if (res != null) {
+                OpenMessage msg = res.getResponseMessages().get(0);
+                if (msg instanceof GatewayMgmt) {
+                    GatewayMgmt gmsg = (GatewayMgmt) msg;
+                    Dim thisDim = gmsg.getDim();
+                    if (thisDim == GatewayMgmt.DIM.FIRMWARE_VERSION) {
+                        try {
+                            firmwareVersion = GatewayMgmt.parseFirmwareVersion(gmsg);
+                            logger.info("##USB-conn## FIRMWARE: {}", firmwareVersion);
+                        } catch (FrameException e) {
+                            logger.warn("##USB-conn## Cannot parse firmware version from message: {}", gmsg);
+                        }
+                    }
+                    if (versionCompare(firmwareVersion, OLD_FIRMWARE_VERSION) <= 0) {
+                        isOldFirmware = true;
+                    }
+                    if (versionCompare(firmwareVersion, AUTOMATION_BUG_FIRMWARE_VERSION) <= 0) {
+                        hasAutomationBug = true;
+                    }
+                    logger.info("##USB-conn## FIRMWARE: hasAutomationBug={}", hasAutomationBug);
+                    logger.info("##USB-conn## FIRMWARE:    isOldFirmware={}", isOldFirmware);
+                }
+
+            }
+        } catch (IOException | FrameException e) {
+            throw new OWNException("Failed to check FirmwareVersion for USB ZigBee Gateway", e);
+        }
+    }
+
+    /**
+     * Returns the firmware version for the connector (e.g. 1.2.3)
+     *
+     * @return String containing firmware version, null if unknown
+     */
+    public String getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
     // TODO add timeout to connect
     private void connectUSBDongle(String portN) throws OWNException {
         if (serialPort == null) {
@@ -104,11 +161,11 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         try {
             // send requestKeepConnect to see if USB stick is ready to receive commands
             GatewayMgmt frame = GatewayMgmt.requestKeepConnect();
-            cmdChannel.sendFrame(GatewayMgmt.requestKeepConnect().getFrameValue()); //
-            logger.info("(HS) USB HS==>>>> {}", frame.getFrameValue());
-            Thread.sleep(50); // !!! we must wait few ms for the answer to be ready
+            cmdChannel.sendFrame(GatewayMgmt.requestKeepConnect().getFrameValue());
+            hsLogger.info("(HS) USB HS==>>>> {}", frame.getFrameValue());
+            Thread.sleep(50); // we must wait few ms for the answer to be ready
             String resp = cmdChannel.readFrames();
-            logger.info("(HS) USB <<<<==HS {}", resp);
+            hsLogger.info("(HS) USB <<<<==HS {}", resp);
             if (!OpenMessage.FRAME_ACK.equals(resp)) {
                 throw new OWNException("Could not communicate with a USB ZigBee Gateway on serial port: " + portN
                         + ". Serial returned: " + resp);
@@ -165,12 +222,6 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
                     sp.getReceiveThreshold());
             logger.debug("##USB-conn## isReceiveTimeoutEnabled={} v={}", sp.isReceiveTimeoutEnabled(),
                     sp.getReceiveTimeout());
-            // activation of serialEvent callback (it's the default!)
-            // sp.notifyOnDataAvailable(true);
-            // } catch (UnsupportedCommOperationException e) {
-            // throw new OWNException("Failed to connect to serial port: " + portN, e);
-            // }
-            // logger.debug("Sucessfully set comms parameters");
             return connectPort;
         } else {
             logger.warn("Failed to connect to serial port {}", ident.getName());
@@ -203,7 +254,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         currentResponse = new Response(BaseOpenMessage.parse(frame));
         cmdChannel.sendFrame(frame);
         lastCmdFrameSentTs = System.currentTimeMillis();
-        logger.info("USB-CMD ====>>>> {}", frame);
+        msgLogger.info("USB-CMD ====>>>> {}", frame);
         try {
             logger.debug("##USB-conn## [{}] waiting for response to complete...", Thread.currentThread().getName());
             currentResponse.waitResponse();
@@ -213,7 +264,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
         final Response res = currentResponse;
         currentResponse = null;
-        logger.info("USB-CMD <<<<==== {}", res.getResponseMessages());
+        msgLogger.info("USB-CMD <<<<==== {}", res.getResponseMessages());
         return res;
     }
 
@@ -234,30 +285,38 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             if (msg.isACK() || msg.isNACK()) {
                 logger.warn("##USB-conn## Recevied ACK/NACK without a command waiting, skipping it");
             } else {
-                logger.info("USB-MON <<<<<<<< {}", newFrame);
+                eventLogger.info("USB-MON <<<<<<<< {}", newFrame);
                 notifyListener(msg);
             }
-        } else { // a command is waiting for response, let's add them to the response object
-            // TODO handle the BUSY_NACK case
-            logger.debug("USB-CMD   <<==   {}", newFrame);
-            currentResponse.addResponse(msg);
-            if (currentResponse.hasFinalResponse()) {
-                // we received an ACK/NACK, so let's signal response is ready to the waiting thread
-                logger.trace("##USB-conn## USB final response: {}", currentResponse);
-                currentResponse.responseReady();
+        } else {
+            if (!currentResponse.hasFinalResponse()) {
+                // a command is waiting for response messages, let's add them to the response object
+                // TODO handle the BUSY_NACK case
+                msgLogger.debug("USB-CMD   <<==   {}", newFrame);
+                currentResponse.addResponse(msg);
+                if (currentResponse.hasFinalResponse()) {
+                    // we received an ACK/NACK, so let's signal response is ready to the waiting thread
+                    logger.trace("##USB-conn## USB final response: {}", currentResponse);
+                    currentResponse.responseReady();
+                } else {
+                    fixDimensionResponseBug();
+                }
             } else {
-                fixDimensionResponseBug();
+                logger.warn(
+                        "##USB-conn## a command is waiting but has already a final response -> processing frame as event");
+                eventLogger.info("USB-MON <<<<<<<< {}", newFrame);
+                notifyListener(msg);
             }
         }
     }
 
     private void fixDimensionResponseBug() {
-        if (!currentResponse.getRequest().isCommand()) {
-            // FIXME check if this is required for old/new USB sticks : isOldFirmware
-            // add virtual ACK to old USB sticks that do not return an ACK after dimension response
-            logger.debug("##USB-conn## BUGFIX for older USB sticks: adding final ACK");
+        if (isOldFirmware && !currentResponse.getRequest().isCommand()
+                && currentResponse.getRequest() instanceof Lighting) {
+            // add virtual ACK to older USB gateways that do not return an ACK after dimension response
+            logger.debug("##USB-conn## BUGFIX for older USB gateways: adding final ACK");
             currentResponse.addResponse(AckOpenMessage.ACK);
-            logger.debug("USB-CMD   <<==   {}", AckOpenMessage.ACK);
+            msgLogger.debug("USB-CMD   <<==   {}", AckOpenMessage.ACK);
             currentResponse.responseReady();
         }
     }
@@ -306,4 +365,35 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
     }
 
+    /**
+     * Compares two version strings.
+     *
+     * Use this instead of String.compareTo() for a non-lexicographical
+     * comparison that works for version strings. e.g. "1.10".compareTo("1.6").
+     *
+     * @note It does not work if "1.10" is supposed to be equal to "1.10.0".
+     *
+     * @param str1 a string of ordinal numbers separated by decimal points.
+     * @param str2 a string of ordinal numbers separated by decimal points.
+     * @return The result is a negative integer if str1 is _numerically_ less than str2.
+     *         The result is a positive integer if str1 is _numerically_ greater than str2.
+     *         The result is zero if the strings are _numerically_ equal.
+     */
+    private static int versionCompare(String str1, String str2) {
+        String[] vals1 = str1.split("\\.");
+        String[] vals2 = str2.split("\\.");
+        int i = 0;
+        // set index to first non-equal ordinal or length of shortest version string
+        while (i < vals1.length && i < vals2.length && vals1[i].equals(vals2[i])) {
+            i++;
+        }
+        // compare first non-equal ordinal number
+        if (i < vals1.length && i < vals2.length) {
+            int diff = Integer.valueOf(vals1[i]).compareTo(Integer.valueOf(vals2[i]));
+            return Integer.signum(diff);
+        }
+        // the strings are equal or one string is a substring of the other
+        // e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
+        return Integer.signum(vals1.length - vals2.length);
+    }
 }
