@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.2] - 2020-10-xxTODO
+
+### Added
+- `message`, `message.event`, `keepalive`, and `handshake` sub-logs for BUSConnector
+
 ## [0.3.1] - 2020-10-03
 
 ### Added

@@ -82,6 +82,10 @@ public class BUSConnector extends OpenConnector {
     String pwd;
 
     private final Logger logger = LoggerFactory.getLogger(BUSConnector.class);
+    private final Logger msgLogger = LoggerFactory.getLogger(logger.getName() + ".message");
+    private final Logger eventLogger = LoggerFactory.getLogger(logger.getName() + ".message.event");
+    private final Logger kaLogger = LoggerFactory.getLogger(logger.getName() + ".keepalive");
+    private final Logger hsLogger = LoggerFactory.getLogger(logger.getName() + ".handshake");
 
     public BUSConnector(String host, int port, String pwd) {
         super();
@@ -136,11 +140,11 @@ public class BUSConnector extends OpenConnector {
             logger.debug("##BUS-conn## ^^^^^^^^ REUSED    CONNECTION    ^^^^^^^^");
             return r;
         } catch (IOException ie) {
-            logger.debug("##BUS-conn## Exception: {}", ie.getMessage());
+            logger.warn("##BUS-conn## Exception: {}", ie.getMessage());
             // CMD session could have been closed by gateway, let's close this one an try with another CMD connection
             cmdSk.close();
             isCmdConnected = false;
-            logger.info("##BUS-conn## trying with NEW CMD connection...");
+            logger.warn("##BUS-conn## trying with NEW CMD connection...");
             try {
                 openCmdConn();
             } catch (OWNException oe) {
@@ -169,25 +173,25 @@ public class BUSConnector extends OpenConnector {
         Response res = new Response(BaseOpenMessage.parse(frame));
         cmdChannel.sendFrame(frame);
         lastCmdFrameSentTs = System.currentTimeMillis();
-        logger.info("BUS-CMD ====>>>> {}", frame);
+        msgLogger.info("BUS-CMD ====>>>> {}", frame);
         String fr;
         while (!res.hasFinalResponse()) {
             logger.trace("now reading new frame...");
             fr = cmdChannel.readFrames();
             if (fr != null) {
                 res.addResponse(BaseOpenMessage.parse(fr));
-                logger.debug("BUS-CMD   <<==   {}", fr);
+                msgLogger.debug("BUS-CMD   <<==   {}", fr);
             } else {
                 throw new IOException("Received null frame while reading responses to command");
             }
         }
-        logger.info("BUS-CMD <<<<==== {}", res.getResponseMessages());
+        msgLogger.info("BUS-CMD <<<<==== {}", res.getResponseMessages());
         return res;
     }
 
     @Override
     protected void processFrame(String newFrame) {
-        logger.info("BUS-MON <<<<<<<< {}", newFrame);
+        eventLogger.info("BUS-MON <<<<<<<< {}", newFrame);
         OpenMessage msg;
         try {
             msg = BaseOpenMessage.parse(newFrame);
@@ -219,7 +223,7 @@ public class BUSConnector extends OpenConnector {
                 logger.trace("##BUS-conn## sending MON keepalive ACK");
                 try {
                     monChannel.sendFrame(OpenMessage.FRAME_ACK);
-                    logger.info("BUS-MON =KA=>>>> {}", OpenMessage.FRAME_ACK);
+                    kaLogger.info("BUS-MON =KA=>>>> {}", OpenMessage.FRAME_ACK);
                 } catch (IOException e) {
                     logger.debug("##BUS-conn## could not send MON keepalive ACK: exception={}", e.getMessage());
                 }
@@ -275,34 +279,34 @@ public class BUSConnector extends OpenConnector {
         startHandshakeTimeout(frCh);
         String fr;
         // STEP-1: wait for ACK from GW
-        logger.debug("(HS) ... STEP-1: receive ACK from GW");
+        hsLogger.debug("(HS) ... STEP-1: receive ACK from GW");
         fr = frCh.readFrames();
-        logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+        hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
         if (!(OpenMessage.FRAME_ACK.equals(fr))) {
-            logger.warn("(HS) ... STEP-1: HANDSHAKE FAILED, no ACK recevied, received: {}", fr);
+            hsLogger.warn("(HS) ... STEP-1: HANDSHAKE FAILED, no ACK recevied, received: {}", fr);
             throw new OWNAuthException("Could not open BUS-" + type + " connection to " + host + ":" + port
                     + " (no ACK received at STEP-1, received: " + fr + ")");
         }
-        logger.debug("(HS) ... STEP-1: first ACK received");
+        hsLogger.debug("(HS) ... STEP-1: first ACK received");
         // STEP-2: send session request and check for ACK/NACK/NONCE/HMAC from GW
         String session = (type == MON_TYPE ? MON_SESSION : CMD_SESSION);
-        logger.debug("(HS) ... STEP-2: send session request {} ... ", session);
+        hsLogger.debug("(HS) ... STEP-2: send session request {} ... ", session);
         frCh.sendFrame(session);
-        logger.info("(HS) BUS-{} HS==>>>> {}", type, session);
+        hsLogger.info("(HS) BUS-{} HS==>>>> {}", type, session);
         fr = frCh.readFrames();
-        logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+        hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
         if (OpenMessage.FRAME_NACK.equals(fr) && type == CMD_TYPE) {
             // try alt CMD session
-            logger.debug("(HS) ... STEP-2: received NACK, trying CMD_SESSION_ALT ...");
+            hsLogger.debug("(HS) ... STEP-2: received NACK, trying CMD_SESSION_ALT ...");
             frCh.sendFrame(CMD_SESSION_ALT);
-            logger.info("(HS) {} HS==>>>> {}", frCh.getName(), CMD_SESSION_ALT);
+            hsLogger.info("(HS) {} HS==>>>> {}", frCh.getName(), CMD_SESSION_ALT);
             fr = frCh.readFrames();
-            logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+            hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
         }
         if (OpenMessage.FRAME_ACK.equals(fr)) {
             // STEP-2: NO_AUTH - Free beer and party, the connection is unauthenticated!
             frCh.handshakeCompleted = true;
-            logger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
+            hsLogger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
         } else if (fr.matches("\\*#\\d{7,12}##")) {
             // STEP-2: OPEN_AUTH passwd nonce received
             doOPENHandshake(fr, frCh);
@@ -312,7 +316,7 @@ public class BUSConnector extends OpenConnector {
             doHMACHandshake(fr, frCh);
             frCh.handshakeCompleted = true;
         } else {
-            logger.warn("(HS) ... STEP-2: cannot authenticate with gateway (unexpected answer: {})", fr);
+            hsLogger.warn("(HS) ... STEP-2: cannot authenticate with gateway (unexpected answer: {})", fr);
             throw new OWNAuthException(
                     "Cannot authenticate with gateway: handshake failed at STEP-2 (unexpected answer: " + fr + ")");
         }
@@ -320,91 +324,91 @@ public class BUSConnector extends OpenConnector {
 
     private void doOPENHandshake(String nonceFrame, FrameChannel frCh) throws IOException, OWNAuthException {
         String nonce = nonceFrame.substring(2, nonceFrame.length() - 2);
-        logger.debug("(HS) ... STEP-2: OPEN_AUTH: received nonce={} ... ", nonce);
+        hsLogger.debug("(HS) ... STEP-2: OPEN_AUTH: received nonce={} ... ", nonce);
         // STEP-3: send pwd and check ACK
         String pwdMessage;
         try {
             pwdMessage = OpenMessage.FRAME_START_DIM + Auth.calcOpenPass(pwd, nonce) + OpenMessage.FRAME_END;
         } catch (NumberFormatException e) {
-            logger.warn("(HS) ... STEP-3: OPEN_AUTH: invalid gateway password. Password must contain only digits");
+            hsLogger.warn("(HS) ... STEP-3: OPEN_AUTH: invalid gateway password. Password must contain only digits");
             throw new OWNAuthException("Invalid gateway password. Password must contain only digits (OPEN_AUTH)");
         }
-        logger.debug("(HS) ... STEP-3: OPEN_AUTH: sending encoded pwd ... ");
+        hsLogger.debug("(HS) ... STEP-3: OPEN_AUTH: sending encoded pwd ... ");
         frCh.sendFrame(pwdMessage);
-        logger.info("(HS) {} HS==>>>> {}", frCh.getName(), pwdMessage);
+        hsLogger.info("(HS) {} HS==>>>> {}", frCh.getName(), pwdMessage);
         String fr = frCh.readFrames();
-        logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+        hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
         if (OpenMessage.FRAME_ACK.equals(fr)) {
-            logger.debug("(HS) ... STEP-3: OPEN_AUTH: pwd accepted ==HANDSHAKE COMPLETED==");
+            hsLogger.debug("(HS) ... STEP-3: OPEN_AUTH: pwd accepted ==HANDSHAKE COMPLETED==");
             return;
         } else {
-            logger.warn("(HS) ... STEP-3: OPEN_AUTH: pwd NOT ACCEPTED");
+            hsLogger.warn("(HS) ... STEP-3: OPEN_AUTH: pwd NOT ACCEPTED");
             throw new OWNAuthException("Password not accepted by gateway, check password configuration (OPEN_AUTH)");
         }
     }
 
     private void doHMACHandshake(String hmacType, FrameChannel frCh) throws IOException, OWNAuthException {
-        logger.debug("(HS) ... STEP-2: HMAC_AUTH: HMAC type received: {}, sending ACK ... ", hmacType);
+        hsLogger.debug("(HS) ... STEP-2: HMAC_AUTH: HMAC type received: {}, sending ACK ... ", hmacType);
 
         // STEP-3: send ACK, wait for HMAC Ra and -based on that- calculate HMAC-encoded pwd
         frCh.sendFrame(OpenMessage.FRAME_ACK);
-        logger.info("(HS) {} HS==>>>> {}", frCh.getName(), OpenMessage.FRAME_ACK);
+        hsLogger.info("(HS) {} HS==>>>> {}", frCh.getName(), OpenMessage.FRAME_ACK);
         String fr = frCh.readFrames();
-        logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+        hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
         Pattern pattern = Pattern.compile("\\*#(\\d{80,128})##");
         Matcher matcher = pattern.matcher(fr);
         if (matcher.find()) {
             // STEP-3: HMAC Ra received, calculate HMAC-encoded pwd
             String raDigits = matcher.group(1);
-            logger.debug("(HS) ... STEP-3: HMAC_AUTH: Ra digits received: {} ...", raDigits);
+            hsLogger.debug("(HS) ... STEP-3: HMAC_AUTH: Ra digits received: {} ...", raDigits);
             String ra = Auth.digitToHex(raDigits);
-            logger.trace("(HS) ...       Ra  = {}", ra);
+            hsLogger.trace("(HS) ...       Ra  = {}", ra);
             String rb = Auth.calcHmacRb();
-            logger.trace("(HS) ...       Rb  = {}", rb);
+            hsLogger.trace("(HS) ...       Rb  = {}", rb);
             String a = "736F70653E";
             logger.trace("(HS) ...       A   = {}", a);
             String b = "636F70653E";
-            logger.trace("(HS) ...       B   = {}", b);
-            logger.trace("(HS) ...       pwd = {}", pwd);
+            hsLogger.trace("(HS) ...       B   = {}", b);
+            hsLogger.trace("(HS) ...       pwd = {}", pwd);
             String kab = Auth.calcSHA256(pwd);
-            logger.trace("(HS) ...       Kab = {}", kab);
+            hsLogger.trace("(HS) ...       Kab = {}", kab);
             String hmacRaRbABKab = Auth.calcSHA256(ra + rb + a + b + kab);
-            logger.trace("(HS) ... STEP-3: HMAC_AUTH: HMAC(Ra,Rb,A,B,Kab) = {}", hmacRaRbABKab);
+            hsLogger.trace("(HS) ... STEP-3: HMAC_AUTH: HMAC(Ra,Rb,A,B,Kab) = {}", hmacRaRbABKab);
 
             // STEP-4: send calculated HMAC-encoded pwd and check final hash
             String hmacMessage = OpenMessage.FRAME_START_DIM + Auth.hexToDigit(rb) + "*"
                     + Auth.hexToDigit(hmacRaRbABKab) + OpenMessage.FRAME_END;
-            logger.debug("(HS) ... STEP-4: HMAC_AUTH: sending <Rb, HMAC(Ra,Rb,A,B,Kab)> ... ");
+            hsLogger.debug("(HS) ... STEP-4: HMAC_AUTH: sending <Rb, HMAC(Ra,Rb,A,B,Kab)> ... ");
             frCh.sendFrame(hmacMessage);
-            logger.info("(HS) {} HS==>>>> {}", frCh.getName(), hmacMessage);
+            hsLogger.info("(HS) {} HS==>>>> {}", frCh.getName(), hmacMessage);
             fr = frCh.readFrames();
-            logger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
+            hsLogger.info("(HS) {} <<<<==HS {}", frCh.getName(), fr);
 
             if (OpenMessage.FRAME_NACK.equals(fr)) {
-                logger.warn("(HS) ... STEP-4: HMAC_AUTH: pwd NOT ACCEPTED");
+                hsLogger.warn("(HS) ... STEP-4: HMAC_AUTH: pwd NOT ACCEPTED");
                 throw new OWNAuthException("Password not accepted by gateway, check password configuration (HMAC)");
             } else {
                 matcher = pattern.matcher(fr);
                 if (matcher.find()) {
                     // STEP-4: verify final hash
                     String hmacRaRbKab = Auth.digitToHex(matcher.group(1));
-                    logger.trace("(HS) ... STEP-4: HMAC_AUTH: final hash HMAC(Ra, Rb, Kab) received: {} ...",
+                    hsLogger.trace("(HS) ... STEP-4: HMAC_AUTH: final hash HMAC(Ra, Rb, Kab) received: {} ...",
                             hmacRaRbKab);
                     if (Auth.calcSHA256(ra + rb + kab).equals(hmacRaRbKab)) {
-                        logger.trace("(HS) ... STEP-4: HMAC_AUTH:  HMAC(Ra, Rb, Kab) --MATCH--, sending ACK ...");
+                        hsLogger.trace("(HS) ... STEP-4: HMAC_AUTH:  HMAC(Ra, Rb, Kab) --MATCH--, sending ACK ...");
                         frCh.sendFrame(OpenMessage.FRAME_ACK);
-                        logger.info("(HS) {} HS==>>>> {}", frCh.getName(), OpenMessage.FRAME_ACK);
-                        logger.debug("(HS) ... STEP-4: HMAC_AUTH: final ACK sent ==HANDSHAKE COMPLETED==");
+                        hsLogger.info("(HS) {} HS==>>>> {}", frCh.getName(), OpenMessage.FRAME_ACK);
+                        hsLogger.debug("(HS) ... STEP-4: HMAC_AUTH: final ACK sent ==HANDSHAKE COMPLETED==");
                         return;
                     } else {
-                        logger.warn(
+                        hsLogger.warn(
                                 "(HS) ... STEP-4: HMAC_AUTH: HANDSHAKE FAILED, final HMAC(Ra, Rb, Kab) does not match. Received HMAC(Ra, Rb, Kab)={}",
                                 hmacRaRbKab);
                         throw new OWNAuthException(
                                 "Handshake failed, final HMAC(Ra, Rb, Kab) does not match (HMAC_AUTH STEP-4)");
                     }
                 } else {
-                    logger.warn(
+                    hsLogger.warn(
                             "(HS) ... STEP-4: HMAC_AUTH: HANDSHAKE FAILED, invalid HMAC(Ra, Rb, Kab) received. Response={}",
                             fr);
                     throw new OWNAuthException(
@@ -412,7 +416,7 @@ public class BUSConnector extends OpenConnector {
                 }
             }
         } else {
-            logger.warn("(HS) ... STEP-3: HMAC_AUTH: HANDSHAKE FAILED, invalid Ra received. Response={}", fr);
+            hsLogger.warn("(HS) ... STEP-3: HMAC_AUTH: HANDSHAKE FAILED, invalid Ra received. Response={}", fr);
             throw new OWNAuthException("Handshake failed, no Ra received from GW at HMAC STEP-3: " + fr);
         }
     }
