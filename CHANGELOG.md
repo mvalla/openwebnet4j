@@ -5,6 +5,9 @@
 ### Added
 - `message`, `message.event`, `keepalive`, and `handshake` sub-logs for BUSConnector
 
+### Fixed
+- Response to device info 2-UNITS for buggy ZigBee gateways
+
 ## [0.3.1] - 2020-10-03
 
 ### Added

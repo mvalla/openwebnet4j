@@ -83,23 +83,36 @@ public class FrameChannel {
             if (size > 0) {
                 String longFrame = new String(buf, 0, size);
                 logger.trace("-FC-{}   <---   {}", name, longFrame);
-                // FIXME this is a fix to handle an error of the gateway in the response to device info 2-UNITS
+                // This is a fix to a bug on older Zigbee gateways in the response to device info
+                // 2-UNITS where an ACK is added after each unit and not just at the end
                 if (longFrame.contains("#9*66*")) { // it's a response to device info
-                    // perform another read to receive the 2-UNITS info
-                    if ((size = readUntilDelimiter(in, buf)) != -1) {
+                    // perform another read to receive more 2-UNITS info, if any
+                    if ((size = readUntilDelimiter(in, buf)) > 0) {
                         String otherFrame = new String(buf, 0, size);
                         logger.trace("-FC-{}   <---   {}", name, otherFrame);
-                        if (longFrame.regionMatches(0, otherFrame, 0, 12)) {
-                            // frames refer to same ZigBee device: remove first ACK
-                            logger.debug("-FC- BUGFIX!!! Removing ACK from device info response");
-                            longFrame = longFrame.replace(OpenMessage.FRAME_ACK, "");
-                        }
                         longFrame += otherFrame;
+                        if (OpenMessage.FRAME_ACK.equals(otherFrame) && (size = readUntilDelimiter(in, buf)) > 0) {
+                            otherFrame = new String(buf, 0, size);
+                            logger.trace("-FC-{}   <---   {}", name, otherFrame);
+                            longFrame += otherFrame;
+                            if (longFrame.regionMatches(0, otherFrame, 0, 12)) {
+                                // frames refer to same ZigBee device: remove first ACK
+                                logger.debug("-FC- BUGFIX!!! Removing ACK from device info response");
+                                longFrame = longFrame.replace(OpenMessage.FRAME_ACK, "");
+                                // read final ACK
+                                if ((size = readUntilDelimiter(in, buf)) > 0) {
+                                    otherFrame = new String(buf, 0, size);
+                                    logger.trace("-FC-{}   <---   {}", name, otherFrame);
+                                    longFrame += otherFrame;
+                                }
+                            }
+                        }
                     }
                 }
                 // end-of-fix
 
                 if (longFrame.contains(OpenMessage.FRAME_END)) {
+                    logger.debug("-FC-{} <------- {}", name, longFrame);
                     String[] frames = longFrame.split(OpenMessage.FRAME_END);
                     // add each single frame queue
                     for (String singleFrame : frames) {
@@ -108,7 +121,7 @@ public class FrameChannel {
                 } else {
                     throw new IOException("Error in readFrameMulti(): no delimiter found on stream: " + longFrame);
                 }
-                logger.info("-FC-{} <------- {}", name, readFrames.toString());
+                logger.info("-FC-{} <------- READ FRAMES: {}", name, readFrames.toString());
                 return readFrames.remove();
             } else {
                 logger.debug("-FC-{} <------- NO DATA (size={})", name, size);
@@ -122,7 +135,7 @@ public class FrameChannel {
     /**
      * Reads from InputStream until delimiter, putting data into buffer
      *
-     * @returns number of bytes read
+     * @returns number of bytes read, or -1 in case of end of stream
      * @throws IOException in case of problems with the InputStream
      */
     private int readUntilDelimiter(InputStream is, byte[] buffer) throws IOException {
@@ -135,7 +148,7 @@ public class FrameChannel {
         do {
             cint = is.read();
             if (cint == -1) {
-                logger.debug("-FC-{} readUntilDelimiter() returned -1 (end of stream)", name);
+                logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
                 return numBytes;
             } else {
                 buffer[numBytes++] = (byte) cint;
