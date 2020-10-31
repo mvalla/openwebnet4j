@@ -19,6 +19,7 @@ import java.util.Enumeration;
 import java.util.TooManyListenersException;
 
 import org.openwebnet4j.message.AckOpenMessage;
+import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.Dim;
 import org.openwebnet4j.message.FrameException;
@@ -54,6 +55,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
 
     private boolean isOldFirmware = false;
     private boolean hasAutomationBug = false;
+
     private String firmwareVersion = null;
     private static final String AUTOMATION_BUG_FIRMWARE_VERSION = "1.2.0"; // firmware versions <= than this are
                                                                            // affected by inverted Automation bug
@@ -251,10 +253,13 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     @Override
     protected synchronized Response sendCommandSynchInternal(String frame) throws IOException, FrameException {
         // TODO add timeout?
-        currentResponse = new Response(BaseOpenMessage.parse(frame));
-        cmdChannel.sendFrame(frame);
+        OpenMessage msg = BaseOpenMessage.parse(frame);
+        currentResponse = new Response(msg); // FIXME check if we have to store original or modified message
+        msg = fixInvertedUpDownBug(msg);
+        String frameSend = msg.getFrameValue();
+        cmdChannel.sendFrame(frameSend);
         lastCmdFrameSentTs = System.currentTimeMillis();
-        msgLogger.info("USB-CMD ====>>>> {}", frame);
+        msgLogger.info("USB-CMD ====>>>> {}", frameSend);
         try {
             logger.debug("##USB-conn## [{}] waiting for response to complete...", Thread.currentThread().getName());
             currentResponse.waitResponse();
@@ -299,7 +304,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
                     logger.trace("##USB-conn## USB final response: {}", currentResponse);
                     currentResponse.responseReady();
                 } else {
+                    // perform fixes to compensate bugs of older gateways
                     fixDimensionResponseBug();
+                    msg = fixInvertedUpDownBug(msg);
                 }
             } else {
                 logger.warn(
@@ -310,15 +317,34 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
     }
 
+    /*
+     * Add final ACK to older USB gateways that do not return an ACK after dimension response
+     */
     private void fixDimensionResponseBug() {
         if (isOldFirmware && !currentResponse.getRequest().isCommand()
                 && currentResponse.getRequest() instanceof Lighting) {
-            // add virtual ACK to older USB gateways that do not return an ACK after dimension response
             logger.debug("##USB-conn## BUGFIX for older USB gateways: adding final ACK");
             currentResponse.addResponse(AckOpenMessage.ACK);
             msgLogger.debug("USB-CMD   <<==   {}", AckOpenMessage.ACK);
             currentResponse.responseReady();
         }
+    }
+
+    /*
+     * Bugfix to invert UP/DOWN for older USB gateways
+     */
+    private OpenMessage fixInvertedUpDownBug(OpenMessage msg) {
+        if (hasAutomationBug && msg instanceof Automation) {
+            try {
+                logger.debug("##USB-conn## older firmware: converting Automation UP / DOWN on message: {}", msg);
+                return Automation.convertUpDown((Automation) msg);
+            } catch (FrameException fe) {
+                logger.warn(
+                        "##USB-conn## older firmware: FrameException while converting Automation UP/DOWN message: {}.",
+                        msg);
+            }
+        }
+        return msg;
     }
 
     @Override

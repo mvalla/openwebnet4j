@@ -5,6 +5,7 @@
 ### Added
 - `message`, `message.event`, `keepalive`, and `handshake` sub-logs for BUSConnector
 - checkFirmwareVersion() check to USBConnector
+- fixInvertedUpDownBug() to invert UP/DOWN for older USB gateways
 
 ### Fixed
 - Response to device info 2-UNITS for buggy ZigBee gateways

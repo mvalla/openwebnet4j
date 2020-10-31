@@ -189,6 +189,21 @@ public class Automation extends BaseOpenMessage {
         }
     }
 
+    /**
+     * Convert an Automation message UP<>DOWN
+     *
+     * @return converted Automation message
+     */
+    public static Automation convertUpDown(Automation autmsg) throws FrameException {
+        if (autmsg.isUp()) {
+            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
+        } else if (autmsg.isDown()) {
+            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
+        } else {
+            return autmsg;
+        }
+    }
+
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr == null) {
