@@ -9,6 +9,7 @@
 
 ### Fixed
 - Response to device info 2-UNITS for buggy ZigBee gateways
+- Discovery of 2-UNITS Zigbee switch modules 
 
 ## [0.3.1] - 2020-10-03
 
