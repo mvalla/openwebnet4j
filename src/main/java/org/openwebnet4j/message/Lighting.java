@@ -128,6 +128,7 @@ public class Lighting extends BaseOpenMessage {
 
     protected Lighting(String value) {
         super(value);
+        this.who = Who.LIGHTING;
     }
 
     /**
@@ -206,8 +207,7 @@ public class Lighting extends BaseOpenMessage {
      */
     public int parseDimmerLevel100() throws FrameException {
         if (getDim() == Lighting.DIM.DIMMER_LEVEL_100) {
-            getDimValues();
-            int level100 = Integer.parseInt(dimValues[0]);
+            int level100 = Integer.parseInt(getDimValues()[0]);
             if (level100 >= DIMMER_LEVEL_100_OFF && level100 <= DIMMER_LEVEL_100_MAX) {
                 return level100 - 100;
             } else {
@@ -267,7 +267,7 @@ public class Lighting extends BaseOpenMessage {
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr == null) {
-            throw new FrameException("Frame has no WHERE part: " + whereStr);
+            throw new FrameException("Lighting frame has no WHERE part: " + whereStr);
         } else {
             if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
                 where = new WhereZigBee(whereStr);

@@ -27,6 +27,7 @@ import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereZigBee;
+import org.openwebnet4j.message.Who;
 
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
@@ -37,13 +38,35 @@ import org.openwebnet4j.message.WhereZigBee;
 public class MessageTest {
 
     @Test
+    public void testLightingOn() {
+        /*
+         * Lighting lM = Lighting.requestTurnOn("789309801#9");
+         * assertNotNull(lM.getWhere());
+         * assertEquals("789309801#9", lM.getWhere().value());
+         */
+        Lighting lightMsg = Lighting.requestTurnOn("0311#4#01");
+
+        assertNotNull(lightMsg);
+        assertEquals(Who.LIGHTING, lightMsg.getWho());
+        assertNull(lightMsg.getDim());
+        assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
+        assertNotNull(lightMsg.getWhere());
+        assertTrue(lightMsg.isCommand());
+        assertEquals("0311#4#01", lightMsg.getWhere().value());
+        assertTrue(lightMsg.isOn());
+        assertFalse(lightMsg.isOff());
+    }
+
+    @Test
     public void testLightingCommandTranslationAndParams() {
         Lighting lightMsg;
         try {
             lightMsg = (Lighting) BaseOpenMessage.parse("*1*1000#1#1#2#3*0311#4#01##");
             assertNotNull(lightMsg);
+            assertEquals(Who.LIGHTING, lightMsg.getWho());
             assertTrue(lightMsg.isCommand());
             assertTrue(lightMsg.isCommandTranslation());
+            assertNull(lightMsg.getDim());
             assertEquals("0311#4#01", lightMsg.getWhere().value());
             assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
             assertTrue(lightMsg.isOn());
@@ -65,8 +88,10 @@ public class MessageTest {
         try {
             automMsg = (Automation) BaseOpenMessage.parse("*2*1000#0*55##");
             assertNotNull(automMsg);
+            assertEquals(Who.AUTOMATION, automMsg.getWho());
             assertTrue(automMsg.isCommand());
             assertTrue(automMsg.isCommandTranslation());
+            assertNull(automMsg.getDim());
             assertEquals("55", automMsg.getWhere().value());
             assertEquals(Automation.WHAT.STOP, automMsg.getWhat());
             assertTrue(automMsg.isStop());
@@ -83,6 +108,7 @@ public class MessageTest {
         try {
             lightMsg = (Lighting) BaseOpenMessage.parse("*1*1*702053501#9##");
             assertNotNull(lightMsg);
+            assertEquals(Who.LIGHTING, lightMsg.getWho());
             WhereZigBee wz = (WhereZigBee) (lightMsg.getWhere());
             assertEquals("702053501#9", wz.value());
             assertEquals(WhereZigBee.UNIT_01, wz.getUnit());
@@ -116,6 +142,7 @@ public class MessageTest {
         try {
             gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**16*1*2*3##");
             assertNotNull(gwMsg);
+            assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
             assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimValues());
@@ -136,6 +163,7 @@ public class MessageTest {
             gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**#16#5#4*255*3##");
             // TODO change test frame with an existing one from Energy mgmt
             assertNotNull(gwMsg);
+            assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
             assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimParams());
@@ -152,4 +180,14 @@ public class MessageTest {
         }
     }
 
+    @Test
+    public void testGatewayMgmt() {
+        GatewayMgmt gwMsg = GatewayMgmt.requestMACAddress();
+        assertNotNull(gwMsg);
+        assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
+        assertFalse(gwMsg.isCommand());
+        assertEquals(GatewayMgmt.DIM.MAC_ADDRESS, gwMsg.getDim());
+        assertNull(gwMsg.getWhere());
+        assertNull(gwMsg.getWhat());
+    }
 }

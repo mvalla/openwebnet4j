@@ -128,6 +128,7 @@ public class GatewayMgmt extends BaseOpenMessage {
 
     protected GatewayMgmt(String value) {
         super(value);
+        this.who = Who.GATEWAY_MANAGEMENT;
     }
 
     /**

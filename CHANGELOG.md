@@ -3,23 +3,24 @@
 ## [0.3.2] - 2020-10-xxTODO
 
 ### Added
-- `message`, `message.event`, `keepalive`, and `handshake` sub-logs for BUSConnector
+- `message`, `message.event`, `keepalive`, and `handshake` sub-logs in BUSConnector
 - checkFirmwareVersion() check to USBConnector
-- fixInvertedUpDownBug() to invert UP/DOWN for older USB gateways
+- [zigbee] fixInvertedUpDownBug() to invert UP/DOWN for older ZigBee USB gateways
 
 ### Fixed
-- Response to device info 2-UNITS for buggy ZigBee gateways
-- Discovery of 2-UNITS Zigbee switch modules 
+- [zigbee] Response to device info 2-UNITS for buggy older ZigBee USB gateways
+- [zigbee] Discovery of 2-UNITS Zigbee switch modules 
+- Improved message parsing for late parsing and sub-parts and related tests; changed isCommand() to abstract
 
 ## [0.3.1] - 2020-10-03
 
 ### Added
 - GatewayManagement.requestModel()
-- detection of green switch (WHAT 34/39). Limit dimmers detection to WHAT=2-10 values.
+- Detection of green switch (WHAT 34/39). Limit dimmers detection to WHAT=2-10 values.
 
 ### Fixed
-- add support for OPEN password nonce with less than 8 digits [Fixes #1]
-- added check to verify gw is still reachable after MON rcv timetout expires before closing MON connection
+- Add support for OPEN password nonce with less than 8 digits [Fixes #1]
+- Added check to verify gw is still reachable after MON rcv timetout expires before closing MON connection
 
 
 ## [0.3.0] - 2020-09-09
@@ -35,7 +36,7 @@
 - Support for numeric (OPEN) and alphanumeric (HMAC) passwords
 
 ### Changed
-- changed monKeepaliveTimer to schedule to avoid MON message flood after standby
+- Changed monKeepaliveTimer to schedule to avoid MON message flood after standby
 
 
 ## [0.1.0] - 2020-07-11

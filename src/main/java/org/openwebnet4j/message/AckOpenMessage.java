@@ -26,12 +26,17 @@ public class AckOpenMessage extends OpenMessage {
     public static final AckOpenMessage NACK = new AckOpenMessage(FRAME_NACK);
     public static final AckOpenMessage BUSY_NACK = new AckOpenMessage(FRAME_BUSY_NACK);
 
-    public AckOpenMessage(String frame) {
+    protected AckOpenMessage(String frame) {
         this.frameValue = frame;
     }
 
     @Override
     public String toStringVerbose() {
         return "<" + frameValue + ">";
+    }
+
+    @Override
+    public boolean isCommand() {
+        return false;
     }
 }

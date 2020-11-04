@@ -108,6 +108,7 @@ public class Automation extends BaseOpenMessage {
 
     protected Automation(String value) {
         super(value);
+        this.who = Who.AUTOMATION;
     }
 
     /**
