@@ -114,12 +114,17 @@ public class Response {
     }
 
     protected synchronized void waitResponse() {
-        try {
-            wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IllegalMonitorStateException e) {
-            e.printStackTrace();
+        if (finalResponse == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IllegalMonitorStateException e) {
+                e.printStackTrace();
+            }
+        } else {
+            logger.debug("REQ={} has already a final response set (={}) -> no need to wait", requestMessage.toString(),
+                    finalResponse);
         }
     }
 

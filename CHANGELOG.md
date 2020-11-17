@@ -11,6 +11,7 @@
 - [zigbee] Response to device info 2-UNITS for buggy older ZigBee USB gateways
 - [zigbee] Discovery of 2-UNITS Zigbee switch modules 
 - Improved message parsing for late parsing and sub-parts and related tests; changed isCommand() to abstract
+- [zigbee] Improved USBConnector for concurrent events and request/response interleaving
 
 ## [0.3.1] - 2020-10-03
 

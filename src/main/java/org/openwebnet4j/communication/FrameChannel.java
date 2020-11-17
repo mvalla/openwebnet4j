@@ -112,19 +112,19 @@ public class FrameChannel {
                 // end-of-fix
 
                 if (longFrame.contains(OpenMessage.FRAME_END)) {
-                    logger.debug("-FC-{} <------- {}", name, longFrame);
+                    logger.trace("-FC-{} <------- {}", name, longFrame);
                     String[] frames = longFrame.split(OpenMessage.FRAME_END);
-                    // add each single frame queue
+                    // add each single frame to the queue
                     for (String singleFrame : frames) {
                         readFrames.add(singleFrame + OpenMessage.FRAME_END);
                     }
                 } else {
-                    throw new IOException("Error in readFrameMulti(): no delimiter found on stream: " + longFrame);
+                    throw new IOException("Error in readFrames(): no delimiter found on stream: " + longFrame);
                 }
-                logger.info("-FC-{} <------- READ FRAMES: {}", name, readFrames.toString());
+                logger.debug("-FC-{} <------- {}", name, readFrames.toString());
                 return readFrames.remove();
             } else {
-                logger.debug("-FC-{} <------- NO DATA (size={})", name, size);
+                logger.debug("-FC-{} |<--     NO DATA (size={})", name, size);
                 return null;
             }
         } else {
@@ -133,7 +133,7 @@ public class FrameChannel {
     }
 
     /**
-     * Reads from InputStream until delimiter, putting data into buffer
+     * Reads from InputStream until delimiter ('##'), putting data into buffer
      *
      * @returns number of bytes read, or -1 in case of end of stream
      * @throws IOException in case of problems with the InputStream
@@ -148,7 +148,7 @@ public class FrameChannel {
         do {
             cint = is.read();
             if (cint == -1) {
-                logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
+                logger.trace("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
                 return numBytes;
             } else {
                 buffer[numBytes++] = (byte) cint;

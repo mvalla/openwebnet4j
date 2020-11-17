@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link USBgateway} to connect to USB OpenWebNet gateways using {@link USBConnector}
+ * Class {@link USBGateway} to connect to ZigBee USB Gateways using {@link USBConnector}
  *
  * @author M. Valla - Initial contribution
  *
@@ -56,7 +56,6 @@ public class USBGateway extends OpenGateway {
     protected void initConnector() {
         connector = new USBConnector(serialPortName);
         logger.info("##USB## Init USB ({})...", serialPortName);
-
     }
 
     @Override
