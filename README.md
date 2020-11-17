@@ -25,6 +25,7 @@ Supported Open Web Net gateways:
 - [x] Support alphanumeric passwords (HMAC handshake)
 - [x] Support for `WHO=2` Automation (shutters)
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
+- [ ] add sendHighPriority with priority queue
 - [ ] Add other `WHOs` (Energy, Thermo, CEN/CEN+, AUX, etc.)
 - [ ] extend OpenConnector.listener to multiple listeners
 
@@ -52,10 +53,7 @@ try {
         System.out.println("Request successful");
     }
     // requests status light WHERE=51
-    res = myGateway.send(Lighting.requestStatus("51"));
-    if (res.isSuccess()) {
-        System.out.println("Light is: " + ((Lighting) res.getResponseMessages().get(0)).getWhat());
-    }
+    myGateway.send(Lighting.requestStatus("51"));
 } catch (OWNException e) {...}
 ```
 

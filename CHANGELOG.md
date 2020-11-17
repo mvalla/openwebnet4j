@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.2] - 2020-10-xxTODO
+## [0.3.2] - 2020-11-17
 
 ### Added
 - `message`, `message.event`, `keepalive`, and `handshake` sub-logs in BUSConnector
@@ -12,6 +12,7 @@
 - [zigbee] Discovery of 2-UNITS Zigbee switch modules 
 - Improved message parsing for late parsing and sub-parts and related tests; changed isCommand() to abstract
 - [zigbee] Improved USBConnector for concurrent events and request/response interleaving
+
 
 ## [0.3.1] - 2020-10-03
 
