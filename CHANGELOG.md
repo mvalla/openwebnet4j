@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.2-1] - 2020-11-21
+
+### Fixed
+- Import-Package in bundle manifest to accept gnu.io versions [3.12,6)
+- Updated dependencies versions
+
 ## [0.3.2] - 2020-11-17
 
 ### Added
