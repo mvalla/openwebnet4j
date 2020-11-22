@@ -262,6 +262,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case AUTOMATION:
                 baseopenmsg = new Automation(frame);
                 break;
+            case THERMOREGULATION:
+                baseopenmsg = new Thermoregulation(frame);
+                break;
             default:
                 break;
         }
