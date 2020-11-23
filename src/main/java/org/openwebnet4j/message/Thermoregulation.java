@@ -19,14 +19,7 @@ public class Thermoregulation extends BaseOpenMessage {
         UNKNOWN(-1),
         COOL(0),
         HEAT(1),
-        SET_POINT_TEMPERATURE(14),
-        REQUEST_TEMPERATURE(0),
-        OFF(303),
-        AUTOMATIC(311);
-        // AUTO("AUTO"),
-        // MANUAL("MANUAL"),
-        // PROTECTION("PROTECTION"),
-        // OFF("OFF");
+        OFF(303);
 
         private static Map<Integer, WHAT> mapping;
 
@@ -54,7 +47,39 @@ public class Thermoregulation extends BaseOpenMessage {
         public Integer value() {
             return value;
         }
+    }
 
+    public enum DIM implements Dim {
+        REQUEST_TEMPERATURE(0),
+        SET_POINT_TEMPERATURE(14),
+        REQUEST_SET_POINT_TEMPERATURE(14);
+
+        private static Map<Integer, DIM> mapping;
+
+        private final int value;
+
+        private DIM(Integer value) {
+            this.value = value;
+        }
+
+        private static void initMapping() {
+            mapping = new HashMap<Integer, DIM>();
+            for (DIM d : values()) {
+                mapping.put(d.value, d);
+            }
+        }
+
+        public static DIM fromValue(int i) {
+            if (mapping == null) {
+                initMapping();
+            }
+            return mapping.get(i);
+        }
+
+        @Override
+        public Integer value() {
+            return value;
+        }
     }
 
     protected Thermoregulation(String value) {
@@ -66,10 +91,27 @@ public class Thermoregulation extends BaseOpenMessage {
         return WHAT.fromValue(i);
     }
 
+    @Override
+    protected Dim dimFromValue(int i) {
+        return DIM.fromValue(i);
+    }
+
     private static final int WHO = THERMOREGULATION.value();
 
     /**
-     * OpenWebNet message request to turn the thermostat <i>OFF</i> <b>*4*303*where##</b>.
+     * OpenWebNet message to Manual setting of “N” zone to T temperature <b>*#4*where*#14*T*M##</b>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation setPointTemperature(String what, String temperature, String mode) {
+        System.out.println(format(FORMAT_SETTING, WHO, what, DIM.SET_POINT_TEMPERATURE.value(), temperature, mode));
+        return new Thermoregulation(
+                format(FORMAT_SETTING, WHO, what, DIM.SET_POINT_TEMPERATURE.value(), temperature, mode));
+    }
+
+    /**
+     * OpenWebNet message request to turn off the thermostat <i>OFF</i> <b>*4*303*where##</b>.
      *
      * @param where WHERE string
      * @return message
@@ -85,37 +127,27 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestTemperature(String w) {
-        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, WHAT.REQUEST_TEMPERATURE.value));
+        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.REQUEST_TEMPERATURE.value()));
     }
 
     /**
-     * OpenWebNet message request to set a temperature to the selected Thermostat<b>*#4*where*#14*T*M##</b>.
+     * OpenWebNet message request the current Thermostat Set Point temperature<b>*#4*where*14##</b>.
      *
      * @param where WHERE string
      * @return message
      */
     public static Thermoregulation requestSetPointTemperature(String w) {
-        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, WHAT.SET_POINT_TEMPERATURE.value));
+        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.REQUEST_SET_POINT_TEMPERATURE.value()));
     }
 
     /**
-     * OpenWebNet message request light status <b>*#1*WHERE##</b>.
+     * OpenWebNet message request to get a Thermostat device status <b>*#4*where##</b>.
      *
      * @param where WHERE string
      * @return message
      */
     public static Thermoregulation requestStatus(String w) {
         return new Thermoregulation(format(FORMAT_STATUS, WHO, w));
-    }
-
-    /**
-     * OpenWebNet message request to set Thermostat in Automatic Mode<b>*4*311*#where##</b>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static Thermoregulation setAutomaticMode(String w) {
-        return new Thermoregulation(format(FORMAT_REQUEST, WHO, WHAT.AUTOMATIC.value, w));
     }
 
     @Override
@@ -125,11 +157,6 @@ public class Thermoregulation extends BaseOpenMessage {
         } else {
             where = new WhereLightAutom(whereStr);
         }
-    }
-
-    @Override
-    protected Dim dimFromValue(int i) {
-        return null;
     }
 
     @Override
@@ -143,5 +170,4 @@ public class Thermoregulation extends BaseOpenMessage {
             return null;
         }
     }
-
 }
