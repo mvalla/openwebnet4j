@@ -31,6 +31,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private final Logger logger = LoggerFactory.getLogger(BaseOpenMessage.class);
 
     protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
+    protected static final String FORMAT_SETTING = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 

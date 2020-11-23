@@ -25,6 +25,7 @@ import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereZigBee;
 
@@ -32,9 +33,22 @@ import org.openwebnet4j.message.WhereZigBee;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
+ * @contributor G. Cocchi
  */
 
 public class MessageTest {
+
+    @Test
+    public void testThermoRegulationCommand() {
+        Thermoregulation thermoregulationMsg;
+        try {
+            thermoregulationMsg = (Thermoregulation) BaseOpenMessage.parse("*#4*2##");
+            assertNotNull(thermoregulationMsg);
+            System.out.println(thermoregulationMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
 
     @Test
     public void testLightingCommandTranslationAndParams() {
