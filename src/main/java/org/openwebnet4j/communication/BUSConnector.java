@@ -140,7 +140,7 @@ public class BUSConnector extends OpenConnector {
             logger.debug("##BUS-conn## ^^^^^^^^ REUSED    CONNECTION    ^^^^^^^^");
             return r;
         } catch (IOException ie) {
-            logger.warn("##BUS-conn## Exception: {}", ie.getMessage());
+            logger.debug("##BUS-conn## Exception: {}", ie.getMessage());
             // CMD session could have been closed by gateway, let's close this one an try with another CMD connection
             cmdSk.close();
             isCmdConnected = false;
@@ -148,7 +148,7 @@ public class BUSConnector extends OpenConnector {
             try {
                 openCmdConn();
             } catch (OWNException oe) {
-                logger.error(
+                logger.warn(
                         "##BUS-conn## openCommandConnection() returned exception ({}) while opening NEW CMD connection",
                         oe.getMessage());
                 throw new IOException("Cannot create NEW CMD connection to send message " + frame, oe);
@@ -158,7 +158,7 @@ public class BUSConnector extends OpenConnector {
                 logger.debug("##BUS-conn## ^^^^^^^^ USED NEW    CONNECTION    ^^^^^^^^");
                 return r;
             } catch (IOException | FrameException e) {
-                logger.error("##BUS-conn## sendCmdAndReadResp() returned exception ({}) using NEW connection",
+                logger.warn("##BUS-conn## sendCmdAndReadResp() returned exception ({}) using NEW connection",
                         e.getMessage());
                 throw (e);
             }

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.3.3-SNAPSHOT] - 2020-??-??
+
+### Changed
+- Bumped nrjavaserial to 5.2.1
+
 ## [0.3.2-1] - 2020-11-21
 
 ### Fixed

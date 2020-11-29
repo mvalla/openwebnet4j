@@ -25,8 +25,12 @@ Supported Open Web Net gateways:
 - [x] Support alphanumeric passwords (HMAC handshake)
 - [x] Support for `WHO=2` Automation (shutters)
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
+- Add other `WHOs`
+    - [ ] Energy
+    - [ ] Thermo
+    - [ ] CEN/CEN+
+    - [ ] AUX
 - [ ] add sendHighPriority with priority queue
-- [ ] Add other `WHOs` (Energy, Thermo, CEN/CEN+, AUX, etc.)
 - [ ] extend OpenConnector.listener to multiple listeners
 
 ## Dependency Management
