@@ -40,9 +40,9 @@ public class MessageTest {
     @Test
     public void testLightingOn() {
         /*
-         * Lighting lM = Lighting.requestTurnOn("789309801#9");
-         * assertNotNull(lM.getWhere());
-         * assertEquals("789309801#9", lM.getWhere().value());
+         * Lighting lm = Lighting.requestTurnOn("789309801#9");
+         * assertNotNull(lm.getWhere());
+         * assertEquals("789309801#9", lm.getWhere().value());
          */
         Lighting lightMsg = Lighting.requestTurnOn("0311#4#01");
 
@@ -121,6 +121,21 @@ public class MessageTest {
     }
 
     @Test
+    public void testMalformedCmdAndDimFrames() {
+        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
+        for (String frame : wrongFrames) {
+            try {
+                BaseOpenMessage.parse(frame);
+                // if we can parse this message, this test fails
+                Assertions.fail("MalformedFrameException not detected: " + frame);
+            } catch (FrameException e) {
+                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                assertTrue(e instanceof MalformedFrameException);
+            }
+        }
+    }
+
+    @Test
     public void testUnknownUnsupportedWho() {
         OpenMessage msg = null;
         try {
@@ -133,7 +148,24 @@ public class MessageTest {
         } catch (FrameException e) {
             assertTrue(e instanceof UnsupportedFrameException);
         }
+        try {
+            msg = BaseOpenMessage.parse("*#5*0##");
+        } catch (FrameException e) {
+            assertTrue(e instanceof UnsupportedFrameException);
+        }
         assertNull(msg);
+    }
+
+    @Test
+    public void testUnsupportedWhat() {
+        OpenMessage msg = null;
+        try {
+            msg = BaseOpenMessage.parse("*2*4*11##");
+            BaseOpenMessage bmsg = (BaseOpenMessage) msg;
+            System.out.println(bmsg.toStringVerbose());
+        } catch (FrameException e) {
+            assertTrue(e instanceof UnsupportedFrameException);
+        }
     }
 
     @Test

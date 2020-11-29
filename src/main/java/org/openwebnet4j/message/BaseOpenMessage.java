@@ -30,6 +30,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     private final Logger logger = LoggerFactory.getLogger(BaseOpenMessage.class);
 
+    protected static final int MAX_FRAME_LENGTH = 1024; // max OWN frame length
     protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
@@ -63,14 +64,15 @@ public abstract class BaseOpenMessage extends OpenMessage {
     @Override
     public boolean isCommand() {
         if (isCommand == null) {
-            isCommand = new Boolean(!(frameValue.startsWith(FRAME_START_DIM))).booleanValue();
+            isCommand = Boolean.valueOf(!(frameValue.startsWith(FRAME_START_DIM)));
         }
         return isCommand;
     }
 
     /*
-     * Parses the frame and returns a new OpenMessage object. Parser uses a "lazy approach": other parts (WHERE, WHAT,
-     * DIM, etc.) are not parsed until requested.
+     * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach": other parts (WHERE,
+     * WHAT,
+     * DIM, parameters, etc.) are not parsed until requested.
      *
      * @param frame the frame String to parse
      *
@@ -89,12 +91,23 @@ public abstract class BaseOpenMessage extends OpenMessage {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException("Frame does not end with frame terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
         } else if (!frame.startsWith(FRAME_START)) {
             throw new MalformedFrameException("Frame does not start with '*' or '*#'");
+        }
+        if (frame.length() > MAX_FRAME_LENGTH) {
+            throw new MalformedFrameException("Frame length is > " + MAX_FRAME_LENGTH);
+        }
+        // check if there are bad characters
+        for (char c : frame.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                if (c != '#' && c != '*') {
+                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
+                }
+            }
         }
         String[] parts = getPartsStrings(frame);
         // parts[0] is empty, first is WHO
@@ -109,13 +122,14 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     private static String[] getPartsStrings(String frame) throws MalformedFrameException {
-        // remove trailing "##" and get frame sections separated by '*'
+        // remove trailing "##" and get frame parts separated by '*'
         String[] parts = frame.substring(0, frame.length() - 2).split("\\*");
         if (parts.length == 0) {
             throw new MalformedFrameException("Invalid frame");
         }
         if (parts.length < 3) { // every OWN frame must have at least 2 '*'
-            throw new MalformedFrameException("Every frame must have at least 2 '*'");
+            throw new MalformedFrameException(
+                    "Cmd/Dim frames must have at least 2 non-empty sections separated by '*'");
         }
         return parts;
     }
@@ -164,7 +178,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 }
                 parseWhat();
             } catch (FrameException e) {
-                logger.warn("Exception getting WHAT for frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} for frame {}", e.getMessage(), frameValue);
             }
         }
         return what;
@@ -183,7 +197,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 }
                 parseWhere();
             } catch (FrameException e) {
-                logger.warn("Exception getting WHERE for frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} for frame {}", e.getMessage(), frameValue);
             }
         }
         return where;
@@ -202,7 +216,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 }
                 parseDim();
             } catch (FrameException e) {
-                logger.warn("Exception getting DIM for frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} for frame {}", e.getMessage(), frameValue);
             }
         }
         return dim;
@@ -279,19 +293,18 @@ public abstract class BaseOpenMessage extends OpenMessage {
                     isCommandTranslation = false;
                 }
                 what = whatFromValue(Integer.parseInt(parts[partsIndex]));
+                commandParams = new int[0];
                 if (what == null) {
-                    throw new UnsupportedFrameException("Unsupported WHAT: " + whatStr);
+                    throw new UnsupportedFrameException("Unsupported WHAT=" + whatStr);
                 }
                 if (parts.length > 1) { // copy command parameters into commandParams
                     commandParams = new int[parts.length - partsIndex - 1];
                     for (int i = 0; i < commandParams.length; i++) {
                         commandParams[i] = Integer.parseInt(parts[i + partsIndex + 1]);
                     }
-                } else {
-                    commandParams = new int[0];
                 }
             } catch (NumberFormatException e) {
-                throw new MalformedFrameException("Invalid integer format in WHAT: " + whatStr);
+                throw new MalformedFrameException("Invalid integer format in WHAT=" + whatStr);
             }
         }
     }
@@ -351,7 +364,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message command parameters (*WHO*WHAT#Par1#Par2...#ParN*...), or empty array if no parameters are present
+     * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if no parameters are
+     * present
      *
      * @return int[] of command parameters, or empty array if no parameters are present
      * @throws FrameException
@@ -421,23 +435,26 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     @Override
     public String toStringVerbose() {
-        String verbose = "<" + frameValue + ">{WHO=" + getWho();
+        String verbose = "<" + frameValue + ">{" + getWho();
         try {
             if (isCommand()) {
-                verbose += ",WHAT=" + getWhat();
+                verbose += "-" + getWhat();
                 if (isCommandTranslation()) {
                     verbose += "(translation)";
                 }
                 if (getCommandParams().length > 0) {
                     verbose += ",cmdParams=" + Arrays.toString(getCommandParams());
                 }
+                if (getWhere() != null) {
+                    verbose += "," + getWhere();
+                }
             } else {
-                verbose += ",dim=" + getDim();
+                verbose += "-" + getDim();
                 if (isDimWriting()) {
-                    verbose += "(writing)";
+                    verbose += " (writing)";
                 }
                 if (getWhere() != null) {
-                    verbose += ",WHERE=" + getWhere().value();
+                    verbose += "," + getWhere();
                 }
                 if (getDimParams().length > 0) {
                     verbose += ",dimParams=" + Arrays.toString(getDimParams());
@@ -447,7 +464,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 }
             }
         } catch (FrameException e) {
-            logger.warn("error during toStringVerbose()", e);
+            logger.warn("Error during toStringVerbose()", e);
             e.printStackTrace();
         }
         return verbose + "}";

@@ -2,6 +2,9 @@
 
 ## [0.3.3-SNAPSHOT] - 2020-??-??
 
+### Added
+- Frame length and bad char checks to BaseOpenMessage
+
 ### Changed
 - Bumped nrjavaserial to 5.2.1
 
