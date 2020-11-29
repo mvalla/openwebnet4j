@@ -232,6 +232,14 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
     }
 
+    private void disconnectSerialPort() {
+        if (serialPort != null) {
+            serialPort.disconnect();
+            logger.debug("##USB-conn## Serial port {} DISCONNECTED", portName);
+            serialPort = null;
+        }
+    }
+
     private String listSerialPorts() {
         StringBuilder sb = new StringBuilder();
         Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
@@ -350,38 +358,45 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
 
     @Override
     public void serialEvent(SerialPortEvent event) {
-        if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-            String frame = null;
-            logger.debug("##USB-conn## START Processing DATA_AVAILABLE event...");
-            do {
-                try {
-                    frame = cmdChannel.readFrames();
-                } catch (IOException e) {
-                    logger.error("##USB-conn## IOException while reading frames from DATA_AVAILABLE event: {}",
-                            e.getMessage());
-                }
-                if (frame == null) {
-                    logger.trace(
-                            "##USB-conn## no more frames to read from DATA_AVAILABLE event (readFrames() returned {})",
-                            frame);
-                } else {
-                    processFrame(frame);
-                }
-            } while (frame != null);
-            logger.trace("##USB-conn## END processing DATA_AVAILABLE event");
-        } else {
-            logger.debug("##USB-conn## serialEvent() - unhandled event type: {}", event.getEventType());
+        int eventType = event.getEventType();
+        switch (eventType) {
+            case SerialPortEvent.DATA_AVAILABLE:
+                String frame = null;
+                logger.debug("##USB-conn## START Processing DATA_AVAILABLE event...");
+                do {
+                    try {
+                        frame = cmdChannel.readFrames();
+                    } catch (IOException e) {
+                        logger.error("##USB-conn## IOException while reading frames from DATA_AVAILABLE event: {}",
+                                e.getMessage());
+                    }
+                    if (frame == null) {
+                        logger.trace(
+                                "##USB-conn## no more frames to read from DATA_AVAILABLE event (readFrames() returned {})",
+                                frame);
+                    } else {
+                        processFrame(frame);
+                    }
+                } while (frame != null);
+                logger.trace("##USB-conn## END processing DATA_AVAILABLE event");
+                break;
+            case 11: // Event is defined from nrjavaserial > 5.1.0 - 11 = SerialPortEvent.HARDWARE_ERROR
+                logger.warn("##USB-conn## serialEvent received HARDWARE_ERROR event: disconnecting serial port {}...",
+                        portName);
+                disconnectCmdChannel();
+                disconnectSerialPort();
+                handleMonDisconnect(new OWNException("Serial port " + portName + " received HARDWARE_ERROR event"));
+                break;
+            default:
+                logger.debug("##USB-conn## serialEvent() received unhandled event type: {}", event.getEventType());
+                break;
         }
     }
 
     @Override
     public void disconnect() {
         super.disconnect();
-        if (serialPort != null) {
-            serialPort.disconnect();
-            logger.debug("##USB-conn## Serial port {} DISCONNECTED", portName);
-            serialPort = null;
-        }
+        disconnectSerialPort();
     }
 
     /**

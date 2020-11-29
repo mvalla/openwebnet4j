@@ -118,12 +118,12 @@ public abstract class OpenConnector {
         try {
             return sendCommandSynchInternal(frame);
         } catch (IOException e) {
-            logger.error("##OPEN-conn## IOException while sending frame {} or reading response: {}", frame,
+            logger.debug("##OPEN-conn## IOException while sending frame {} or reading response: {}", frame,
                     e.getMessage());
             throw new OWNException(
                     "IOException while sending frame " + frame + " or reading response: " + e.getMessage(), e);
         } catch (FrameException e) {
-            logger.error("##OPEN-conn## FrameException while sending frame {} or reading response: {}", frame,
+            logger.warn("##OPEN-conn## FrameException while sending frame {} or reading response: {}", frame,
                     e.getMessage());
             throw new OWNException(
                     "FrameException while sending frame " + frame + " or reading response: " + e.getMessage(), e);
@@ -148,7 +148,7 @@ public abstract class OpenConnector {
                         Thread.currentThread().getName(), msg);
                 listener.onMessage(msg);
             } catch (Exception e) {
-                logger.error("##OPEN-conn## Error while notifying message {} to listener: {}", msg, e.getMessage());
+                logger.warn("##OPEN-conn## Error while notifying message {} to listener: {}", msg, e.getMessage());
                 e.printStackTrace();
             }
         });
@@ -194,7 +194,7 @@ public abstract class OpenConnector {
                         if (!isMonConnected) {
                             logger.debug("{} - MON is not connected, do nothing.", getName());
                         } else {
-                            logger.debug("{} - sending CMD message to see if gw is still reachable...", getName());
+                            logger.info("{} - sending CMD message to see if gw is still reachable...", getName());
                             try {
                                 Response res = sendCommandSynchInternal(GatewayMgmt.requestModel().getFrameValue());
                                 if (res.isSuccess()) {
@@ -206,7 +206,7 @@ public abstract class OpenConnector {
                                     break;
                                 }
                             } catch (IOException | FrameException e) {
-                                logger.info("{} - Exception while checking if gw is still reachable: {}", getName(),
+                                logger.debug("{} - Exception while checking if gw is still reachable: {}", getName(),
                                         e.getMessage());
                                 handleMonDisconnect(new OWNException(getName()
                                         + " - exception while checking if gw is still reachable: " + e.getMessage(),
@@ -216,7 +216,7 @@ public abstract class OpenConnector {
                         }
                     }
                 } catch (IOException e) {
-                    logger.info("{} - got IOException: {}", getName(), e.getMessage());
+                    logger.debug("{} - got IOException: {}", getName(), e.getMessage());
                     if (!stopRequested) {
                         handleMonDisconnect(new OWNException(getName() + " got IOException: " + e.getMessage(), e));
                         break;
@@ -237,10 +237,7 @@ public abstract class OpenConnector {
      */
     protected void handleMonDisconnect(OWNException e) {
         logger.debug("##OPEN-conn## handleMonDisconnect() OWNException={}", e.getMessage());
-        isMonConnected = false;
-        if (monChannel != null) {
-            monChannel.disconnect();
-        }
+        disconnectMonChannel();
         listener.onMonDisconnected(e);
     }
 
@@ -249,21 +246,28 @@ public abstract class OpenConnector {
      */
     public void disconnect() {
         logger.debug("##OPEN-conn## OpenConnector.disconnect() ...");
-        isCmdConnected = false;
-        isMonConnected = false;
         if (monRcvThread != null) {
             logger.debug("##OPEN-conn## ... sending STOP to MON RcvThread ...");
             monRcvThread.stopReceiving();
             monRcvThread = null;
         }
         logger.debug("##OPEN-conn## ... closing all streams ...");
-        if (cmdChannel != null) {
-            cmdChannel.disconnect();
-        }
+        disconnectCmdChannel();
+        disconnectMonChannel();
+        logger.debug("##OPEN-conn## ... all streams closed!");
+    }
+
+    protected void disconnectMonChannel() {
+        isMonConnected = false;
         if (monChannel != null) {
             monChannel.disconnect();
         }
-        logger.debug("##OPEN-conn## ... all streams closed!");
+    }
 
+    protected void disconnectCmdChannel() {
+        isCmdConnected = false;
+        if (cmdChannel != null) {
+            cmdChannel.disconnect();
+        }
     }
 }
