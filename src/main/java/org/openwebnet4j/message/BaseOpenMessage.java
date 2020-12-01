@@ -216,7 +216,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 }
                 parseDim();
             } catch (FrameException e) {
-                logger.warn("{} for frame {}", e.getMessage(), frameValue);
+                logger.warn("{} - frame {}", e.getMessage(), frameValue);
             }
         }
         return dim;
@@ -318,7 +318,6 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Parse DIM, its params and values and assigns it to {@link dim}, {@link dimParams} and {@link dimValues}
      * attributes
-     *
      */
     private void parseDim() throws FrameException {
         if (dimStr == null) {
@@ -357,10 +356,18 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @throws FrameException
      */
     public boolean isCommandTranslation() throws FrameException {
-        if (isCommandTranslation == null) {
-            getWhat();
+        if (isCommand()) {
+            if (isCommandTranslation == null) {
+                getWhat(); // by parsing what we get command translation
+            }
+        } else {
+            isCommandTranslation = false;
         }
-        return isCommandTranslation;
+        if (isCommandTranslation != null) {
+            return isCommandTranslation.booleanValue();
+        } else {
+            return false;
+        }
     }
 
     /**

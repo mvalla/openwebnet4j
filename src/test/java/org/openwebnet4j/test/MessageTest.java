@@ -91,11 +91,26 @@ public class MessageTest {
             assertEquals(Who.AUTOMATION, automMsg.getWho());
             assertTrue(automMsg.isCommand());
             assertTrue(automMsg.isCommandTranslation());
-            assertNull(automMsg.getDim());
             assertEquals("55", automMsg.getWhere().value());
+            assertNull(automMsg.getDim());
             assertEquals(Automation.WHAT.STOP, automMsg.getWhat());
             assertTrue(automMsg.isStop());
             assertFalse(automMsg.isUp());
+            System.out.println(automMsg.toStringVerbose());
+            // advanced motor actuator
+            automMsg = (Automation) BaseOpenMessage.parse("*#2*55*10*10*100*0*0##");
+            assertNotNull(automMsg);
+            assertEquals(Who.AUTOMATION, automMsg.getWho());
+            assertFalse(automMsg.isCommand());
+            assertFalse(automMsg.isCommandTranslation());
+            assertEquals("55", automMsg.getWhere().value());
+            assertEquals(Automation.DIM.SHUTTER_STATUS, automMsg.getDim());
+            assertNotNull(automMsg.getDimValues());
+            assertEquals(4, automMsg.getDimValues().length);
+            assertEquals("10", automMsg.getDimValues()[0]);
+            assertEquals("100", automMsg.getDimValues()[1]);
+            assertEquals("0", automMsg.getDimValues()[2]);
+            assertEquals("0", automMsg.getDimValues()[3]);
             System.out.println(automMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();

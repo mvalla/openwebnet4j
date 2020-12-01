@@ -68,7 +68,8 @@ public class Automation extends BaseOpenMessage {
     }
 
     public enum DIM implements Dim {
-        DIMMER_LEVEL_100(1);
+        SHUTTER_STATUS(10),
+        GOTO_LEVEL(11);
 
         private static Map<Integer, DIM> mapping;
 

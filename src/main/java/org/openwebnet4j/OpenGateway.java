@@ -129,10 +129,10 @@ public abstract class OpenGateway implements ConnectorListener {
                         }
                     }
                 } catch (OWNAuthException ae) { // in case of auth exception, we stop re-trying
-                    logger.warn("--...re-connect FAILED. OWNAuthException: {}", ae.getMessage());
+                    logger.warn("--Re-connect FAILED. OWNAuthException: {}", ae.getMessage());
                     throw ae;
                 } catch (OWNException e) {
-                    logger.warn("--...error while re-connecting. Exception: {}", e.getMessage());
+                    logger.debug("--Error while re-connecting: {}", e.getMessage());
                     retry = retry * RECCONECT_RETRY_MULTIPLIER;
                     if (retry >= RECONNECT_RETRY_AFTER_MAX) {
                         retry = RECONNECT_RETRY_AFTER_MAX;
