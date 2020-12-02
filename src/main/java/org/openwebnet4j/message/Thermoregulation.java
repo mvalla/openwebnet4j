@@ -128,6 +128,7 @@ public class Thermoregulation extends BaseOpenMessage {
         OFFSET(13),
         TEMP_SETPOINT(14),
         PROBE_TEMPERATURE(15),
+        VALVES_STATUS(19),
         ACTUATOR_STATUS(20),
         ACTUATOR_STATUS_ON(1),
         ACTUATOR_STATUS_OFF(0);
@@ -221,14 +222,23 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to get a Thermostat device status <b>*#4*where##</b>.
+     * OpenWebNet message N zone device status request <b>*#4*where##</b>.
      *
      * @param where WHERE string
      * @return message
      */
     public static Thermoregulation requestStatus(String w) {
-        System.out.println("requestStatus: " + format(FORMAT_STATUS, WHO, w));
         return new Thermoregulation(format(FORMAT_STATUS, WHO, w));
+    }
+
+    /**
+     * OpenWebNet message N zone valves status request<b>*#4*where*19##</b>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestValvesStatus(String w) {
+        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.VALVES_STATUS.value()));
     }
 
     @Override
