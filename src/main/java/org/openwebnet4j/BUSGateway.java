@@ -20,6 +20,7 @@ import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.slf4j.Logger;
@@ -117,9 +118,23 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
+
+            // DISCOVER THERMOREGULATION - request status for all thermoregulation devices: *#4*0##
+            logger.debug("##BUS## ----- THERMOREGULATION discovery");
+            res = sendInternal(Thermoregulation.requestStatus(WhereLightAutom.GENERAL.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof Automation) {
+                    Thermoregulation amsg = ((Thermoregulation) msg);
+                    OpenDeviceType type = amsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = amsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
+                    }
+                }
+            }
+
         } catch (OWNException e) {
-            logger.error(
-                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -138,9 +153,7 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected
-                && connector.isCmdConnected()
-                && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
             return true;
         } else {
             return false;
