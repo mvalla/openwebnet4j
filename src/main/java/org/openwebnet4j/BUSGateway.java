@@ -123,7 +123,7 @@ public class BUSGateway extends OpenGateway {
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
             res = sendInternal(Thermoregulation.requestStatus(WhereLightAutom.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
-                if (msg instanceof Automation) {
+                if (msg instanceof Thermoregulation) {
                     Thermoregulation amsg = ((Thermoregulation) msg);
                     OpenDeviceType type = amsg.detectDeviceType();
                     if (type != null) {

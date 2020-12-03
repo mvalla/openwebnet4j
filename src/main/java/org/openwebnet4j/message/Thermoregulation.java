@@ -195,11 +195,16 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param temp temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param mode
      * @return message
+     * @throws MalformedFrameException
      */
-    public static Thermoregulation requestWriteSetpointTemperature(String where, float newSetPointTemperature,
-            String mode) {
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            String mode) throws MalformedFrameException {
+        if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
+            throw new MalformedFrameException("Set Point Temperature should be between 5 and 40° Celsius.");
+        }
+        // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
-                encodeTemperature(newSetPointTemperature), mode));
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode));
     }
 
     /**
@@ -323,12 +328,12 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param temp temperature
      * @return String
      */
-    public static String encodeTemperature(float temp) {
+    public static String encodeTemperature(double temp) {
         // +23.51 °C --> '0235'; -4.86 °C --> '1049'
         // checkRange(5, 40, Math.round(temp));
         char sign = (temp >= 0 ? '0' : '1');
         String digits = "";
-        int absTemp = Math.abs(Math.round(temp * 10));
+        int absTemp = (int) Math.abs(Math.round(temp * 10));
         if (absTemp < 100) {
             digits += "0";
         }
