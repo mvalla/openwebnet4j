@@ -1,4 +1,17 @@
-/* (C)2020 */
+/**
+ * Copyright (c) 2020 Contributors to the openwebnet4j project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ */
 package org.openwebnet4j.message;
 
 import static java.lang.String.format;
@@ -8,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * OpenWebNet Thermostat messages (WHO=4)
  *
  * @author M. Valla - Initial contribution
- * @contributor G. Cocchi - Contributor
+ * @author G. Cocchi - Contributor
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -88,7 +100,10 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static MODE fromValue(Integer i) {
-            Optional<MODE> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue()).findFirst();
+            Optional<MODE> m =
+                    Arrays.stream(values())
+                            .filter(val -> i.intValue() == val.value.intValue())
+                            .findFirst();
             return m.orElse(null);
         }
     }
@@ -113,7 +128,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static LOCAL_OFFSET fromValue(String s) {
-            Optional<LOCAL_OFFSET> offset = Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
+            Optional<LOCAL_OFFSET> offset =
+                    Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
             return offset.orElse(null);
         }
 
@@ -129,9 +145,7 @@ public class Thermoregulation extends BaseOpenMessage {
         TEMP_SETPOINT(14),
         PROBE_TEMPERATURE(15),
         VALVES_STATUS(19),
-        ACTUATOR_STATUS(20),
-        ACTUATOR_STATUS_ON(1),
-        ACTUATOR_STATUS_OFF(0);
+        ACTUATOR_STATUS(20);
 
         private static Map<Integer, DIM> mapping;
 
@@ -185,10 +199,16 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param mode
      * @return message
      */
-    public static Thermoregulation requestWriteSetpointTemperature(String where, float newSetPointTemperature,
-            String mode) {
-        return new Thermoregulation(format(FORMAT_SETTING, WHO, where, DIM.TEMP_SETPOINT.value(),
-                encodeTemperature(newSetPointTemperature), mode));
+    public static Thermoregulation requestWriteSetpointTemperature(
+            String where, float newSetPointTemperature, String mode) {
+        return new Thermoregulation(
+                format(
+                        FORMAT_SETTING,
+                        WHO,
+                        where,
+                        DIM.TEMP_SETPOINT.value(),
+                        encodeTemperature(newSetPointTemperature),
+                        mode));
     }
 
     /**
@@ -259,17 +279,21 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @throws NumberFormatException
      */
-    public static Double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
+    public static Double parseTemperature(Thermoregulation msg)
+            throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         // temp is in the first dim value for thermostats (dim=0,12,14), in the second in case of
         // probes (dim=15)
         // TODO check min,max values
-        if (msg.getDim() == DIM.TEMPERATURE || msg.getDim() == DIM.TEMP_SETPOINT || msg.getDim() == DIM.TEMP_TARGET) {
+        if (msg.getDim() == DIM.TEMPERATURE
+                || msg.getDim() == DIM.TEMP_SETPOINT
+                || msg.getDim() == DIM.TEMP_TARGET) {
             return decodeTemperature(values[0]);
         } else if (msg.getDim() == DIM.PROBE_TEMPERATURE) {
             return decodeTemperature(values[1]);
         } else {
-            throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
+            throw new NumberFormatException(
+                    "Could not parse temperature from: " + msg.getFrameValue());
         }
     }
 
