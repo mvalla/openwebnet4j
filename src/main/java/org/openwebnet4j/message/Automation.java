@@ -68,7 +68,8 @@ public class Automation extends BaseOpenMessage {
     }
 
     public enum DIM implements Dim {
-        DIMMER_LEVEL_100(1);
+        SHUTTER_STATUS(10),
+        GOTO_LEVEL(11);
 
         private static Map<Integer, DIM> mapping;
 
@@ -108,6 +109,7 @@ public class Automation extends BaseOpenMessage {
 
     protected Automation(String value) {
         super(value);
+        this.who = Who.AUTOMATION;
     }
 
     /**
@@ -186,6 +188,21 @@ public class Automation extends BaseOpenMessage {
             return false;
         } else {
             return getWhat().equals(WHAT.DOWN);
+        }
+    }
+
+    /**
+     * Convert an Automation message UP<>DOWN
+     *
+     * @return converted Automation message
+     */
+    public static Automation convertUpDown(Automation autmsg) throws FrameException {
+        if (autmsg.isUp()) {
+            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
+        } else if (autmsg.isDown()) {
+            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
+        } else {
+            return autmsg;
         }
     }
 

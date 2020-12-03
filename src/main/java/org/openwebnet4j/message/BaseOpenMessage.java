@@ -30,37 +30,58 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     private final Logger logger = LoggerFactory.getLogger(BaseOpenMessage.class);
 
+    protected static final int MAX_FRAME_LENGTH = 1024; // max OWN frame length
     protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
     protected static final String FORMAT_SETTING = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
-    protected String whoStr; // WHO part of the frame
-    protected String whatStr; // WHAT part of the frame
-    protected String whereStr; // WHERE part of the frame
-    protected String dimStr; // DIM part of the frame
+    private String whoStr = null; // WHO part of the frame
+    private String whatStr = null; // WHAT part of the frame
+    protected String whereStr = null; // WHERE part of the frame
+    private String dimStr = null; // DIM part of the frame
 
     protected Who who = null;
-    protected What what = null;
+    private What what = null;
     protected Where where = null;
-    protected Dim dim = null;
+    private Dim dim = null;
 
-    protected boolean commandTranslation = false;
     private Boolean isCommand = null;
+    private Boolean isCommandTranslation = null;
 
-    protected boolean isDimWriting = false; // true if dim writing *#WHO*WHERE*#DIM...##
-    protected int[] dimParams = null; // list of dimension params PAR1...PARn in the frame
+    private Boolean isDimWriting = null; // true if dim writing *#WHO*WHERE*#DIM...##
+    private int[] dimParams = null; // list of dimension params PAR1...PARn in the frame
     // *#WHO*WHERE*DIM#PAR1...#PARn*...##
-    protected String[] dimValues = null; // list of dimension values VAL1...VALn in the frame
-                                         // *#WHO*WHERE*DIM...*VAL1*...*VALn##
+    private String[] dimValues = null; // list of dimension values VAL1...VALn in the frame
+                                       // *#WHO*WHERE*DIM...*VAL1*...*VALn##
 
-    protected int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
+    private int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
     // *WHO*WHAT#PAR1...#PARn*WHERE##
 
     protected BaseOpenMessage(String frame) {
         this.frameValue = frame;
     }
 
+    @Override
+    public boolean isCommand() {
+        if (isCommand == null) {
+            isCommand = Boolean.valueOf(!(frameValue.startsWith(FRAME_START_DIM)));
+        }
+        return isCommand;
+    }
+
+    /*
+     * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach": other parts (WHERE,
+     * WHAT,
+     * DIM, parameters, etc.) are not parsed until requested.
+     *
+     * @param frame the frame String to parse
+     *
+     * @return a new {@link OpenMessage} object representing the OpenWebNet frame
+     *
+     * @throws FrameException in case the provided frame is not a valid OpenWebNet frame
+     *
+     */
     public static OpenMessage parse(String frame) throws FrameException {
         boolean isCmd = true;
         if (frame == null) {
@@ -71,54 +92,69 @@ public abstract class BaseOpenMessage extends OpenMessage {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException("Frame does not end with frame terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
         } else if (!frame.startsWith(FRAME_START)) {
             throw new MalformedFrameException("Frame does not start with '*' or '*#'");
         }
-        // remove trailing "##" and get frame sections separated by '*'
-        String[] parts = frame.substring(0, frame.length() - 2).split("\\*");
-        if (parts.length == 0) {
-            throw new MalformedFrameException("Invalid frame");
+        if (frame.length() > MAX_FRAME_LENGTH) {
+            throw new MalformedFrameException("Frame length is > " + MAX_FRAME_LENGTH);
         }
-        if (parts.length < 3) { // every OWN frame must have at least 2 '*'
-            throw new MalformedFrameException("Every frame must have at least 2 '*'");
+        // check if there are bad characters
+        for (char c : frame.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                if (c != '#' && c != '*') {
+                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
+                }
+            }
         }
+        String[] parts = getPartsStrings(frame);
         // parts[0] is empty, first is WHO
         String whoStr = parts[1];
         if (!isCmd) {
             whoStr = parts[1].substring(1); // remove '#' from WHO part
         }
         BaseOpenMessage baseMsg = parseWho(whoStr, frame);
-        if (isCmd) {
-            baseMsg.whatStr = parts[2]; // second part is WHAT
-            if (parts.length > 3) {
-                baseMsg.whereStr = parts[3]; // third part is WHERE (optional)
-            }
-        } else {
-            if (!(parts[2].equals(""))) {
-                baseMsg.whereStr = parts[2]; // second part is WHERE
-            }
-            if (parts.length >= 4) {
-                baseMsg.dimStr = parts[3]; // third part is DIM
-                // copy last parts of this frame as DIM values
-                baseMsg.dimValues = Arrays.copyOfRange(parts, 4, parts.length);
-            }
-        }
         baseMsg.isCommand = isCmd;
-        // NOTE: we use here a LAZY APPROACH: we do not parse other parts (WHERE, WHAT, DIM, etc.) until requested: here
-        // we just return the identified BaseOpenMessage subclass
+        baseMsg.parseParts(parts);
         return baseMsg;
     }
 
-    @Override
-    public boolean isCommand() {
-        if (isCommand == null) {
-            isCommand = super.isCommand();
+    private static String[] getPartsStrings(String frame) throws MalformedFrameException {
+        // remove trailing "##" and get frame parts separated by '*'
+        String[] parts = frame.substring(0, frame.length() - 2).split("\\*");
+        if (parts.length == 0) {
+            throw new MalformedFrameException("Invalid frame");
         }
-        return isCommand;
+        if (parts.length < 3) { // every OWN frame must have at least 2 '*'
+            throw new MalformedFrameException(
+                    "Cmd/Dim frames must have at least 2 non-empty sections separated by '*'");
+        }
+        return parts;
+    }
+
+    private void parseParts(String[] parts) {
+        if (isCommand()) {
+            whatStr = parts[2]; // second part is WHAT
+            if (parts.length > 3) {
+                whereStr = parts[3]; // third part is WHERE (optional)
+            }
+        } else {
+            if (!(parts[2].equals(""))) {
+                whereStr = parts[2]; // second part is WHERE
+            }
+            if (parts.length >= 4) {
+                dimStr = parts[3]; // third part is DIM
+                // copy last parts of this frame as DIM values
+                dimValues = Arrays.copyOfRange(parts, 4, parts.length);
+            }
+        }
+    }
+
+    private void parseParts() throws MalformedFrameException {
+        parseParts(getPartsStrings(frameValue));
     }
 
     /**
@@ -136,12 +172,14 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @return message WHAT
      */
     public What getWhat() {
-        if (what == null && whatStr != null) {
-            // try to parse WHAT from frame
+        if (what == null) {
             try {
+                if (whatStr == null) {
+                    parseParts();
+                }
                 parseWhat();
             } catch (FrameException e) {
-                logger.warn("Exception parsing WHAT of frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} for frame {}", e.getMessage(), frameValue);
             }
         }
         return what;
@@ -153,11 +191,14 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @return message WHERE
      */
     public Where getWhere() {
-        if (where == null && whereStr != null) {
-            try { // try to parse WHERE from frame
+        if (where == null) {
+            try {
+                if (whereStr == null) {
+                    parseParts();
+                }
                 parseWhere();
             } catch (FrameException e) {
-                logger.warn("Exception parsing WHERE of frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} for frame {}", e.getMessage(), frameValue);
             }
         }
         return where;
@@ -170,11 +211,13 @@ public abstract class BaseOpenMessage extends OpenMessage {
      */
     public Dim getDim() {
         if (dim == null) {
-            // try to parse DIM from frame
             try {
+                if (dimStr == null) {
+                    parseParts();
+                }
                 parseDim();
             } catch (FrameException e) {
-                logger.warn("Exception parsing DIM of frame {}: {}", frameValue, e.getMessage());
+                logger.warn("{} - frame {}", e.getMessage(), frameValue);
             }
         }
         return dim;
@@ -186,15 +229,18 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @return true if it's a dimension writing message
      */
     public boolean isDimWriting() {
+        if (isDimWriting == null) {
+            getDim();
+        }
         return isDimWriting;
     }
 
     /**
-     * Parse WHO from frame whoPart sub-string and returns a BaseOpenMessage of the corresponding type
+     * Parse WHO from given whoPart and returns a BaseOpenMessage of the corresponding type
      *
      * @param whoPart String containing the WHO
      */
-    protected static BaseOpenMessage parseWho(String whoPart, String frame) throws FrameException {
+    private static BaseOpenMessage parseWho(String whoPart, String frame) throws FrameException {
         Who who = null;
         try {
             int whoInt = Integer.parseInt(whoPart);
@@ -234,11 +280,10 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     /**
      * Parse WHAT and its parameters and assigns it to {@link what} and {@link commandParams} obj attributes
-     *
      */
-    protected void parseWhat() throws FrameException {
+    private void parseWhat() throws FrameException {
         if (whatStr == null) {
-            throw new FrameException("Frame has null WHAT");
+            return;
         }
         String[] parts = whatStr.split("\\#");
         if (parts != null) {
@@ -246,12 +291,15 @@ public abstract class BaseOpenMessage extends OpenMessage {
             try {
                 if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION) && parts.length > 1) {
                     // commandTranslation: 1000#WHAT
-                    commandTranslation = true;
+                    isCommandTranslation = true;
                     partsIndex++; // skip first 1000 value
+                } else {
+                    isCommandTranslation = false;
                 }
                 what = whatFromValue(Integer.parseInt(parts[partsIndex]));
+                commandParams = new int[0];
                 if (what == null) {
-                    throw new UnsupportedFrameException("Unsupported WHAT: " + whatStr);
+                    throw new UnsupportedFrameException("Unsupported WHAT=" + whatStr);
                 }
                 if (parts.length > 1) { // copy command parameters into commandParams
                     commandParams = new int[parts.length - partsIndex - 1];
@@ -260,7 +308,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                     }
                 }
             } catch (NumberFormatException e) {
-                throw new MalformedFrameException("Invalid integer format in WHAT: " + whatStr);
+                throw new MalformedFrameException("Invalid integer format in WHAT=" + whatStr);
             }
         }
     }
@@ -274,16 +322,17 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Parse DIM, its params and values and assigns it to {@link dim}, {@link dimParams} and {@link dimValues}
      * attributes
-     *
      */
-    protected void parseDim() throws FrameException {
+    private void parseDim() throws FrameException {
         if (dimStr == null) {
-            throw new MalformedFrameException("Frame has no DIM");
+            return;
         }
         String ds = dimStr;
         if (ds.startsWith("#")) { // Dim writing
             isDimWriting = true;
             ds = ds.substring(1);
+        } else {
+            isDimWriting = false;
         }
         String[] dimParts = ds.split("#");
         try {
@@ -311,34 +360,44 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @throws FrameException
      */
     public boolean isCommandTranslation() throws FrameException {
-        if (isCommand && what == null) {
-            parseWhat();
+        if (isCommand()) {
+            if (isCommandTranslation == null) {
+                getWhat(); // by parsing what we get command translation
+            }
+        } else {
+            isCommandTranslation = false;
         }
-        return commandTranslation;
+        if (isCommandTranslation != null) {
+            return isCommandTranslation.booleanValue();
+        } else {
+            return false;
+        }
     }
 
     /**
-     * Returns message command parameters (*WHO*WHAT#Par1#Par2...#ParN*...), or null if no parameters are present
+     * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if no parameters are
+     * present
      *
-     * @return int[] of command parameters, or null if no parameters
+     * @return int[] of command parameters, or empty array if no parameters are present
      * @throws FrameException
      */
     public int[] getCommandParams() throws FrameException {
-        if (what == null) {
-            parseWhat();
+        if (commandParams == null) {
+            getWhat();
         }
         return commandParams;
     }
 
     /**
-     * Returns an array with DIM parameters PAR1..PARN (*#WHO*DIM#PAR1..#PARN*...##)
+     * Returns an array with DIM parameters PAR1..PARN (*#WHO*DIM#PAR1..#PARN*...##), or empty array if no parameters
+     * are present
      *
-     * @return a int[] of DIM parameters
+     * @return a int[] of DIM parameters, or empty array if no parameters are present
      * @throws FrameException
      */
     public int[] getDimParams() throws FrameException {
-        if (dim == null) {
-            parseDim();
+        if (dimParams == null) {
+            getDim();
         }
         return dimParams;
     }
@@ -348,22 +407,22 @@ public abstract class BaseOpenMessage extends OpenMessage {
      *
      * @param values the String[] of Dim params
      */
-    protected void setDimParams(String[] params) throws NumberFormatException {
+    private void setDimParams(String[] params) throws NumberFormatException {
         int[] tempArr = Arrays.stream(params).mapToInt(Integer::parseInt).toArray();
-        if (tempArr.length > 0) {
-            dimParams = tempArr;
-        }
+
+        dimParams = tempArr;
+
     }
 
     /**
-     * Returns and array with DIM values
+     * Returns and array with DIM values, or empty array if no values are present
      *
-     * @return a String[] of DIM values
+     * @return a String[] of DIM values, or empty array if no values are present
      * @throws FrameException
      */
     public String[] getDimValues() throws FrameException {
-        if (dim == null) {
-            parseDim();
+        if (dimValues == null) {
+            getDim();
         }
         return dimValues;
     }
@@ -387,33 +446,36 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     @Override
     public String toStringVerbose() {
-        String verbose = "<" + frameValue + ">{WHO=" + getWho();
+        String verbose = "<" + frameValue + ">{" + getWho();
         try {
             if (isCommand()) {
-                verbose += ",WHAT=" + getWhat();
-                if (commandTranslation) {
+                verbose += "-" + getWhat();
+                if (isCommandTranslation()) {
                     verbose += "(translation)";
                 }
-                if (getCommandParams() != null) {
+                if (getCommandParams().length > 0) {
                     verbose += ",cmdParams=" + Arrays.toString(getCommandParams());
                 }
+                if (getWhere() != null) {
+                    verbose += "," + getWhere();
+                }
             } else {
-                verbose += ",dim=" + getDim();
+                verbose += "-" + getDim();
                 if (isDimWriting()) {
-                    verbose += "(writing)";
+                    verbose += " (writing)";
                 }
                 if (getWhere() != null) {
-                    verbose += ",WHERE=" + getWhere().value();
+                    verbose += "," + getWhere();
                 }
-                if (getDimParams() != null) {
+                if (getDimParams().length > 0) {
                     verbose += ",dimParams=" + Arrays.toString(getDimParams());
                 }
-                if (getDimValues() != null) {
+                if (getDimValues().length > 0) {
                     verbose += ",dimValues=" + Arrays.toString(getDimValues());
                 }
             }
         } catch (FrameException e) {
-            logger.warn("error during toStringVerbose()", e);
+            logger.warn("Error during toStringVerbose()", e);
             e.printStackTrace();
         }
         return verbose + "}";

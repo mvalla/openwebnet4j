@@ -32,7 +32,7 @@ public interface ConnectorListener {
     public void onMessage(OpenMessage message);
 
     /**
-     * This method is called when the MONITOR connections gets disconnected for some error
+     * This method is called when the MONITOR connection gets disconnected for some error
      *
      * @param e the Exception that caused disconnection
      */

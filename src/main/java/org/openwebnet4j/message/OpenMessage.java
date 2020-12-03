@@ -47,9 +47,7 @@ public abstract class OpenMessage {
      *
      * @return true if it's a command frame
      */
-    public boolean isCommand() {
-        return !(frameValue.startsWith(FRAME_START_DIM));
-    }
+    public abstract boolean isCommand();
 
     /**
      * Is this OpenMessage an ACK? (<b>*#*1##</b>).

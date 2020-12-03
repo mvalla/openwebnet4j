@@ -24,9 +24,14 @@ Supported Open Web Net gateways:
 - [x] Support numeric passwords (OPEN handshake)
 - [x] Support alphanumeric passwords (HMAC handshake)
 - [x] Support for `WHO=2` Automation (shutters)
-- [ ] Add other `WHOs` (Energy, Thermo, CEN/CEN+, AUX, etc.)
+- [x] ZigBee: check isOldFirmware and related gw bugfixes
+- Add other `WHOs`
+    - [ ] Energy
+    - [ ] Thermo
+    - [ ] CEN/CEN+
+    - [ ] AUX
+- [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
-- [ ] ZigBee: check isOldFirmware and related gw bugfixes
 
 ## Dependency Management
 
@@ -35,7 +40,7 @@ Supported Open Web Net gateways:
     <dependency>
       <groupId>com.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.2</version>
     </dependency>
 ```
 
@@ -52,10 +57,7 @@ try {
         System.out.println("Request successful");
     }
     // requests status light WHERE=51
-    res = myGateway.send(Lighting.requestStatus("51"));
-    if (res.isSuccess()) {
-        System.out.println("Light is: " + ((Lighting) res.getResponseMessages().get(0)).getWhat());
-    }
+    myGateway.send(Lighting.requestStatus("51"));
 } catch (OWNException e) {...}
 ```
 
