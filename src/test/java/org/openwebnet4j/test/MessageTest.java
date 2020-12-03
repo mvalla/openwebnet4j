@@ -35,6 +35,7 @@ import org.openwebnet4j.message.Who;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy Management contribution
+ * @author G. Cocchi - Thermoregulation contribution
  */
 public class MessageTest {
 
@@ -137,15 +138,14 @@ public class MessageTest {
 
     @Test
     public void testMalformedCmdAndDimFrames() {
-        String[] wrongFrames = {"*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##"};
+        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
         for (String frame : wrongFrames) {
             try {
                 BaseOpenMessage.parse(frame);
                 // if we can parse this message, this test fails
                 Assertions.fail("MalformedFrameException not detected: " + frame);
             } catch (FrameException e) {
-                System.out.println(
-                        "correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
                 assertTrue(e instanceof MalformedFrameException);
             }
         }
