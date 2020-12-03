@@ -35,6 +35,7 @@ import org.openwebnet4j.message.Who;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy Management contribution
+ * @author G. Cocchi - Thermoregulation contribution
  */
 public class MessageTest {
 
