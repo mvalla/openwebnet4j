@@ -1,4 +1,17 @@
-/* (C)2020 */
+/**
+ * Copyright (c) 2020 Contributors to the openwebnet4j project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ */
 package org.openwebnet4j.message;
 
 import static java.lang.String.format;
@@ -17,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * OpenWebNet Thermostat messages (WHO=4)
  *
  * @author M. Valla - Initial contribution
- * @contributor G. Cocchi - Contributor
+ * @author G. Cocchi - Contributor
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -129,9 +142,7 @@ public class Thermoregulation extends BaseOpenMessage {
         TEMP_SETPOINT(14),
         PROBE_TEMPERATURE(15),
         VALVES_STATUS(19),
-        ACTUATOR_STATUS(20),
-        ACTUATOR_STATUS_ON(1),
-        ACTUATOR_STATUS_OFF(0);
+        ACTUATOR_STATUS(20);
 
         private static Map<Integer, DIM> mapping;
 
@@ -238,7 +249,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestValvesStatus(String w) {
-        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.VALVES_STATUS.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, w, DIM.VALVES_STATUS.value()));
     }
 
     @Override
