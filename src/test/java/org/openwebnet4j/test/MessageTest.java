@@ -33,7 +33,7 @@ import org.openwebnet4j.message.WhereZigBee;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
- * @contributor G. Cocchi
+ * @author G. Cocchi
  */
 
 public class MessageTest {
