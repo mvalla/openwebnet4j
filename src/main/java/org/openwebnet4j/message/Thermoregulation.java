@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,10 +101,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static MODE fromValue(Integer i) {
-            Optional<MODE> m =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<MODE> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue()).findFirst();
             return m.orElse(null);
         }
     }
@@ -128,8 +126,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static LOCAL_OFFSET fromValue(String s) {
-            Optional<LOCAL_OFFSET> offset =
-                    Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
+            Optional<LOCAL_OFFSET> offset = Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
             return offset.orElse(null);
         }
 
@@ -198,17 +195,16 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param temp temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param mode
      * @return message
+     * @throws MalformedFrameException
      */
-    public static Thermoregulation requestWriteSetpointTemperature(
-            String where, float newSetPointTemperature, String mode) {
-        return new Thermoregulation(
-                format(
-                        FORMAT_SETTING,
-                        WHO,
-                        where,
-                        DIM.TEMP_SETPOINT.value(),
-                        encodeTemperature(newSetPointTemperature),
-                        mode));
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            String mode) throws MalformedFrameException {
+        if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
+            throw new MalformedFrameException("Set Point Temperature should be between 5 and 40° Celsius.");
+        }
+        // Round new Set Point Temperature to close 0.5° C value
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode));
     }
 
     /**
@@ -279,21 +275,17 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @throws NumberFormatException
      */
-    public static Double parseTemperature(Thermoregulation msg)
-            throws NumberFormatException, FrameException {
+    public static Double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         // temp is in the first dim value for thermostats (dim=0,12,14), in the second in case of
         // probes (dim=15)
         // TODO check min,max values
-        if (msg.getDim() == DIM.TEMPERATURE
-                || msg.getDim() == DIM.TEMP_SETPOINT
-                || msg.getDim() == DIM.TEMP_TARGET) {
+        if (msg.getDim() == DIM.TEMPERATURE || msg.getDim() == DIM.TEMP_SETPOINT || msg.getDim() == DIM.TEMP_TARGET) {
             return decodeTemperature(values[0]);
         } else if (msg.getDim() == DIM.PROBE_TEMPERATURE) {
             return decodeTemperature(values[1]);
         } else {
-            throw new NumberFormatException(
-                    "Could not parse temperature from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
         }
     }
 
@@ -336,12 +328,12 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param temp temperature
      * @return String
      */
-    public static String encodeTemperature(float temp) {
+    public static String encodeTemperature(double temp) {
         // +23.51 °C --> '0235'; -4.86 °C --> '1049'
         // checkRange(5, 40, Math.round(temp));
         char sign = (temp >= 0 ? '0' : '1');
         String digits = "";
-        int absTemp = Math.abs(Math.round(temp * 10));
+        int absTemp = (int) Math.abs(Math.round(temp * 10));
         if (absTemp < 100) {
             digits += "0";
         }
