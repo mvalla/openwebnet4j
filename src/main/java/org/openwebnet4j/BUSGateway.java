@@ -20,6 +20,7 @@ import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.slf4j.Logger;
@@ -29,7 +30,6 @@ import org.slf4j.LoggerFactory;
  * {@link BUSgateway} to connect to BUS OpenWebNet gateways using {@link BUSConnector}
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -47,7 +47,6 @@ public class BUSGateway extends OpenGateway {
      * @param host the gateway host name or IP
      * @param port the gateway port
      * @param pwd the gateway password
-     *
      */
     public BUSGateway(String host, int port, String pwd) {
         this.host = host;
@@ -86,7 +85,6 @@ public class BUSGateway extends OpenGateway {
     protected void initConnector() {
         connector = new BUSConnector(host, port, pwd);
         logger.info("##BUS## Init BUS ({}:{})...", host, port);
-
     }
 
     @Override
@@ -118,9 +116,23 @@ public class BUSGateway extends OpenGateway {
                         Where w = amsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
                     }
-
                 }
             }
+
+            // DISCOVER THERMOREGULATION - request status for all thermoregulation devices: *#4*0##
+            logger.debug("##BUS## ----- THERMOREGULATION discovery");
+            res = sendInternal(Thermoregulation.requestStatus(WhereLightAutom.GENERAL.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof Thermoregulation) {
+                    Thermoregulation amsg = ((Thermoregulation) msg);
+                    OpenDeviceType type = amsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = amsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
+                    }
+                }
+            }
+
         } catch (OWNException e) {
             logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
@@ -147,5 +159,4 @@ public class BUSGateway extends OpenGateway {
             return false;
         }
     }
-
 } /* class */

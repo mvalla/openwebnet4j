@@ -32,6 +32,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     protected static final int MAX_FRAME_LENGTH = 1024; // max OWN frame length
     protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
+    protected static final String FORMAT_DIMENSION_WRITING_2V = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
@@ -262,6 +263,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 break;
             case AUTOMATION:
                 baseopenmsg = new Automation(frame);
+                break;
+            case THERMOREGULATION:
+                baseopenmsg = new Thermoregulation(frame);
                 break;
             default:
                 break;

@@ -33,11 +33,11 @@ import org.openwebnet4j.message.Who;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
+ * @author G. Cocchi
  */
 
 public class MessageTest {
 
-    @Test
     public void testLightingOn() {
         /*
          * Lighting lm = Lighting.requestTurnOn("789309801#9");
