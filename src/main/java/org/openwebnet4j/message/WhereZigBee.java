@@ -26,8 +26,8 @@ public class WhereZigBee extends Where {
     public static final String UNIT_ALL = "00";
     public static final String ZB_NETWORK = "#9";
 
-    private String unit = null; // UNIT part of the address
-    private String addr = null; // ADDR part of the address
+    private String unit = null; // UNIT part of the WHERE address
+    private String addr = null; // ADDR part of the WHERE address
 
     public WhereZigBee(String w) throws IllegalArgumentException, NullPointerException {
         // TODO check range for WHERE
@@ -40,6 +40,12 @@ public class WhereZigBee extends Where {
         }
     }
 
+    /**
+     * Returns a String with the value of this WHERE using the provided string as UNIT
+     *
+     * @param u the UNIT string
+     * @return a String with the value of this WHERE ending with u as UNIT
+     */
     public String valueWithUnit(String u) {
         return addr + u + ZB_NETWORK;
     }
@@ -54,7 +60,7 @@ public class WhereZigBee extends Where {
     }
 
     /**
-     * Return the ADDR part by removing UNIT and network ('#9')
+     * Return the ADDR part by removing UNIT (e.g. '02') and network ('#9')
      * Example: WHERE=123456702#9 -> ADDR=1234567
      *
      * @return a String with the ADDR part of this address, null if no ADDR part is found

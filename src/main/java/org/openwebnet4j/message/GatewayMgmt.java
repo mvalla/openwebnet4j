@@ -128,6 +128,7 @@ public class GatewayMgmt extends BaseOpenMessage {
 
     protected GatewayMgmt(String value) {
         super(value);
+        this.who = Who.GATEWAY_MANAGEMENT;
     }
 
     /**
@@ -170,6 +171,15 @@ public class GatewayMgmt extends BaseOpenMessage {
             mac[i] = Integer.valueOf(values[i]).byteValue();
         }
         return mac;
+    }
+
+    /**
+     * OpenWebNet message request for gateway model <b>*#13**15##</b>.
+     *
+     * @return GatewayMgmt message
+     */
+    public static GatewayMgmt requestModel() {
+        return new GatewayMgmt(format(FORMAT_DIMENSION, WHO, "", DIM.MODEL.value()));
     }
 
     /**

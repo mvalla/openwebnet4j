@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link USBgateway} to connect to USB OpenWebNet gateways using {@link USBConnector}
+ * Class {@link USBGateway} to connect to ZigBee USB Gateways using {@link USBConnector}
  *
  * @author M. Valla - Initial contribution
  *
@@ -56,7 +56,6 @@ public class USBGateway extends OpenGateway {
     protected void initConnector() {
         connector = new USBConnector(serialPortName);
         logger.info("##USB## Init USB ({})...", serialPortName);
-
     }
 
     @Override
@@ -81,53 +80,52 @@ public class USBGateway extends OpenGateway {
     @Override
     public void onMessage(OpenMessage message) {
         if (isDiscovering && message instanceof GatewayMgmt) {
-            handleDiscovery((GatewayMgmt) message);
+            handleDiscoveryEvent((GatewayMgmt) message);
         }
         super.onMessage(message);
     }
 
-    private void handleDiscovery(GatewayMgmt message) {
+    /*
+     * handle a discovery event msg (number of products in the network)
+     */
+    private void handleDiscoveryEvent(GatewayMgmt message) {
         if (message.getDim() == GatewayMgmt.DIM.NB_NETW_PROD) {
             try {
                 discoveredProducts = Integer.parseInt(message.getDimValues()[0]);
                 logger.debug("##USB## ----- # {} products found!", discoveredProducts);
-                // request product infos, starting from last index
-                Response res = sendInternal(GatewayMgmt.requestProductInfo(discoveredProducts - 1));
-                if (res.getResponseMessages().get(0) instanceof GatewayMgmt) {
-                    handleDiscovery((GatewayMgmt) res.getResponseMessages().get(0));
+                // request product infos, starting from index 0
+                for (int p = 0; p < discoveredProducts; p++) {
+                    handleDiscoveryResponse(sendInternal(GatewayMgmt.requestProductInfo(p)));
+                    receivedProducts++;
+                    logger.debug("##USB## ----- # DISCOVERED {} / {} products", receivedProducts, discoveredProducts);
                 }
-            } catch (Exception e) {
-                logger.debug("##USB## ----- # Error while discovering devices: " + e.getMessage());
-                isDiscovering = false;
-            }
-        } else if (message.getDim() == GatewayMgmt.DIM.PRODUCT_INFO) {
-            WhereZigBee w = (WhereZigBee) (message.getWhere());
-            logger.debug("##USB## ----- # new product found: WHERE={}", w);
-            // notify new device found
-            notifyListeners((listener) -> listener.onNewDevice(w, getZigBeeDeviceType(message), message));
-            // increase receivedProducts only if found product WHERE UNIT is 01 or 00
-            if (WhereZigBee.UNIT_ALL.equals(w.getUnit()) || WhereZigBee.UNIT_01.equals(w.getUnit())) {
-                receivedProducts++;
-            }
-            if (receivedProducts < discoveredProducts) {
-                // requestProductInfo for next product
-                logger.debug("##USB## ----- # DISCOVERED {} / {} products", receivedProducts, discoveredProducts);
-                try {
-                    Response res = sendInternal(
-                            GatewayMgmt.requestProductInfo(discoveredProducts - receivedProducts - 1));
-                    if (res.getResponseMessages().get(0) instanceof GatewayMgmt) {
-                        handleDiscovery((GatewayMgmt) res.getResponseMessages().get(0));
-                    }
-                } catch (OWNException e) {
-                    logger.debug("##USB## ----- # Error while discovering devices: " + e.getMessage());
-                    isDiscovering = false;
-                }
-            } else {
-                isDiscovering = false;
                 logger.debug("##USB## ----- ### DISCOVERY COMPLETED - DISCOVERED {} / {} products", receivedProducts,
                         discoveredProducts);
                 notifyListeners((listener) -> listener.onDiscoveryCompleted());
+            } catch (Exception e) {
+                logger.debug("##USB## ----- # Error while discovering devices: " + e.getMessage());
             }
+            isDiscovering = false;
+        }
+    }
+
+    /*
+     * handle a response to a product info request
+     */
+    private void handleDiscoveryResponse(Response r) {
+        GatewayMgmt gMsg = null;
+        int i = 0;
+        // get messages in the response and notify all endpoints in the response, before last ACK/NACK
+        while (r.getResponseMessages().get(i) instanceof GatewayMgmt) {
+            gMsg = (GatewayMgmt) r.getResponseMessages().get(i);
+            if (gMsg != null && gMsg.getDim() == GatewayMgmt.DIM.PRODUCT_INFO) {
+                WhereZigBee w = (WhereZigBee) (gMsg.getWhere());
+                logger.debug("##USB## ----- # new product found: WHERE={}", w);
+                // notify new endpoint found
+                final GatewayMgmt m = gMsg;
+                notifyListeners((listener) -> listener.onNewDevice(w, getZigBeeDeviceType(m), m));
+            }
+            i++;
         }
     }
 

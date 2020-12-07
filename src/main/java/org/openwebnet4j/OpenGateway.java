@@ -22,6 +22,7 @@ import org.openwebnet4j.communication.OWNAuthException;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.OpenConnector;
 import org.openwebnet4j.communication.Response;
+import org.openwebnet4j.message.Dim;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.OpenMessage;
@@ -49,7 +50,7 @@ public abstract class OpenGateway implements ConnectorListener {
     private boolean connectionCloseRequested = false;
 
     protected byte[] macAddr;
-    protected String firmwareVersion = null;
+    private String firmwareVersion = null;
 
     /**
      * Init the connector for this OpenGateway.
@@ -128,10 +129,10 @@ public abstract class OpenGateway implements ConnectorListener {
                         }
                     }
                 } catch (OWNAuthException ae) { // in case of auth exception, we stop re-trying
-                    logger.warn("--...re-connect FAILED. OWNAuthException: {}", ae.getMessage());
+                    logger.warn("--Re-connect FAILED. OWNAuthException: {}", ae.getMessage());
                     throw ae;
                 } catch (OWNException e) {
-                    logger.error("--...error while re-connecting. Exception: {}", e.getMessage());
+                    logger.debug("--Error while re-connecting: {}", e.getMessage());
                     retry = retry * RECCONECT_RETRY_MULTIPLIER;
                     if (retry >= RECONNECT_RETRY_AFTER_MAX) {
                         retry = RECONNECT_RETRY_AFTER_MAX;
@@ -200,14 +201,15 @@ public abstract class OpenGateway implements ConnectorListener {
                 if (msg instanceof GatewayMgmt) {
                     GatewayMgmt gmsg = (GatewayMgmt) msg;
                     logger.debug("##GW## handleManagementDimensions() for frame: {}", gmsg);
-                    if (gmsg.getDim() == GatewayMgmt.DIM.MAC_ADDRESS) {
+                    Dim thisDim = gmsg.getDim();
+                    if (thisDim == GatewayMgmt.DIM.MAC_ADDRESS) {
                         try {
                             macAddr = GatewayMgmt.parseMACAddress(gmsg);
                             logger.info("##GW## MAC ADDRESS: {}", getMACAddr());
                         } catch (FrameException e) {
                             logger.warn("##GW## Cannot parse MAC address from message: {}", gmsg);
                         }
-                    } else if (gmsg.getDim() == GatewayMgmt.DIM.FIRMWARE_VERSION) {
+                    } else if (thisDim == GatewayMgmt.DIM.FIRMWARE_VERSION) {
                         try {
                             firmwareVersion = GatewayMgmt.parseFirmwareVersion(gmsg);
                             logger.info("##GW## FIRMWARE: {}", getFirmwareVersion());
@@ -215,7 +217,7 @@ public abstract class OpenGateway implements ConnectorListener {
                             logger.warn("##GW## Cannot parse firmware version from message: {}", gmsg);
                         }
                     } else {
-                        logger.debug("##GW## handleManagementDimensions DIM not supported");
+                        logger.debug("##GW## handleManagementDimensions DIM {} not supported", thisDim);
                     }
                 }
             }

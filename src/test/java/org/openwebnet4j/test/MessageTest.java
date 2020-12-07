@@ -25,9 +25,9 @@ import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
-import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereZigBee;
+import org.openwebnet4j.message.Who;
 
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
@@ -38,16 +38,22 @@ import org.openwebnet4j.message.WhereZigBee;
 
 public class MessageTest {
 
-    @Test
-    public void testThermoRegulationCommand() {
-        Thermoregulation thermoregulationMsg;
-        try {
-            thermoregulationMsg = (Thermoregulation) BaseOpenMessage.parse("*#4*2##");
-            assertNotNull(thermoregulationMsg);
-            System.out.println(thermoregulationMsg.toStringVerbose());
-        } catch (FrameException e) {
-            Assertions.fail();
-        }
+    public void testLightingOn() {
+        /*
+         * Lighting lm = Lighting.requestTurnOn("789309801#9");
+         * assertNotNull(lm.getWhere());
+         * assertEquals("789309801#9", lm.getWhere().value());
+         */
+        Lighting lightMsg = Lighting.requestTurnOn("0311#4#01");
+        assertNotNull(lightMsg);
+        assertEquals(Who.LIGHTING, lightMsg.getWho());
+        assertNull(lightMsg.getDim());
+        assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
+        assertNotNull(lightMsg.getWhere());
+        assertTrue(lightMsg.isCommand());
+        assertEquals("0311#4#01", lightMsg.getWhere().value());
+        assertTrue(lightMsg.isOn());
+        assertFalse(lightMsg.isOff());
     }
 
     @Test
@@ -56,8 +62,10 @@ public class MessageTest {
         try {
             lightMsg = (Lighting) BaseOpenMessage.parse("*1*1000#1#1#2#3*0311#4#01##");
             assertNotNull(lightMsg);
+            assertEquals(Who.LIGHTING, lightMsg.getWho());
             assertTrue(lightMsg.isCommand());
             assertTrue(lightMsg.isCommandTranslation());
+            assertNull(lightMsg.getDim());
             assertEquals("0311#4#01", lightMsg.getWhere().value());
             assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
             assertTrue(lightMsg.isOn());
@@ -79,12 +87,29 @@ public class MessageTest {
         try {
             automMsg = (Automation) BaseOpenMessage.parse("*2*1000#0*55##");
             assertNotNull(automMsg);
+            assertEquals(Who.AUTOMATION, automMsg.getWho());
             assertTrue(automMsg.isCommand());
             assertTrue(automMsg.isCommandTranslation());
             assertEquals("55", automMsg.getWhere().value());
+            assertNull(automMsg.getDim());
             assertEquals(Automation.WHAT.STOP, automMsg.getWhat());
             assertTrue(automMsg.isStop());
             assertFalse(automMsg.isUp());
+            System.out.println(automMsg.toStringVerbose());
+            // advanced motor actuator
+            automMsg = (Automation) BaseOpenMessage.parse("*#2*55*10*10*100*0*0##");
+            assertNotNull(automMsg);
+            assertEquals(Who.AUTOMATION, automMsg.getWho());
+            assertFalse(automMsg.isCommand());
+            assertFalse(automMsg.isCommandTranslation());
+            assertEquals("55", automMsg.getWhere().value());
+            assertEquals(Automation.DIM.SHUTTER_STATUS, automMsg.getDim());
+            assertNotNull(automMsg.getDimValues());
+            assertEquals(4, automMsg.getDimValues().length);
+            assertEquals("10", automMsg.getDimValues()[0]);
+            assertEquals("100", automMsg.getDimValues()[1]);
+            assertEquals("0", automMsg.getDimValues()[2]);
+            assertEquals("0", automMsg.getDimValues()[3]);
             System.out.println(automMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();
@@ -97,6 +122,7 @@ public class MessageTest {
         try {
             lightMsg = (Lighting) BaseOpenMessage.parse("*1*1*702053501#9##");
             assertNotNull(lightMsg);
+            assertEquals(Who.LIGHTING, lightMsg.getWho());
             WhereZigBee wz = (WhereZigBee) (lightMsg.getWhere());
             assertEquals("702053501#9", wz.value());
             assertEquals(WhereZigBee.UNIT_01, wz.getUnit());
@@ -106,6 +132,21 @@ public class MessageTest {
             Assertions.fail();
         }
 
+    }
+
+    @Test
+    public void testMalformedCmdAndDimFrames() {
+        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
+        for (String frame : wrongFrames) {
+            try {
+                BaseOpenMessage.parse(frame);
+                // if we can parse this message, this test fails
+                Assertions.fail("MalformedFrameException not detected: " + frame);
+            } catch (FrameException e) {
+                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                assertTrue(e instanceof MalformedFrameException);
+            }
+        }
     }
 
     @Test
@@ -121,7 +162,24 @@ public class MessageTest {
         } catch (FrameException e) {
             assertTrue(e instanceof UnsupportedFrameException);
         }
+        try {
+            msg = BaseOpenMessage.parse("*#5*0##");
+        } catch (FrameException e) {
+            assertTrue(e instanceof UnsupportedFrameException);
+        }
         assertNull(msg);
+    }
+
+    @Test
+    public void testUnsupportedWhat() {
+        OpenMessage msg = null;
+        try {
+            msg = BaseOpenMessage.parse("*2*4*11##");
+            BaseOpenMessage bmsg = (BaseOpenMessage) msg;
+            System.out.println(bmsg.toStringVerbose());
+        } catch (FrameException e) {
+            assertTrue(e instanceof UnsupportedFrameException);
+        }
     }
 
     @Test
@@ -130,6 +188,7 @@ public class MessageTest {
         try {
             gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**16*1*2*3##");
             assertNotNull(gwMsg);
+            assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
             assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimValues());
@@ -150,6 +209,7 @@ public class MessageTest {
             gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**#16#5#4*255*3##");
             // TODO change test frame with an existing one from Energy mgmt
             assertNotNull(gwMsg);
+            assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
             assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimParams());
@@ -166,4 +226,14 @@ public class MessageTest {
         }
     }
 
+    @Test
+    public void testGatewayMgmt() {
+        GatewayMgmt gwMsg = GatewayMgmt.requestMACAddress();
+        assertNotNull(gwMsg);
+        assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
+        assertFalse(gwMsg.isCommand());
+        assertEquals(GatewayMgmt.DIM.MAC_ADDRESS, gwMsg.getDim());
+        assertNull(gwMsg.getWhere());
+        assertNull(gwMsg.getWhat());
+    }
 }

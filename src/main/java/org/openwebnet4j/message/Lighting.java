@@ -45,7 +45,10 @@ public class Lighting extends BaseOpenMessage {
         DIMMER_100(10), // dimmer level=10
         DIMMER_UP(30), // dimmer up one level
         DIMMER_DOWN(31), // dimmer down one level
-        DIMMER_TOGGLE(32); // toggle
+        DIMMER_TOGGLE(32), // toggle
+        // green switch
+        MOVEMENT_DETECTED(34),
+        END_MOVEMENT_DETECTED(39);
 
         private static Map<Integer, WHAT> mapping;
 
@@ -125,6 +128,7 @@ public class Lighting extends BaseOpenMessage {
 
     protected Lighting(String value) {
         super(value);
+        this.who = Who.LIGHTING;
     }
 
     /**
@@ -203,8 +207,7 @@ public class Lighting extends BaseOpenMessage {
      */
     public int parseDimmerLevel100() throws FrameException {
         if (getDim() == Lighting.DIM.DIMMER_LEVEL_100) {
-            getDimValues();
-            int level100 = Integer.parseInt(dimValues[0]);
+            int level100 = Integer.parseInt(getDimValues()[0]);
             if (level100 >= DIMMER_LEVEL_100_OFF && level100 <= DIMMER_LEVEL_100_MAX) {
                 return level100 - 100;
             } else {
@@ -264,7 +267,7 @@ public class Lighting extends BaseOpenMessage {
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr == null) {
-            throw new FrameException("Frame has no WHERE part: " + whereStr);
+            throw new FrameException("Lighting frame has no WHERE part: " + whereStr);
         } else {
             if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
                 where = new WhereZigBee(whereStr);
@@ -279,9 +282,9 @@ public class Lighting extends BaseOpenMessage {
         if (isCommand()) { // ignore status/dimension frames for detecting device type
             OpenDeviceType type = null;
             What w = getWhat();
-            if (w == WHAT.OFF || w == WHAT.ON) {
+            if (w == WHAT.OFF || w == WHAT.ON || w == WHAT.MOVEMENT_DETECTED || w == WHAT.END_MOVEMENT_DETECTED) {
                 type = OpenDeviceType.SCS_ON_OFF_SWITCH;
-            } else {
+            } else if (w.value() >= 2 && w.value() <= 10) {
                 type = OpenDeviceType.SCS_DIMMER_SWITCH;
             }
             return type;
