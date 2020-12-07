@@ -13,6 +13,7 @@ Supported frames:
 
 * `WHO=1` Lighting
 * `WHO=2` Automation
+* `WHO=4` Thermoregulation
 * `WHO=13` Gateway Management
 * `WHO=18` Energy Management
 
@@ -28,7 +29,8 @@ Supported Open Web Net gateways:
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
 - Add other `WHOs`
     - [x] Energy
-    - [ ] Thermo
+    - [x] Thermo
+    - [ ] Thermo (advanced)
     - [ ] CEN/CEN+
     - [ ] AUX
 - [ ] add sendHighPriority with priority queue
