@@ -27,10 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OpenWebNet Thermostat messages (WHO=4)
+ * OpenWebNet Thermoregulation messages (WHO=4)
  *
  * @author M. Valla - Initial contribution
- * @author G. Cocchi - Contributor
+ * @author G. Cocchi - Contribution for new lib
+ *
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -200,7 +201,7 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
             String mode) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
-            throw new MalformedFrameException("Set Point Temperature should be between 5 and 40° Celsius.");
+            throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
@@ -354,8 +355,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (what.toString().startsWith("5")) {
             return OpenDeviceType.SCS_TEMP_SENSOR;
         } else if (what.toString().startsWith("0") || what.toString().startsWith("#0")) {
-            // Central unit or "all
-            // probes"
+            // Central unit or "all probes"
             return null;
         } else {
             return OpenDeviceType.SCS_THERMOSTAT;
