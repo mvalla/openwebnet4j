@@ -263,7 +263,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            where = new WhereLightAutom(whereStr);
+            where = new WhereThermo(whereStr);
         }
     }
 
@@ -355,7 +355,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (what.toString().startsWith("5")) {
             return OpenDeviceType.SCS_TEMP_SENSOR;
         } else if (what.toString().startsWith("0") || what.toString().startsWith("#0")) {
-            // Central unit or "all probes"
+            // Central unit or "all probes", not supported for now
             return null;
         } else {
             return OpenDeviceType.SCS_THERMOSTAT;
