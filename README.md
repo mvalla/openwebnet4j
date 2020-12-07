@@ -13,6 +13,7 @@ Supported frames:
 
 * `WHO=1` Lighting
 * `WHO=2` Automation
+* `WHO=4` Thermoregulation
 * `WHO=13` Gateway Management
 
 Supported Open Web Net gateways:
@@ -26,8 +27,9 @@ Supported Open Web Net gateways:
 - [x] Support for `WHO=2` Automation (shutters)
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
 - Add other `WHOs`
+    - [x] Thermo
+    - [ ] Thermo (advanced)
     - [ ] Energy
-    - [ ] Thermo
     - [ ] CEN/CEN+
     - [ ] AUX
 - [ ] add sendHighPriority with priority queue
@@ -40,7 +42,7 @@ Supported Open Web Net gateways:
     <dependency>
       <groupId>com.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.3.2</version>
+      <version>0.4.0</version>
     </dependency>
 ```
 

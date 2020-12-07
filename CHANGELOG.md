@@ -1,8 +1,9 @@
 # Changelog
 
-## [0.3.3-SNAPSHOT] - 2020-??-??
+## [0.4.0-SNAPSHOT] - 2020-??-??
 
 ### Added
+- Initial support for Thermoregulation (WHO=4)
 - [zigbee] Handling of disconnection/reconnection of ZigBee USB Gateway from USB port
 - Frame length and bad char checks to BaseOpenMessage
 - added isCurrentlyOwned()/is serial port checks in USBConnector
