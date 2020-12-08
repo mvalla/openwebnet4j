@@ -23,6 +23,7 @@ import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereLightAutom;
+import org.openwebnet4j.message.WhereThermo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,9 +120,10 @@ public class BUSGateway extends OpenGateway {
                 }
             }
 
-            // DISCOVER THERMOREGULATION - request status for all thermoregulation devices: *#4*0##
+            // DISCOVER THERMOREGULATION - request status for all thermoregulation devices via all actuators:
+            // *#4*0#0*20##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
-            res = sendInternal(Thermoregulation.requestStatus(WhereLightAutom.GENERAL.value()));
+            res = sendInternal(Thermoregulation.requestActuatorStatus(WhereThermo.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof Thermoregulation) {
                     Thermoregulation amsg = ((Thermoregulation) msg);
