@@ -282,10 +282,12 @@ public class Lighting extends BaseOpenMessage {
         if (isCommand()) { // ignore status/dimension frames for detecting device type
             OpenDeviceType type = null;
             What w = getWhat();
-            if (w == WHAT.OFF || w == WHAT.ON || w == WHAT.MOVEMENT_DETECTED || w == WHAT.END_MOVEMENT_DETECTED) {
-                type = OpenDeviceType.SCS_ON_OFF_SWITCH;
-            } else if (w.value() >= 2 && w.value() <= 10) {
-                type = OpenDeviceType.SCS_DIMMER_SWITCH;
+            if (w != null) {
+                if (w == WHAT.OFF || w == WHAT.ON || w == WHAT.MOVEMENT_DETECTED || w == WHAT.END_MOVEMENT_DETECTED) {
+                    type = OpenDeviceType.SCS_ON_OFF_SWITCH;
+                } else if (w.value() >= 2 && w.value() <= 10) {
+                    type = OpenDeviceType.SCS_DIMMER_SWITCH;
+                }
             }
             return type;
         } else {

@@ -71,8 +71,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     /*
      * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach": other parts (WHERE,
-     * WHAT,
-     * DIM, parameters, etc.) are not parsed until requested.
+     * WHAT, DIM, parameters, etc.) are not parsed until requested.
      *
      * @param frame the frame String to parse
      *
@@ -347,6 +346,12 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     protected abstract What whatFromValue(int i);
 
+    /**
+     * Tries to return a {@link OpenDeviceType} based on frame value
+     *
+     * @return recognized device type or null if not device can be recognized
+     * @throws FrameException
+     */
     public abstract OpenDeviceType detectDeviceType() throws FrameException;
 
     /**
