@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) 2020 Contributors to the openwebnet4j project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ */
 package org.openwebnet4j.message;
 
 import static java.lang.String.format;
@@ -13,9 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OpenWebNet Thermostat messages (WHO=4)
+ * OpenWebNet Thermoregulation messages (WHO=4)
  *
- * @author G. Cocchi - Initial contribution
+ * @author M. Valla - Initial contribution
+ * @author G. Cocchi - Contribution for new lib
+ *
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -126,9 +142,8 @@ public class Thermoregulation extends BaseOpenMessage {
         OFFSET(13),
         TEMP_SETPOINT(14),
         PROBE_TEMPERATURE(15),
-        ACTUATOR_STATUS(20),
-        ACTUATOR_STATUS_ON(1),
-        ACTUATOR_STATUS_OFF(0);
+        VALVES_STATUS(19),
+        ACTUATOR_STATUS(20);
 
         private static Map<Integer, DIM> mapping;
 
@@ -158,6 +173,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    private static final int WHO = THERMOREGULATION.value();
+
     protected Thermoregulation(String value) {
         super(value);
     }
@@ -172,8 +189,6 @@ public class Thermoregulation extends BaseOpenMessage {
         return DIM.fromValue(i);
     }
 
-    private static final int WHO = THERMOREGULATION.value();
-
     /**
      * OpenWebNet message to Manual setting of “N” zone to T temperature <b>*#4*where*#14*T*M##</b>.
      *
@@ -181,9 +196,16 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param temp temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param mode
      * @return message
+     * @throws MalformedFrameException
      */
-    public static Thermoregulation requestWriteSetpointTemperature(String where, String temperature, String mode) {
-        return new Thermoregulation(format(FORMAT_SETTING, WHO, where, DIM.TEMP_SETPOINT.value(), temperature, mode));
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            String mode) throws MalformedFrameException {
+        if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
+            throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
+        }
+        // Round new Set Point Temperature to close 0.5° C value
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode));
     }
 
     /**
@@ -217,7 +239,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to get a Thermostat device status <b>*#4*where##</b>.
+     * OpenWebNet message N zone device status request <b>*#4*where##</b>.
      *
      * @param where WHERE string
      * @return message
@@ -226,24 +248,117 @@ public class Thermoregulation extends BaseOpenMessage {
         return new Thermoregulation(format(FORMAT_STATUS, WHO, w));
     }
 
+    /**
+     * OpenWebNet message N zone valves status request<b>*#4*where*19##</b>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestValvesStatus(String w) {
+        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.VALVES_STATUS.value()));
+    }
+
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            where = new WhereLightAutom(whereStr);
+            where = new WhereThermo(whereStr);
         }
     }
 
-    @Override
-    public OpenDeviceType detectDeviceType() throws FrameException {
-        if (isCommand()) { // ignore status/dimension frames for detecting device type
-            OpenDeviceType type = null;
-            What w = getWhat();
-            type = OpenDeviceType.SCS_THERMOSTAT;
-            return type;
+    /*
+     * Parse temperature from Thermoregulation msg (dimensions: 0, 12, 14 or 15)
+     *
+     * @param msg Thermoregulation message
+     *
+     * @return parsed temperature in degrees Celsius
+     *
+     * @throws NumberFormatException
+     */
+    public static Double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
+        String[] values = msg.getDimValues();
+        // temp is in the first dim value for thermostats (dim=0,12,14), in the second in case of
+        // probes (dim=15)
+        // TODO check min,max values
+        if (msg.getDim() == DIM.TEMPERATURE || msg.getDim() == DIM.TEMP_SETPOINT || msg.getDim() == DIM.TEMP_TARGET) {
+            return decodeTemperature(values[0]);
+        } else if (msg.getDim() == DIM.PROBE_TEMPERATURE) {
+            return decodeTemperature(values[1]);
         } else {
+            throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
+        }
+    }
+
+    public LOCAL_OFFSET getLocalOffset() throws FrameException {
+        String[] values = getDimValues();
+        return LOCAL_OFFSET.fromValue(values[0]);
+    }
+
+    /**
+     * Convert temperature from BTicino format to number For example: 0235 --> +23.5 (°C) and 1048
+     * --> -4.8 (°C)
+     *
+     * @param temperature the temperature as String
+     * @return the temperature as Double
+     */
+    public static Double decodeTemperature(String _temperature) throws NumberFormatException {
+        int tempInt;
+        int sign = 1;
+        String temperature = _temperature;
+        if (temperature.charAt(0) == '#') { // remove leading '#' if present
+            temperature = temperature.substring(1);
+        }
+        if (temperature.length() == 4) {
+            if (temperature.charAt(0) == '1') {
+                sign = -1;
+            }
+            tempInt = Integer.parseInt(temperature.substring(1)); // leave out first sign digit
+        } else if (temperature.length() == 3) { // 025 -> 2.5°C
+            tempInt = Integer.parseInt(temperature);
+        } else {
+            throw new NumberFormatException("Unrecognized temperature format: " + temperature);
+        }
+        Double t = sign * tempInt / 10.0;
+        return (Math.round(t * 100.0)) / 100.0; // round it to 2 decimal digits
+    }
+
+    /**
+     * Encodes temperature from float to BTicino format
+     *
+     * @param temp temperature
+     * @return String
+     */
+    public static String encodeTemperature(double temp) {
+        // +23.51 °C --> '0235'; -4.86 °C --> '1049'
+        // checkRange(5, 40, Math.round(temp));
+        char sign = (temp >= 0 ? '0' : '1');
+        String digits = "";
+        int absTemp = (int) Math.abs(Math.round(temp * 10));
+        if (absTemp < 100) {
+            digits += "0";
+        }
+        if (absTemp < 10) {
+            digits += "0";
+        }
+        digits += absTemp;
+        if (digits == "000") {
+            sign = '0';
+        }
+        logger.debug("====TEMPERATURE {} --> : <{}>", temp, sign + digits);
+        return sign + digits;
+    }
+
+    @Override
+    public OpenDeviceType detectDeviceType() {
+        What what = getWhat();
+        if (what.toString().startsWith("5")) {
+            return OpenDeviceType.SCS_TEMP_SENSOR;
+        } else if (what.toString().startsWith("0") || what.toString().startsWith("#0")) {
+            // Central unit or "all probes", not supported for now
             return null;
+        } else {
+            return OpenDeviceType.SCS_THERMOSTAT;
         }
     }
 }
