@@ -273,6 +273,10 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
+            if (whereStr.indexOf("#") > 0) {
+                // Correct Actuator Where value x#y to value x
+                whereStr = whereStr.substring(0, whereStr.indexOf("#"));
+            }
             where = new WhereThermo(whereStr);
         }
     }
