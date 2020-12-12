@@ -209,6 +209,19 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
+     * OpenWebNet to set the Thermoregulation device mode.
+     *
+     * @param where Zone between #1 and #99
+     * @param mode
+     * @return message
+     * @throws MalformedFrameException
+     */
+    public static Thermoregulation requestWriteSetMode(String where, Thermoregulation.WHAT newMode)
+            throws MalformedFrameException {
+        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode, where));
+    }
+
+    /**
      * OpenWebNet message request to turn off the thermostat <i>OFF</i> <b>*4*303*where##</b>.
      *
      * @param where WHERE string
