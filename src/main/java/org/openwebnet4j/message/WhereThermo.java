@@ -21,7 +21,7 @@ package org.openwebnet4j.message;
  */
 public class WhereThermo extends Where {
 
-    public static final Where GENERAL = new WhereThermo("0");
+    public static final Where GENERAL = new WhereThermo("0#0");
 
     public WhereThermo(String w) throws NullPointerException {
         // TODO check range for WHERE
