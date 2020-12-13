@@ -252,6 +252,16 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
+     * OpenWebNet message N actuator status request <b>*#4*where*20##</b>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestActuatorStatus(String w) {
+        return new Thermoregulation(format(FORMAT_DIMENSION, WHO, w, DIM.ACTUATOR_STATUS.value()));
+    }
+
+    /**
      * OpenWebNet message N zone device status request <b>*#4*where##</b>.
      *
      * @param where WHERE string
@@ -364,14 +374,19 @@ public class Thermoregulation extends BaseOpenMessage {
 
     @Override
     public OpenDeviceType detectDeviceType() {
-        What what = getWhat();
-        if (what.toString().startsWith("5")) {
-            return OpenDeviceType.SCS_TEMP_SENSOR;
-        } else if (what.toString().startsWith("0") || what.toString().startsWith("#0")) {
-            // Central unit or "all probes", not supported for now
+        Where w = getWhere();
+        if (w == null) {
             return null;
         } else {
-            return OpenDeviceType.SCS_THERMOSTAT;
+            // if (w.toString().startsWith("5")) {
+            // return OpenDeviceType.SCS_TEMP_SENSOR;
+            // } else
+            if (w.toString().startsWith("0") || w.toString().startsWith("#0")) {
+                // Central unit or "all probes", not supported for now
+                return null;
+            } else {
+                return OpenDeviceType.SCS_THERMOSTAT;
+            }
         }
     }
 }
