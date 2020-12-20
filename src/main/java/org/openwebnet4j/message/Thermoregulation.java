@@ -173,6 +173,27 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    public enum ACTUATOR {
+        STATUS_OFF(0),
+        STATUS_ON(1);
+
+        private final Integer value;
+
+        private ACTUATOR(Integer value) {
+            this.value = value;
+        }
+
+        public static ACTUATOR fromValue(Integer i) {
+            Optional<ACTUATOR> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
+            return a.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
+        }
+    }
+
     private static final int WHO = THERMOREGULATION.value();
 
     protected Thermoregulation(String value) {
@@ -320,6 +341,28 @@ public class Thermoregulation extends BaseOpenMessage {
     public LOCAL_OFFSET getLocalOffset() throws FrameException {
         String[] values = getDimValues();
         return LOCAL_OFFSET.fromValue(values[0]);
+    }
+
+    /**
+     * Returns the actuator form the message WHERE part.
+     * WHERE=Z#N --> returns N
+     *
+     * @return id (1-9) of the actuator
+     */
+    public int getActuator() {
+        return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
+    }
+
+    /**
+     * Extracts status of actuator N from message
+     *
+     * @param n the actuator number
+     * @return 0=OFF, 1=ON
+     */
+    // TODO return Enum instead of int
+    public int getActuatorStatus(int n) throws FrameException {
+        String[] values = getDimValues();
+        return Integer.parseInt((values[0]));
     }
 
     /**
