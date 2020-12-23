@@ -237,9 +237,8 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      * @throws MalformedFrameException
      */
-    public static Thermoregulation requestWriteSetMode(String where, Thermoregulation.WHAT newMode)
-            throws MalformedFrameException {
-        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode, where));
+    public static Thermoregulation requestWriteSetMode(String where, WHAT newMode) throws MalformedFrameException {
+        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
     }
 
     /**
