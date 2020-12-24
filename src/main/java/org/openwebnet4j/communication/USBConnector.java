@@ -69,8 +69,6 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private final Object cmdSentSynchObj = new Object(); // Synch object to synchronise sending a frame and processing
                                                          // its answer
 
-    // private final Object bufferSynchronisationObject = new Object(); // Synch object for buffer queue manipulation
-
     public USBConnector(String portName) {
         super();
         this.portName = portName;

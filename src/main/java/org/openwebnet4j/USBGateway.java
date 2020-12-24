@@ -14,6 +14,8 @@
  */
 package org.openwebnet4j;
 
+import java.nio.ByteBuffer;
+
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.communication.USBConnector;
@@ -126,6 +128,21 @@ public class USBGateway extends OpenGateway {
                 notifyListeners((listener) -> listener.onNewDevice(w, getZigBeeDeviceType(m), m));
             }
             i++;
+        }
+    }
+
+    /**
+     * Returns the ZigBee ID of the gateway in decimal format (=four last bytes of the ZigBee MAC address of the product
+     * converted in decimal format)
+     *
+     * @return the gateway ZigBeeId, or 0 if it is unknown
+     */
+    public int getZigBeeIdAsDecimal() {
+        if (macAddr != null) {
+            ByteBuffer bb = ByteBuffer.wrap(macAddr, 4, 4); // get last 4 bytes
+            return bb.getInt();
+        } else {
+            return 0;
         }
     }
 
