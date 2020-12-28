@@ -266,9 +266,6 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case THERMOREGULATION:
                 baseopenmsg = new Thermoregulation(frame);
                 break;
-            case ENERGY_MANAGEMENT:
-                baseopenmsg = new EnergyManagement(frame);
-                break;
             default:
                 break;
         }
