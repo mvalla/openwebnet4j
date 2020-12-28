@@ -21,7 +21,7 @@ package org.openwebnet4j.message;
  */
 public class WhereEnergyManagement extends Where {
 
-    public static final Where GENERAL = new WhereEnergyManagement("0#0");
+    public static final Where GENERAL = new WhereEnergyManagement("70#0");
 
     public WhereEnergyManagement(String w) throws NullPointerException {
         super(w);
