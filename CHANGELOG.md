@@ -6,9 +6,11 @@
 - Initial support for Thermoregulation (WHO=4)
 - [zigbee] Handling of disconnection/reconnection of ZigBee USB Gateway from USB port
 - Frame length and bad char checks to BaseOpenMessage
+- added isCurrentlyOwned()/is serial port checks in USBConnector
 
 ### Changed
 - Bumped nrjavaserial to 5.2.1
+
 
 ## [0.3.2-1] - 2020-11-21
 

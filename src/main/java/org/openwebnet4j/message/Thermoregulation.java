@@ -237,8 +237,9 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      * @throws MalformedFrameException
      */
-    public static Thermoregulation requestWriteSetMode(String where, WHAT newMode) throws MalformedFrameException {
-        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
+    public static Thermoregulation requestWriteSetMode(String where, Thermoregulation.WHAT newMode)
+            throws MalformedFrameException {
+        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode, where));
     }
 
     /**
@@ -343,6 +344,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
+     * <<<<<<< HEAD
      * Returns the actuator form the message WHERE part.
      * WHERE=Z#N --> returns N
      *
@@ -365,6 +367,8 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
+     * =======
+     * >>>>>>> upstream/0.4-thermo-new
      * Convert temperature from BTicino format to number For example: 0235 --> +23.5 (°C) and 1048
      * --> -4.8 (°C)
      *

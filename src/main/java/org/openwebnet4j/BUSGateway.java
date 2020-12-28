@@ -18,12 +18,10 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
-import org.openwebnet4j.message.EnergyManagement;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Where;
-import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
 import org.slf4j.Logger;
@@ -129,21 +127,6 @@ public class BUSGateway extends OpenGateway {
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof Thermoregulation) {
                     Thermoregulation amsg = ((Thermoregulation) msg);
-                    OpenDeviceType type = amsg.detectDeviceType();
-                    if (type != null) {
-                        Where w = amsg.getWhere();
-                        notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
-                    }
-                }
-            }
-
-            // DISCOVER ENERGYMANAGEMENT - request status for all energyManagement devices:
-            // *#4*0#0*20##
-            logger.debug("##BUS## ----- ENERGYMANAGEMENT discovery");
-            res = sendInternal(EnergyManagement.requestActuatorStatus(WhereEnergyManagement.GENERAL.value()));
-            for (OpenMessage msg : res.getResponseMessages()) {
-                if (msg instanceof EnergyManagement) {
-                    EnergyManagement amsg = ((EnergyManagement) msg);
                     OpenDeviceType type = amsg.detectDeviceType();
                     if (type != null) {
                         Where w = amsg.getWhere();

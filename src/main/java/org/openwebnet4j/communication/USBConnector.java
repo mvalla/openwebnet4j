@@ -69,8 +69,6 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private final Object cmdSentSynchObj = new Object(); // Synch object to synchronise sending a frame and processing
                                                          // its answer
 
-    // private final Object bufferSynchronisationObject = new Object(); // Synch object for buffer queue manipulation
-
     public USBConnector(String portName) {
         super();
         this.portName = portName;
@@ -198,20 +196,31 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         } catch (NoSuchPortException e) {
             logger.info("##USB-conn## Failed to connect to serial port {}: NoSuchPortException", portN);
             String availPorts = listSerialPorts();
-            logger.info("##USB-conn## Available ports are: {}", availPorts);
-            throw new OWNException("Failed to connect to serial port " + portN + ". Available ports are: " + availPorts,
-                    e);
+            logger.info("##USB-conn## Available serial ports are: {}", availPorts);
+            throw new OWNException(
+                    "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts, e);
         }
         logger.debug("##USB-conn## CommPortIndetifier: name={} type={} owner={}", ident.getName(), ident.getPortType(),
                 ident.getCurrentOwner());
+
+        if (ident.getPortType() != CommPortIdentifier.PORT_SERIAL) {
+            logger.error("##USB-conn## Port {} is not a serial port", ident.getName());
+            throw new OWNException("Failed to connect to port " + portN + " (not a serial port).");
+        }
+        if (ident.isCurrentlyOwned()) {
+            logger.debug("##USB-conn## Serial port {} is already in use", ident.getName());
+            throw new OWNException("Failed to connect to serial port " + portN + ". Port is already in use.");
+        }
         NRSerialPort connectPort = new NRSerialPort(portN, SERIAL_SPEED);
         logger.debug("##USB-conn## NRSerialPort created");
+
         if (connectPort.connect()) {
             try {
                 connectPort.getSerialPortInstance().setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8,
                         SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-            } catch (UnsupportedCommOperationException e) {
-                throw new OWNException("Failed to connect to serial port: " + portN, e);
+            } catch (UnsupportedCommOperationException ue) {
+                logger.error("##USB-conn## Failed setting params for port {}", ident.getName());
+                throw new OWNException("Failed setting params for port: " + portN, ue);
             }
             SerialPort sp = connectPort.getSerialPortInstance();
             // try {
