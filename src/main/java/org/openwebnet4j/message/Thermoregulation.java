@@ -173,6 +173,27 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    public enum ACTUATOR {
+        STATUS_OFF(0),
+        STATUS_ON(1);
+
+        private final Integer value;
+
+        private ACTUATOR(Integer value) {
+            this.value = value;
+        }
+
+        public static ACTUATOR fromValue(Integer i) {
+            Optional<ACTUATOR> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
+            return a.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
+        }
+    }
+
     private static final int WHO = THERMOREGULATION.value();
 
     protected Thermoregulation(String value) {
@@ -194,18 +215,19 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param where Zone between #1 and #99
      * @param temp temperature T between 5.0° and 40.0° (with 0.5° step)
-     * @param mode
+     * @param MODE thermoFunction
      * @return message
      * @throws MalformedFrameException
      */
+
     public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
-            String mode) throws MalformedFrameException {
+            int thermoFunction) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
             throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
-                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode));
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), thermoFunction));
     }
 
     /**
@@ -218,7 +240,7 @@ public class Thermoregulation extends BaseOpenMessage {
      */
     public static Thermoregulation requestWriteSetMode(String where, Thermoregulation.WHAT newMode)
             throws MalformedFrameException {
-        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode, where));
+        return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
     }
 
     /**
@@ -286,8 +308,44 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
+            if (whereStr.indexOf("#") > 0) {
+                // Correct Actuator Where value x#y to value x in case of Thermostat device without Central Unit
+                whereStr = whereStr.substring(0, whereStr.indexOf("#"));
+            }
             where = new WhereThermo(whereStr);
         }
+    }
+
+    /**
+     * Returns the actuator form the message WHERE part.
+     * WHERE=Z#N --> returns N
+     *
+     * @return id (1-9) of the actuator
+     */
+    public int getActuator() {
+        return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
+    }
+
+    /**
+     * Extracts status of actuator N from message
+     *
+     * @param n the actuator number
+     * @return 0=OFF, 1=ON
+     */
+    // TODO return Enum instead of int
+    public int getActuatorStatus(int n) throws FrameException {
+        String[] values = getDimValues();
+        return Integer.parseInt((values[0]));
+    }
+
+    /**
+     * Extracts the Local Offset value
+     *
+     * @return localOffset
+     */
+    public LOCAL_OFFSET getLocalOffset() throws FrameException {
+        String[] values = getDimValues();
+        return LOCAL_OFFSET.fromValue(values[0]);
     }
 
     /*
@@ -311,11 +369,6 @@ public class Thermoregulation extends BaseOpenMessage {
         } else {
             throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
         }
-    }
-
-    public LOCAL_OFFSET getLocalOffset() throws FrameException {
-        String[] values = getDimValues();
-        return LOCAL_OFFSET.fromValue(values[0]);
     }
 
     /**
