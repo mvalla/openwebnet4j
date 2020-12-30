@@ -105,6 +105,10 @@ public class Thermoregulation extends BaseOpenMessage {
             Optional<MODE> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue()).findFirst();
             return m.orElse(null);
         }
+
+        public Integer value() {
+            return value;
+        }
     }
 
     public enum LOCAL_OFFSET {
@@ -221,13 +225,13 @@ public class Thermoregulation extends BaseOpenMessage {
      */
 
     public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
-            int thermoFunction) throws MalformedFrameException {
+            Thermoregulation.MODE mode) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
             throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
-                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), thermoFunction));
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode.value()));
     }
 
     /**
