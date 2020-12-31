@@ -183,12 +183,12 @@ public class Thermoregulation extends BaseOpenMessage {
 
         private final Integer value;
 
-        private ACTUATOR(Integer value) {
+        private ACTUATOR_STATUS(Integer value) {
             this.value = value;
         }
 
-        public static ACTUATOR fromValue(Integer i) {
-            Optional<ACTUATOR> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+        public static ACTUATOR_STATUS fromValue(Integer i) {
+            Optional<ACTUATOR_STATUS> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
                     .findFirst();
             return a.orElse(null);
         }
@@ -312,7 +312,8 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            // TODO the original where string of the message should not be modified here: instead thermo id and actuator id should be parsed in WhereThermo
+            // TODO the original where string of the message should not be modified here: instead thermo id and actuator
+            // id should be parsed in WhereThermo
             if (whereStr.indexOf("#") > 0) {
                 // Correct Actuator Where value x#y to value x in case of Thermostat device without Central Unit
                 whereStr = whereStr.substring(0, whereStr.indexOf("#"));
@@ -328,7 +329,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return id (1-9) of the actuator
      */
     public int getActuator() {
-        //TODO move this parsing to WhereThermo and here just return the actuator part of the where object
+        // TODO move this parsing to WhereThermo and here just return the actuator part of the where object
         return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
     }
 
@@ -437,6 +438,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (w == null) {
             return null;
         } else {
+            // TODO
             // if (w.toString().startsWith("5")) {
             // return OpenDeviceType.SCS_TEMP_SENSOR;
             // } else

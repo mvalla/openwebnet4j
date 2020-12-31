@@ -142,6 +142,8 @@ public class MessageTest {
         }
     }
 
+    // TODO thestWhereThermo
+
     @Test
     public void testZigBeeLightingWhere() {
         Lighting lightMsg;
