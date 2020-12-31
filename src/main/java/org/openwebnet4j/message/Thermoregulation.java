@@ -177,9 +177,9 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    public enum ACTUATOR {
-        STATUS_OFF(0),
-        STATUS_ON(1);
+    public enum ACTUATOR_STATUS {
+        OFF(0),
+        ON(1);
 
         private final Integer value;
 
@@ -219,7 +219,7 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param where Zone between #1 and #99
      * @param temp temperature T between 5.0° and 40.0° (with 0.5° step)
-     * @param MODE thermoFunction
+     * @param MODE mode
      * @return message
      * @throws MalformedFrameException
      */
@@ -312,6 +312,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
+            // TODO the original where string of the message should not be modified here: instead thermo id and actuator id should be parsed in WhereThermo
             if (whereStr.indexOf("#") > 0) {
                 // Correct Actuator Where value x#y to value x in case of Thermostat device without Central Unit
                 whereStr = whereStr.substring(0, whereStr.indexOf("#"));
@@ -327,6 +328,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return id (1-9) of the actuator
      */
     public int getActuator() {
+        //TODO move this parsing to WhereThermo and here just return the actuator part of the where object
         return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
     }
 
