@@ -17,6 +17,22 @@ package org.openwebnet4j.message;
 /**
  * WHERE for Thermoregulation frames
  *
+ * == Where Table:
+ *
+ * === Probes
+ * 0 - all probes
+ * Z - master probe of zone Z [1-99]
+ * 0ZZ - all slave probes of zone ZZ [01-99]
+ * sZZ - slave probe s[1-8] of zone ZZ [01-99]
+ * s00 - external probe s[1-9] of external zone 00
+ *
+ * === Actuators (thermostats)
+ * #0 - central unit
+ * #Z - zone Z [1-99] via central unit
+ * 0#0 - all zones, all actuators
+ * Z#0 - zone Z [1-99], all actuators
+ * Z#N - zone Z [1-99], actuator N [1-9]
+ *
  * @author M. Valla - Initial contribution
  */
 public class WhereThermo extends Where {
