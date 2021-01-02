@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.3-SNAPSHOT] - 2020-??-??
+## [0.3.3] - 2021-01-02
 
 ### Fixed
 - [zigbee] Fixed fixInvertedUpDownBug() not converting commands
