@@ -354,12 +354,14 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private OpenMessage fixInvertedUpDownBug(OpenMessage msg) {
         if (hasAutomationBug && msg instanceof Automation) {
             try {
-                logger.debug("##USB-conn## older firmware: converting Automation UP / DOWN on message: {}", msg);
-                return Automation.convertUpDown((Automation) msg);
+                Automation msgConverted = Automation.convertUpDown((Automation) msg);
+                logger.debug("##USB-conn## older firmware: converting Automation UP / DOWN on message {} --> {}", msg,
+                        msgConverted);
+                return msgConverted;
             } catch (FrameException fe) {
                 logger.warn(
-                        "##USB-conn## older firmware: FrameException while converting Automation UP/DOWN message: {}.",
-                        msg);
+                        "##USB-conn## older firmware: FrameException while converting Automation UP/DOWN on message {}: {}",
+                        msg, fe.getMessage());
             }
         }
         return msg;

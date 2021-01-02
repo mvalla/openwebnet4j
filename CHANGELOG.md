@@ -2,6 +2,9 @@
 
 ## [0.3.3-SNAPSHOT] - 2020-??-??
 
+### Fixed
+- [zigbee] Fixed fixInvertedUpDownBug() not converting commands
+
 ### Added
 - [zigbee] Handling of disconnection/reconnection of ZigBee USB Gateway from USB port
 - Frame length and bad char checks to BaseOpenMessage
