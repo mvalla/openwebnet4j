@@ -34,17 +34,17 @@ public class Lighting extends BaseOpenMessage {
         OFF(0), // OFF
         ON(1), // ON
         // dimmer
-        DIMMER_20(2), // dimmer level=2
-        DIMMER_30(3),
-        DIMMER_40(4),
-        DIMMER_50(5),
-        DIMMER_60(6),
-        DIMMER_70(7),
-        DIMMER_80(8),
-        DIMMER_90(9),
-        DIMMER_100(10), // dimmer level=10
-        DIMMER_UP(30), // dimmer up one level
-        DIMMER_DOWN(31), // dimmer down one level
+        DIMMER_LEVEL_2(2),
+        DIMMER_LEVEL_3(3),
+        DIMMER_LEVEL_4(4),
+        DIMMER_LEVEL_5(5),
+        DIMMER_LEVEL_6(6),
+        DIMMER_LEVEL_7(7),
+        DIMMER_LEVEL_8(8),
+        DIMMER_LEVEL_9(9),
+        DIMMER_LEVEL_10(10),
+        DIMMER_LEVEL_UP(30), // dimmer up one level
+        DIMMER_LEVEL_DOWN(31), // dimmer down one level
         DIMMER_TOGGLE(32), // toggle
         // green switch
         MOVEMENT_DETECTED(34),
