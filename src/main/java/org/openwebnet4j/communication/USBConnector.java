@@ -276,7 +276,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         OpenMessage fixedMsg = fixInvertedUpDownBug(msg);
         synchronized (cmdSentSynchObj) {
             currentResponse = new Response(fixedMsg); // FIXME check if we have to store original or modified message
-            String frameSend = msg.getFrameValue();
+            String frameSend = fixedMsg.getFrameValue();
             cmdChannel.sendFrame(frameSend);
             lastCmdFrameSentTs = System.currentTimeMillis();
             msgLogger.info("USB-CMD ====>>>> {}", frameSend);
