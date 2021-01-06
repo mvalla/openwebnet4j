@@ -1,10 +1,14 @@
 # Changelog
 
-## [0.3.4-SNAPSHOT] - 2021-01-??
+## [0.3.4] - 2021-01-07
 
 ### Fixed
-- [zigbee] Disconnect serial port if USB dongle returns NACK (fixes #7)
+- [zigbee] Disconnect serial port if USB dongle returns NACK during connection (fixes #7)
 - [zigbee] Fixed (again) fixInvertedUpDownBug() not converting commands
+- removed warn logs when reconnecting command connection
+
+### Changed
+- renamed dimmer levels in Lighting WHAT enum
 
 
 ## [0.3.3] - 2021-01-02

@@ -144,7 +144,7 @@ public class BUSConnector extends OpenConnector {
             // CMD session could have been closed by gateway, let's close this one an try with another CMD connection
             cmdSk.close();
             isCmdConnected = false;
-            logger.warn("##BUS-conn## trying NEW CMD connection...");
+            logger.debug("##BUS-conn## trying NEW CMD connection...");
             try {
                 openCmdConn();
             } catch (OWNException oe) {
