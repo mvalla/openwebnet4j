@@ -38,13 +38,20 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
+			<version>1.7.30</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.30</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
-			<!--  <version>3.15.0</version> -->
+			<!-- <version>3.15.0</version> -->
 			<version>5.2.1</version>
 		</dependency>
 
@@ -149,15 +156,15 @@
 
 		</plugins>
 	</build>
-	
+
 	<distributionManagement>
-        <repository>
-            <id>bintray-mvalla-maven</id>
-            <name>mvalla-maven</name>
-            <!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url>  -->
-            <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url>  
-            
-        </repository>
-    </distributionManagement>
+		<repository>
+			<id>bintray-mvalla-maven</id>
+			<name>mvalla-maven</name>
+			<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url> -->
+			<url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url>
+
+		</repository>
+	</distributionManagement>
 
 </project>
