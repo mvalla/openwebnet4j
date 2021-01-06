@@ -3,6 +3,7 @@
 ## [0.3.4-SNAPSHOT] - 2021-01-??
 
 ### Fixed
+- [zigbee] Disconnect serial port if USB dongle returns NACK (fixes #7)
 - [zigbee] Fixed (again) fixInvertedUpDownBug() not converting commands
 
 
@@ -47,7 +48,7 @@
 - Detection of green switch (WHAT 34/39). Limit dimmers detection to WHAT=2-10 values.
 
 ### Fixed
-- Add support for OPEN password nonce with less than 8 digits [Fixes #1]
+- Add support for OPEN password nonce with less than 8 digits (fixes #1)
 - Added check to verify gw is still reachable after MON rcv timetout expires before closing MON connection
 
 

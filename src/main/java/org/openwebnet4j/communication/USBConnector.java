@@ -159,11 +159,13 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             // send requestKeepConnect to see if USB stick is ready to receive commands
             GatewayMgmt frame = GatewayMgmt.requestKeepConnect();
             cmdChannel.sendFrame(GatewayMgmt.requestKeepConnect().getFrameValue());
+
             hsLogger.info("(HS) USB HS==>>>> {}", frame.getFrameValue());
             Thread.sleep(50); // we must wait few ms for the answer to be ready
             String resp = cmdChannel.readFrames();
             hsLogger.info("(HS) USB <<<<==HS {}", resp);
             if (!OpenMessage.FRAME_ACK.equals(resp)) {
+                disconnectSerialPort();
                 throw new OWNException("Could not communicate with a Zigbee USB Gateway on serial port: " + portN
                         + ". Serial returned: " + resp);
             }
@@ -174,8 +176,10 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            disconnectSerialPort();
             throw new OWNException("Failed to communicate with Zigbee USB Gateway on serial port: " + portN, e);
         } catch (TooManyListenersException e) {
+            disconnectSerialPort();
             throw new OWNException("Failed to communicate with Zigbee USB Gateway on serial port: " + portN, e);
         }
     }
