@@ -18,8 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openwebnet4j.BUSGateway;
+import org.openwebnet4j.communication.OWNException;
+import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.EnergyManagement;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
@@ -33,6 +37,7 @@ import org.openwebnet4j.message.Who;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
+ * @author Andrea Conte - Energy manager contribution
  */
 
 public class MessageTest {
@@ -237,4 +242,43 @@ public class MessageTest {
         assertNull(gwMsg.getWhere());
         assertNull(gwMsg.getWhat());
     }
+
+    @Test
+    public void testEnergyManagerUnit() {
+        EnergyManagement energyMsg;
+        try {
+            energyMsg = (EnergyManagement) BaseOpenMessage.parse("*#18*51*113##");
+            assertNotNull(energyMsg);
+            assertEquals(Who.ENERGY_MANAGEMENT, energyMsg.getWho());
+            assertFalse(energyMsg.isCommand());
+            assertEquals("51", energyMsg.getWhere().value());
+            assertEquals(EnergyManagement.DIM.ACTIVE_POWER, energyMsg.getDim());
+            assertNotNull(energyMsg.getDimValues());            
+        } catch (FrameException e) {
+            System.out.println(e.getMessage());
+
+            Assertions.fail();
+        }
+    }
+
+    // @Test
+    // public void testMyHomeServer1() 
+    // {
+    //     // create BUS gateway with IP=192.168.1.50 and password=12345
+    //     BUSGateway myGateway = new BUSGateway("192.168.1.50", 20000, "12345");
+
+    //     try {
+    //         myGateway.connect();
+
+    //         // get active power
+    //         Response res = myGateway.send(EnergyManagement.requestActivePower("51"));
+    //         assertTrue(res.isSuccess());
+
+    //         res = myGateway.send(EnergyManagement.setActivePowerNotificationsTime("51", 10));
+    //         assertTrue(res.isSuccess());
+
+    //     } catch (OWNException e) {
+    //         Assertions.fail();
+    //     }
+    // }
 }
