@@ -4,7 +4,7 @@
 ## [0.4.0-SNAPSHOT] - 2021-02-??
 
 ### Added
-- Initial support for Energy Manager (WHO=18)
+- Initial support for Energy Management (WHO=18)
 
 ## [0.3.4] - 2021-01-07
 
