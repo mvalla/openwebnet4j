@@ -1,7 +1,7 @@
 # Changelog
 
 
-## [0.4.0] - 2021-02-08
+## [0.4.0-SNAPSHOT] - 2021-02-??
 
 ### Added
 - Initial support for Energy Manager (WHO=18)
