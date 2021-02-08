@@ -18,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openwebnet4j.BUSGateway;
-import org.openwebnet4j.communication.OWNException;
-import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.EnergyManagement;
@@ -260,25 +257,4 @@ public class MessageTest {
             Assertions.fail();
         }
     }
-
-    // @Test
-    // public void testMyHomeServer1() 
-    // {
-    //     // create BUS gateway with IP=192.168.1.50 and password=12345
-    //     BUSGateway myGateway = new BUSGateway("192.168.1.50", 20000, "12345");
-
-    //     try {
-    //         myGateway.connect();
-
-    //         // get active power
-    //         Response res = myGateway.send(EnergyManagement.requestActivePower("51"));
-    //         assertTrue(res.isSuccess());
-
-    //         res = myGateway.send(EnergyManagement.setActivePowerNotificationsTime("51", 10));
-    //         assertTrue(res.isSuccess());
-
-    //     } catch (OWNException e) {
-    //         Assertions.fail();
-    //     }
-    // }
 }
