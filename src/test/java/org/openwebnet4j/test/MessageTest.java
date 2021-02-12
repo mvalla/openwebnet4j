@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.EnergyManagement;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
@@ -33,6 +34,7 @@ import org.openwebnet4j.message.Who;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
+ * @author Andrea Conte - Energy manager contribution
  */
 
 public class MessageTest {
@@ -236,5 +238,23 @@ public class MessageTest {
         assertEquals(GatewayMgmt.DIM.MAC_ADDRESS, gwMsg.getDim());
         assertNull(gwMsg.getWhere());
         assertNull(gwMsg.getWhat());
+    }
+
+    @Test
+    public void testEnergyManagerUnit() {
+        EnergyManagement energyMsg;
+        try {
+            energyMsg = (EnergyManagement) BaseOpenMessage.parse("*#18*51*113##");
+            assertNotNull(energyMsg);
+            assertEquals(Who.ENERGY_MANAGEMENT, energyMsg.getWho());
+            assertFalse(energyMsg.isCommand());
+            assertEquals("51", energyMsg.getWhere().value());
+            assertEquals(EnergyManagement.DIM.ACTIVE_POWER, energyMsg.getDim());
+            assertNotNull(energyMsg.getDimValues());            
+        } catch (FrameException e) {
+            System.out.println(e.getMessage());
+
+            Assertions.fail();
+        }
     }
 }
