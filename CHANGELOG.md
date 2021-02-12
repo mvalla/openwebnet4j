@@ -1,10 +1,13 @@
 # Changelog
 
-
 ## [0.4.0-SNAPSHOT] - 2021-02-??
 
 ### Added
 - Initial support for Energy Management (WHO=18)
+
+### Fixed
+- Add support for OPEN password nonce with any number of digits (fixes #1 again)
+
 
 ## [0.3.4] - 2021-01-07
 

@@ -307,7 +307,7 @@ public class BUSConnector extends OpenConnector {
             // STEP-2: NO_AUTH - Free beer and party, the connection is unauthenticated!
             frCh.handshakeCompleted = true;
             hsLogger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
-        } else if (fr.matches("\\*#\\d{7,12}##")) {
+        } else if (fr.matches("\\*#\\d+##")) {
             // STEP-2: OPEN_AUTH passwd nonce received
             doOPENHandshake(fr, frCh);
             frCh.handshakeCompleted = true;
