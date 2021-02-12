@@ -155,7 +155,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestMACAddress() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION, WHO, "", DIM.MAC_ADDRESS.value()));
+        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.MAC_ADDRESS.value()));
     }
 
     /**
@@ -179,7 +179,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestModel() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION, WHO, "", DIM.MODEL.value()));
+        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.MODEL.value()));
     }
 
     /**
@@ -188,7 +188,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestFirmwareVersion() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION, WHO, "", DIM.FIRMWARE_VERSION.value()));
+        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.FIRMWARE_VERSION.value()));
     }
 
     public static String parseFirmwareVersion(GatewayMgmt msg) throws FrameException {
@@ -230,7 +230,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      */
     public static GatewayMgmt requestProductInfo(int index) {
         // we must use here addValues instead of addDimensions to be compatible with gateway bug
-        String req = format(FORMAT_DIMENSION, WHO, "", DIM.PRODUCT_INFO.value());
+        String req = format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.PRODUCT_INFO.value());
         req = addValues(req, index + "");
         return new GatewayMgmt(req);
     }

@@ -143,7 +143,7 @@ public class EnergyManagement extends BaseOpenMessage {
      * @return message
      */
     public static EnergyManagement requestActivePower(String where) {
-        return new EnergyManagement(format(FORMAT_DIMENSION, WHO, where, DIM.ACTIVE_POWER.value()));
+        return new EnergyManagement(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTIVE_POWER.value()));
     }
 
     /**
@@ -161,6 +161,6 @@ public class EnergyManagement extends BaseOpenMessage {
             time = 0;
         }
         return new EnergyManagement(
-                format(FORMAT_DIMENSION_2V, WHO, where, DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
+                format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where, DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
     }
 }

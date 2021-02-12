@@ -33,8 +33,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     protected static final int MAX_FRAME_LENGTH = 1024; // max OWN frame length
 
     // TODO change to factory methods? (formatDimRequest(...) )
-    protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
-    protected static final String FORMAT_DIMENSION_2V = "*#%d*%s*#%d#%s*%s##";
+    protected static final String FORMAT_DIMENSION_REQUEST = "*#%d*%s*%d##";
+    protected static final String FORMAT_DIMENSION_WRITING_1P_1V = "*#%d*%s*#%d#%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
