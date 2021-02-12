@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -24,6 +24,13 @@ import java.util.Map;
 
 import org.openwebnet4j.OpenDeviceType;
 
+/**
+ * OpenWebNet Energy Managmenet messages (WHO=18)
+ */
+
+/**
+ * @author Andrea Conte - Initial contribution
+ */
 public class EnergyManagement extends BaseOpenMessage {
 
     public enum WHAT implements What {

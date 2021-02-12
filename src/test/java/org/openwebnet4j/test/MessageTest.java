@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -34,7 +34,7 @@ import org.openwebnet4j.message.Who;
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
  * @author M. Valla - Initial contribution
- * @author Andrea Conte - Energy manager contribution
+ * @author Andrea Conte - Energy Management contribution
  */
 
 public class MessageTest {
@@ -250,7 +250,7 @@ public class MessageTest {
             assertFalse(energyMsg.isCommand());
             assertEquals("51", energyMsg.getWhere().value());
             assertEquals(EnergyManagement.DIM.ACTIVE_POWER, energyMsg.getDim());
-            assertNotNull(energyMsg.getDimValues());            
+            assertNotNull(energyMsg.getDimValues());
         } catch (FrameException e) {
             System.out.println(e.getMessage());
 

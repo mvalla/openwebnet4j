@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -24,8 +24,7 @@ package org.openwebnet4j.message;
  * Legrand reference: 03555,03557, 03554
  * 7N#0 N= [1-255] Energy Management Actuators: BTicino reference: F522, F523; Legrand reference: 03558, 03559
  *
- * @author M. Valla - Initial contribution
- * @author Andrea Conte - Energy management contribution
+ * @author Andrea Conte - Initial contribution
  */
 public class WhereEnergyManagement extends Where {
 
