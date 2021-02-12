@@ -29,7 +29,7 @@ public class EnergyManagement extends BaseOpenMessage {
     public enum WHAT implements What {
         AUTOMATIC_RESET_ON(26),
         AUTOMATIC_RESET_OFF(27);
-        
+
         private static Map<Integer, WHAT> mapping;
 
         private final int value;
@@ -57,9 +57,10 @@ public class EnergyManagement extends BaseOpenMessage {
             return value;
         }
     }
-    
+
     public enum DIM implements Dim {
-        ACTIVE_POWER(113);
+        ACTIVE_POWER(113),
+        ACTIVE_POWER_NOTIFICATION_TIME(1200);
 
         private static Map<Integer, DIM> mapping;
 
@@ -104,7 +105,7 @@ public class EnergyManagement extends BaseOpenMessage {
             if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
                 where = new WhereZigBee(whereStr);
             } else {
-                where = new WhereEnergyManager(whereStr);
+                where = new WhereEnergyManagement(whereStr);
             }
         }
     }
@@ -116,18 +117,18 @@ public class EnergyManagement extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return WHAT.fromValue(i); 
+        return WHAT.fromValue(i);
     }
 
     @Override
     public OpenDeviceType detectDeviceType() throws FrameException {
-        // if (isCommand()) { // ignore status/dimension frames for detecting device type
+        if (getWhere().value().startsWith("5")) {
             return OpenDeviceType.SCS_ENERGY_CENTRAL_UNIT;
-        // } else {
-        //     return null;
-        // }
-    }    
-    
+        } else {
+            return null;
+        }
+    }
+
     /**
      * OpenWebNet message request to get active power <b>*#18*<WHERE>*113##</b>.
      *
@@ -138,15 +139,21 @@ public class EnergyManagement extends BaseOpenMessage {
         return new EnergyManagement(format(FORMAT_DIMENSION, WHO, where, DIM.ACTIVE_POWER.value()));
     }
 
-
-    /**  setActivePowerNotificationsTime
-    *
-    * OpenWebNet message request to set <i>Automatic Update Size</i> <b>*#18*<Where>*#1200#<Type>*<Time>##</b>.
-    *
-    * @param where WHERE string
-    * @return message
-    */
+    /**
+     *
+     * OpenWebNet message to set for how many minutes instantaneous active power change notifications will be sent
+     * <b>*#18*WHERE*#1200#1*TIME##</b>.
+     *
+     * @param where WHERE string
+     * @param time For how many minutes (0-255) active power change notifications will be sent. With time=0 active power
+     *            change notifications will be stopped.
+     * @return message
+     */
     public static EnergyManagement setActivePowerNotificationsTime(String where, int time) {
-        return new EnergyManagement(format(FORMAT_DIMENSION2, WHO, where, 1200, 1, time));
+        if (time < 0 || time > 255) {
+            time = 0;
+        }
+        return new EnergyManagement(
+                format(FORMAT_DIMENSION_2V, WHO, where, DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
     }
 }
