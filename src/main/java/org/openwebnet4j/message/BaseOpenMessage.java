@@ -270,6 +270,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case ENERGY_MANAGEMENT:
                 baseopenmsg = new EnergyManagement(frame);
                 break;
+
+            // DIAGNOSTIC
+            case ENERGY_MANAGEMENT_DIAGNOSTIC:
+                baseopenmsg = new EnergyManagementDiagnostic(frame);
+
             default:
                 break;
         }
