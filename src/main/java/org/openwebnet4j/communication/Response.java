@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,19 +16,16 @@ package org.openwebnet4j.communication;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class represents a response to a OpenWebNet request sent to the gateway.
- * Can contain multiple messages (frames), last message should be an ACK/NACK.
+ * This class represents a response to a OpenWebNet request sent to the gateway. Can contain
+ * multiple messages (frames), last message should be an ACK/NACK.
  *
  * @author M. Valla - Initial contribution
- *
  */
-
 public class Response {
     private OpenMessage requestMessage;
     private OpenMessage finalResponse = null;
@@ -123,7 +120,9 @@ public class Response {
                 e.printStackTrace();
             }
         } else {
-            logger.debug("REQ={} has already a final response set (={}) -> no need to wait", requestMessage.toString(),
+            logger.debug(
+                    "REQ={} has already a final response set (={}) -> no need to wait",
+                    requestMessage.toString(),
                     finalResponse);
         }
     }
@@ -131,5 +130,4 @@ public class Response {
     protected synchronized void responseReady() {
         notify();
     }
-
 }

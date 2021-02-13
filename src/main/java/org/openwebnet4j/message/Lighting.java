@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,7 +19,6 @@ import static org.openwebnet4j.message.Who.LIGHTING;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -76,7 +75,6 @@ public class Lighting extends BaseOpenMessage {
         public Integer value() {
             return value;
         }
-
     }
 
     @Override
@@ -113,7 +111,6 @@ public class Lighting extends BaseOpenMessage {
         public Integer value() {
             return value;
         }
-
     }
 
     @Override
@@ -155,8 +152,8 @@ public class Lighting extends BaseOpenMessage {
      * OpenWebNet message request to dim light to level <code>*1*level*WHERE##</code>.
      *
      * @param where WHERE string
-     * @param level What level (0=Off, 1=On, 2-10=level, 30=Up one level, 31=Down one level, 32=Toggle). See
-     *            {@link WHAT}
+     * @param level What level (0=Off, 1=On, 2-10=level, 30=Up one level, 31=Down one level,
+     *     32=Toggle). See {@link WHAT}
      * @return message
      */
     public static Lighting requestDimTo(String where, What level) {
@@ -283,7 +280,10 @@ public class Lighting extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WHAT.OFF || w == WHAT.ON || w == WHAT.MOVEMENT_DETECTED || w == WHAT.END_MOVEMENT_DETECTED) {
+                if (w == WHAT.OFF
+                        || w == WHAT.ON
+                        || w == WHAT.MOVEMENT_DETECTED
+                        || w == WHAT.END_MOVEMENT_DETECTED) {
                     type = OpenDeviceType.SCS_ON_OFF_SWITCH;
                 } else if (w.value() >= 2 && w.value() <= 10) {
                     type = OpenDeviceType.SCS_DIMMER_SWITCH;

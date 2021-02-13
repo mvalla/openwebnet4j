@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -60,13 +60,12 @@ public class WhereZigBee extends Where {
     }
 
     /**
-     * Return the ADDR part by removing UNIT (e.g. '02') and network ('#9')
-     * Example: WHERE=123456702#9 -&gt; ADDR=1234567
+     * Return the ADDR part by removing UNIT (e.g. '02') and network ('#9') Example:
+     * WHERE=123456702#9 -&gt; ADDR=1234567
      *
      * @return a String with the ADDR part of this address, null if no ADDR part is found
      */
     public String getAddr() {
         return addr;
     }
-
 }

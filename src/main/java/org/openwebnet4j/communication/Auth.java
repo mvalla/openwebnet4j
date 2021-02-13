@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,20 +17,17 @@ package org.openwebnet4j.communication;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class contains helper methods for authenticating to a BUS OpenWebNet gateway using a numeric (OPEN) or alphanumeric
- * (HMAC) password.
- * Encoding algorithm for OPEN numeric password can be found at this link:
- * https://rosettacode.org/wiki/OpenWebNet_Password#JavaScript
- * HMAC authentication algorithm can be found at this Legrand/BTicino link:
+ * Class contains helper methods for authenticating to a BUS OpenWebNet gateway using a numeric
+ * (OPEN) or alphanumeric (HMAC) password. Encoding algorithm for OPEN numeric password can be found
+ * at this link: https://rosettacode.org/wiki/OpenWebNet_Password#JavaScript HMAC authentication
+ * algorithm can be found at this Legrand/BTicino link:
  * https://developer.legrand.com/documentation/open-web-net-for-myhome/
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class Auth {
 
@@ -46,11 +43,14 @@ public class Auth {
         String out = "";
         char[] chars = digits.toCharArray();
         for (int i = 0; i < digits.length(); i = i + 4) {
-            out = out
-                    + Integer.toHexString(
-                            Character.getNumericValue(chars[i]) * 10 + Character.getNumericValue(chars[i + 1]))
-                    + Integer.toHexString(
-                            Character.getNumericValue(chars[i + 2]) * 10 + Character.getNumericValue(chars[i + 3]));
+            out =
+                    out
+                            + Integer.toHexString(
+                                    Character.getNumericValue(chars[i]) * 10
+                                            + Character.getNumericValue(chars[i + 1]))
+                            + Integer.toHexString(
+                                    Character.getNumericValue(chars[i + 2]) * 10
+                                            + Character.getNumericValue(chars[i + 3]));
         }
         return out;
     }

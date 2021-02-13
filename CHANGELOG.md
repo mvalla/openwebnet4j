@@ -4,6 +4,7 @@
 
 ### Added
 - Initial support for Energy Management (WHO=18)
+- Spotless check and JavaDoc plugins
 
 ### Fixed
 - Add support for OPEN password nonce with any number of digits (fixes #1 again)

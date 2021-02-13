@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -26,9 +26,7 @@ import org.openwebnet4j.message.Where;
  */
 public interface GatewayListener {
 
-    /**
-     * This method is called after the connection to the gateway has been established correctly
-     */
+    /** This method is called after the connection to the gateway has been established correctly */
     public void onConnected();
 
     /**
@@ -39,7 +37,8 @@ public interface GatewayListener {
     public void onConnectionError(OWNException error);
 
     /**
-     * This method is called after the gateway connection has been closed calling {@link OpenGateway#closeConnection()}
+     * This method is called after the gateway connection has been closed calling {@link
+     * OpenGateway#closeConnection()}
      */
     public void onConnectionClosed();
 
@@ -50,9 +49,7 @@ public interface GatewayListener {
      */
     public void onDisconnected(OWNException error);
 
-    /**
-     * This method is called after the connection with gateway has been re-connected
-     */
+    /** This method is called after the connection with gateway has been re-connected */
     public void onReconnected();
 
     /**
@@ -63,8 +60,8 @@ public interface GatewayListener {
     public void onEventMessage(OpenMessage msg);
 
     /**
-     * After {@link OpenGateway#discoverDevices} is called, each time a new device is discovered, this method will be
-     * called
+     * After {@link OpenGateway#discoverDevices} is called, each time a new device is discovered,
+     * this method will be called
      *
      * @param where the discovered device's address (WHERE)
      * @param deviceType device type of the discovered device
@@ -73,9 +70,8 @@ public interface GatewayListener {
     public void onNewDevice(Where where, OpenDeviceType deviceType, BaseOpenMessage message);
 
     /**
-     * This method is called after {@link OpenGateway#discoverDevices} is called when device discovery has been
-     * completed successfully
-     *
+     * This method is called after {@link OpenGateway#discoverDevices} is called when device
+     * discovery has been completed successfully
      */
     public void onDiscoveryCompleted();
 }

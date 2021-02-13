@@ -11,10 +11,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * @author M. Valla - Initial contribution
- * @author Andrea Conte - Energy manager contribution
  */
-
 package org.openwebnet4j.message;
 
 import static java.lang.String.format;
@@ -25,10 +22,8 @@ import java.util.Map;
 import org.openwebnet4j.OpenDeviceType;
 
 /**
- * OpenWebNet Energy Managmenet messages (WHO=18)
- */
-
-/**
+ * OpenWebNet Energy Management messages (WHO=18)
+ *
  * @author Andrea Conte - Initial contribution
  */
 public class EnergyManagement extends BaseOpenMessage {
@@ -147,13 +142,12 @@ public class EnergyManagement extends BaseOpenMessage {
     }
 
     /**
-     *
-     * OpenWebNet message to set for how many minutes instantaneous active power change notifications will be sent
-     * <code>*#18*WHERE*#1200#1*TIME##</code>.
+     * OpenWebNet message to set for how many minutes instantaneous active power change
+     * notifications will be sent <code>*#18*WHERE*#1200#1*TIME##</code>.
      *
      * @param where WHERE string
-     * @param time For how many minutes (0-255) active power change notifications will be sent. With time=0 active power
-     *            change notifications will be stopped.
+     * @param time For how many minutes (0-255) active power change notifications will be sent. With
+     *            time=0 active power change notifications will be stopped.
      * @return message
      */
     public static EnergyManagement setActivePowerNotificationsTime(String where, int time) {

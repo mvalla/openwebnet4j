@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * {@link BUSGateway} to connect to BUS OpenWebNet gateways using {@link BUSConnector}
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -47,7 +46,6 @@ public class BUSGateway extends OpenGateway {
      * @param host the gateway host name or IP
      * @param port the gateway port
      * @param pwd the gateway password
-     *
      */
     public BUSGateway(String host, int port, String pwd) {
         this.host = host;
@@ -86,7 +84,6 @@ public class BUSGateway extends OpenGateway {
     protected void initConnector() {
         connector = new BUSConnector(host, port, pwd);
         logger.info("##BUS## Init BUS ({}:{})...", host, port);
-
     }
 
     @Override
@@ -118,11 +115,11 @@ public class BUSGateway extends OpenGateway {
                         Where w = amsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
                     }
-
                 }
             }
         } catch (OWNException e) {
-            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error(
+                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -141,11 +138,12 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected
+                && connector.isCmdConnected()
+                && (now - connector.getLastCmdFrameSentTs() < 120000)) {
             return true;
         } else {
             return false;
         }
     }
-
 } /* class */

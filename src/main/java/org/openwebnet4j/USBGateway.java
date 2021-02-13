@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,7 +15,6 @@
 package org.openwebnet4j;
 
 import java.nio.ByteBuffer;
-
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.communication.USBConnector;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * Class {@link USBGateway} to connect to ZigBee USB Gateways using {@link USBConnector}
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class USBGateway extends OpenGateway {
 
@@ -38,8 +36,8 @@ public class USBGateway extends OpenGateway {
 
     private String serialPortName;
     private int discoveredProducts = 0; // number of products returned from the last SCAN command
-    private int receivedProducts = 0; // number of products returned from PRODUCT INFORMATION requests during a device
-                                      // discovery
+    private int receivedProducts = 0; // number of products returned from PRODUCT INFORMATION
+    // requests during a device discovery
 
     public USBGateway(String serialPortName) {
         this.serialPortName = serialPortName;
@@ -69,7 +67,9 @@ public class USBGateway extends OpenGateway {
         try {
             res = send(GatewayMgmt.requestScanNetwork());
             if (!res.isSuccess()) {
-                logger.debug("##USB## ----- # Cannot discover devices, requestScanNetwork() returned: " + res);
+                logger.debug(
+                        "##USB## ----- # Cannot discover devices, requestScanNetwork() returned: "
+                                + res);
                 isDiscovering = false;
             }
         } catch (OWNException e) {
@@ -99,9 +99,14 @@ public class USBGateway extends OpenGateway {
                 for (int p = 0; p < discoveredProducts; p++) {
                     handleDiscoveryResponse(sendInternal(GatewayMgmt.requestProductInfo(p)));
                     receivedProducts++;
-                    logger.debug("##USB## ----- # DISCOVERED {} / {} products", receivedProducts, discoveredProducts);
+                    logger.debug(
+                            "##USB## ----- # DISCOVERED {} / {} products",
+                            receivedProducts,
+                            discoveredProducts);
                 }
-                logger.debug("##USB## ----- ### DISCOVERY COMPLETED - DISCOVERED {} / {} products", receivedProducts,
+                logger.debug(
+                        "##USB## ----- ### DISCOVERY COMPLETED - DISCOVERED {} / {} products",
+                        receivedProducts,
                         discoveredProducts);
                 notifyListeners((listener) -> listener.onDiscoveryCompleted());
             } catch (Exception e) {
@@ -117,7 +122,8 @@ public class USBGateway extends OpenGateway {
     private void handleDiscoveryResponse(Response r) {
         GatewayMgmt gMsg = null;
         int i = 0;
-        // get messages in the response and notify all endpoints in the response, before last ACK/NACK
+        // get messages in the response and notify all endpoints in the response, before last
+        // ACK/NACK
         while (r.getResponseMessages().get(i) instanceof GatewayMgmt) {
             gMsg = (GatewayMgmt) r.getResponseMessages().get(i);
             if (gMsg != null && gMsg.getDim() == GatewayMgmt.DIM.PRODUCT_INFO) {
@@ -132,8 +138,8 @@ public class USBGateway extends OpenGateway {
     }
 
     /**
-     * Returns the ZigBee ID of the gateway in decimal format (=four last bytes of the ZigBee MAC address of the product
-     * converted in decimal format)
+     * Returns the ZigBee ID of the gateway in decimal format (=four last bytes of the ZigBee MAC
+     * address of the product converted in decimal format).
      *
      * @return the gateway ZigBeeId, or 0 if it is unknown
      */
@@ -146,9 +152,7 @@ public class USBGateway extends OpenGateway {
         }
     }
 
-    /**
-     * Return device type from a product info message received from ZigBee network
-     */
+    /** Return device type from a product info message received from ZigBee network */
     private OpenDeviceType getZigBeeDeviceType(BaseOpenMessage openmsg) {
         String frame = openmsg.getFrameValue();
         frame = frame.substring(0, frame.length() - 2);
