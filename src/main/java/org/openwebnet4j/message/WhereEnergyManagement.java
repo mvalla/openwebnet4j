@@ -19,7 +19,7 @@ package org.openwebnet4j.message;
  *
  * == Where Table:
  *
- * 1N N=[1-127] Stop & Go
+ * 1N N=[1-127] Stop &amp; Go
  * 5N N= [1-255] Energy Management Central Unit, Pulse Counter, Power Meter: BTicino reference: F520, F523, 3522;
  * Legrand reference: 03555,03557, 03554
  * 7N#0 N= [1-255] Energy Management Actuators: BTicino reference: F522, F523; Legrand reference: 03558, 03559

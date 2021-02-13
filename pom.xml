@@ -86,6 +86,23 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<source>8</source>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.2.0</version>
 				<executions>
@@ -158,12 +175,16 @@
 	</build>
 
 	<distributionManagement>
+		<!-- <repository> <id>bintray-mvalla-maven</id> <name>mvalla-maven</name> -->
+		<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url> -->
+		<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url> </repository> -->
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
 		<repository>
-			<id>bintray-mvalla-maven</id>
-			<name>mvalla-maven</name>
-			<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url> -->
-			<url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url>
-
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
 

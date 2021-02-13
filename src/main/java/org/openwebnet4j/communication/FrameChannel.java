@@ -135,7 +135,7 @@ public class FrameChannel {
     /**
      * Reads from InputStream until delimiter ('##'), putting data into buffer
      *
-     * @returns number of bytes read, or -1 in case of end of stream
+     * @return number of bytes read, or -1 in case of end of stream
      * @throws IOException in case of problems with the InputStream
      */
     private int readUntilDelimiter(InputStream is, byte[] buffer) throws IOException {

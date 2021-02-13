@@ -61,6 +61,7 @@ public abstract class OpenGateway implements ConnectorListener {
     /**
      * Connect to the OpenWebNet gateway.
      *
+     * @throws OWNException in case of error during connection
      */
     public void connect() throws OWNException {
         if (isConnected) {
@@ -100,11 +101,11 @@ public abstract class OpenGateway implements ConnectorListener {
 
     /**
      * Tries to reconnect to the OpenWebNet gateway, waiting increasing time intervals.
-     * {@link ConnectionListener#onConnectionError} is called each time a connection is tried and fails
-     * {@link ConnectionListener#onRecconected} is called when reconnection is successful.
+     * {@link GatewayListener#onConnectionError} is called each time a connection is tried and fails
+     * {@link GatewayListener#onReconnected} is called when reconnection is successful.
      * To stop trying, call {@link #closeConnection()}.
      *
-     * @throws {@link OWNAuthException} in case of auth error, reconnect is stopped
+     * @throws OWNAuthException in case of auth error (reconnect is stopped)
      */
     public void reconnect() throws OWNAuthException {
         int retry = RECONNECT_RETRY_AFTER;
@@ -177,7 +178,7 @@ public abstract class OpenGateway implements ConnectorListener {
 
     /**
      * Returns true if CMD connection is ready to send messages (connector must be connected and in case of BUS
-     * connection checks if a CMD was sent recently < 120sec)
+     * connection checks if a CMD was sent recently &lt; 120sec)
      *
      * @return boolean
      */
@@ -254,6 +255,8 @@ public abstract class OpenGateway implements ConnectorListener {
     /**
      * Generic method to notify registered OpenListener about 'method' event. Thread safe. A (single) notification
      * thread is used.
+     *
+     * @param method the method to be notified
      */
     protected void notifyListeners(Consumer<? super GatewayListener> method) {
         ArrayList<GatewayListener> listenersCopy;
@@ -275,7 +278,7 @@ public abstract class OpenGateway implements ConnectorListener {
      * Start a device discovery session and notify {@link GatewayListener}s for each new device
      * discovered calling method {@link GatewayListener#onNewDevice}
      *
-     * @throws OWNException
+     * @throws OWNException in case of error while discovering
      */
     public void discoverDevices() throws OWNException {
         // TODO add timeout for discoverDevices()

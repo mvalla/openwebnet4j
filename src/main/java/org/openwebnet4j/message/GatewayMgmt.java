@@ -132,7 +132,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request for supervisor mode <b>*13*66*##</b>.
+     * OpenWebNet message request for supervisor mode <code>*13*66*##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -141,7 +141,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request keep connect <b>*13*60*##</b>.
+     * OpenWebNet message request keep connect <code>*13*60*##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -150,7 +150,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request for gateway MAC address <b>*#13**12##</b>.
+     * OpenWebNet message request for gateway MAC address <code>*#13**12##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -161,7 +161,9 @@ public class GatewayMgmt extends BaseOpenMessage {
     /**
      * Parse MAC address in the OWN message and return values in byte[]
      *
+     * @param msg the message to parse
      * @return byte[] MAC address values
+     * @throws FrameException in case of error in frame
      */
     public static byte[] parseMACAddress(GatewayMgmt msg) throws FrameException {
         // MAC address is returned in VAL1-VAL6 or VAL1-VAL8 decimal dimensions of the MAC address response frame
@@ -174,7 +176,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request for gateway model <b>*#13**15##</b>.
+     * OpenWebNet message request for gateway model <code>*#13**15##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -183,7 +185,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request for gateway firmware version <b>*#13**16##</b>.
+     * OpenWebNet message request for gateway firmware version <code>*#13**16##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -198,7 +200,7 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to scan network <b>*13*65*##</b>.
+     * OpenWebNet message request to scan network <code>*13*65*##</code>.
      *
      * @return GatewayMgmt message
      */
@@ -207,26 +209,17 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request for product information <b>*#13**66*index##</b>.
+     * OpenWebNet message request for product information <code>*#13**66*index##</code>.
+     *
+     * <p>
+     * <b>NOTE</b>
+     * Due to a bug in the USB gateway, request product info message must use <code>*</code> to separate index instead
+     * of <code>#</code>: <code>*#13**66*index##</code> instead of <code>*#13**66#index##</code> as documented in
+     * OpenWebNet specs.
      *
      * @param index The index of the product inside the gateway products database as returned from network scan. Index
      *            starts at 0.
      * @return GatewayMgmt message
-     *
-     * @note Due to a bug in the USB gateway, request product info message must use '*' to separate index instead of
-     *       '#'.
-     *
-     *       <pre>
-     * *#13**66<b>*</b>index##
-     *       </pre>
-     *
-     *       instead of
-     *
-     *       <pre>
-     * *#13**66<b>#</b>index##
-     *       </pre>
-     *
-     *       as documented in OpenWebNet specs
      */
     public static GatewayMgmt requestProductInfo(int index) {
         // we must use here addValues instead of addDimensions to be compatible with gateway bug

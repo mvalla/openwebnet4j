@@ -132,49 +132,49 @@ public class Lighting extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to turn light <i>ON</i> <b>*1*1*WHERE##</b>.
+     * OpenWebNet message request to turn light <code>ON</code> <code>*1*1*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Lighting requestTurnOn(String w) {
-        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.ON.value, w));
+    public static Lighting requestTurnOn(String where) {
+        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.ON.value, where));
     }
 
     /**
-     * OpenWebNet message request to turn light <i>OFF</i> <b>*1*0*WHERE##</b>.
+     * OpenWebNet message request to turn light <code>OFF</code> <code>*1*0*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Lighting requestTurnOff(String w) {
-        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.OFF.value, w));
+    public static Lighting requestTurnOff(String where) {
+        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.OFF.value, where));
     }
 
     /**
-     * OpenWebNet message request to dim light to level <b>*1*level*WHERE##</b>.
+     * OpenWebNet message request to dim light to level <code>*1*level*WHERE##</code>.
      *
      * @param where WHERE string
      * @param level What level (0=Off, 1=On, 2-10=level, 30=Up one level, 31=Down one level, 32=Toggle). See
      *            {@link WHAT}
      * @return message
      */
-    public static Lighting requestDimTo(String w, What level) {
-        return new Lighting(format(FORMAT_REQUEST, WHO, level.value(), w));
+    public static Lighting requestDimTo(String where, What level) {
+        return new Lighting(format(FORMAT_REQUEST, WHO, level.value(), where));
     }
 
     /**
-     * OpenWebNet message request light status <b>*#1*WHERE##</b>.
+     * OpenWebNet message request light status <code>*#1*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Lighting requestStatus(String w) {
-        return new Lighting(format(FORMAT_STATUS, WHO, w));
+    public static Lighting requestStatus(String where) {
+        return new Lighting(format(FORMAT_STATUS, WHO, where));
     }
 
     /**
-     * Verify OpenWebNet message if light is ON (WHAT=1).
+     * Verify OpenWebNet message if light is <code>ON</code> (WHAT=1).
      *
      * @return true if light is ON
      */
@@ -187,7 +187,7 @@ public class Lighting extends BaseOpenMessage {
     }
 
     /**
-     * Verify OpenWebNet message if light is OFF (WHAT=0).
+     * Verify OpenWebNet message if light is <code>OFF</code> (WHAT=0).
      *
      * @return true if light is OFF
      */
@@ -203,7 +203,7 @@ public class Lighting extends BaseOpenMessage {
      * Parse dimmerLevel100 (DIM: 1)
      *
      * @return corresponding int percentage (0-100)
-     * @throws FrameException
+     * @throws FrameException in case of frame error
      */
     public int parseDimmerLevel100() throws FrameException {
         if (getDim() == Lighting.DIM.DIMMER_LEVEL_100) {
@@ -221,7 +221,7 @@ public class Lighting extends BaseOpenMessage {
     /**
      * Transforms a 0-10 level (int) to a percent (0-100)
      *
-     * @param int level 0-10
+     * @param level 0-10
      * @return int percent
      */
     // TODO for now, we use a linear mapping
@@ -236,7 +236,7 @@ public class Lighting extends BaseOpenMessage {
     /**
      * Return WHAT corresponding to the brightness percent.
      *
-     * @param int percent 0-100
+     * @param percent 0-100
      * @return What level (2-10) corresponding to percent
      */
     public static What percentToWhat(int percent) {

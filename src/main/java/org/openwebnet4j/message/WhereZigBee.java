@@ -51,7 +51,7 @@ public class WhereZigBee extends Where {
     }
 
     /**
-     * Return the UNIT part (ex.: WHERE=123456702#9 -> UNIT=02)
+     * Return the UNIT part (ex.: WHERE=123456702#9 -&gt; UNIT=02)
      *
      * @return a String with the UNIT part of this address, null if no UNIT part is found
      */
@@ -61,7 +61,7 @@ public class WhereZigBee extends Where {
 
     /**
      * Return the ADDR part by removing UNIT (e.g. '02') and network ('#9')
-     * Example: WHERE=123456702#9 -> ADDR=1234567
+     * Example: WHERE=123456702#9 -&gt; ADDR=1234567
      *
      * @return a String with the ADDR part of this address, null if no ADDR part is found
      */

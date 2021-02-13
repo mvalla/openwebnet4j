@@ -38,9 +38,9 @@ public class Response {
     private final Logger logger = LoggerFactory.getLogger(Response.class);
 
     /**
-     * Creates a Response object associated to the request message
+     * Creates a {@link Response} object associated to the request message
      *
-     * @param OpenMessage the request message
+     * @param request the {@link OpenMessage} request message
      */
     public Response(OpenMessage request) {
         this.requestMessage = request;
@@ -49,7 +49,7 @@ public class Response {
     /**
      * Returns the initial request message
      *
-     * @return OpenMessage
+     * @return the initial request message
      */
     public OpenMessage getRequest() {
         return requestMessage;
@@ -65,9 +65,9 @@ public class Response {
     }
 
     /**
-     * Returns a list of OpenMessages received as response
+     * Returns a list of {@link OpenMessage} received as response
      *
-     * @return List<OpenMessage>
+     * @return a list of {@link OpenMessage}
      */
     public List<OpenMessage> getResponseMessages() {
         return responses;
@@ -76,7 +76,7 @@ public class Response {
     /**
      * Returns the last OpenMessage that has finalised this response
      *
-     * @return OpenMessage
+     * @return the last {@link OpenMessage}
      */
     public OpenMessage getFinalResponse() {
         return finalResponse;
@@ -90,7 +90,7 @@ public class Response {
     /**
      * Add a new message received as response
      *
-     * @param response messages
+     * @param msg the new message to add
      */
     protected synchronized void addResponse(OpenMessage msg) {
         responses.add(msg);

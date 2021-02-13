@@ -137,7 +137,7 @@ public class EnergyManagement extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to get active power <b>*#18*<WHERE>*113##</b>.
+     * OpenWebNet message request to get active power <code>*#18*WHERE*113##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -149,7 +149,7 @@ public class EnergyManagement extends BaseOpenMessage {
     /**
      *
      * OpenWebNet message to set for how many minutes instantaneous active power change notifications will be sent
-     * <b>*#18*WHERE*#1200#1*TIME##</b>.
+     * <code>*#18*WHERE*#1200#1*TIME##</code>.
      *
      * @param where WHERE string
      * @param time For how many minutes (0-255) active power change notifications will be sent. With time=0 active power
@@ -160,7 +160,7 @@ public class EnergyManagement extends BaseOpenMessage {
         if (time < 0 || time > 255) {
             time = 0;
         }
-        return new EnergyManagement(
-                format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where, DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
+        return new EnergyManagement(format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where,
+                DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
     }
 }
