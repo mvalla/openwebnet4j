@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0-SNAPSHOT] - 2020-??-??
+## [0.5.0-SNAPSHOT] - 2021-??-??
 
 ### Added
 - Initial support for Thermoregulation (WHO=4)
@@ -59,7 +59,7 @@
 
 ### Fixed
 - [zigbee] Response to device info 2-UNITS for buggy older ZigBee USB gateways
-- [zigbee] Discovery of 2-UNITS Zigbee switch modules 
+- [zigbee] Discovery of 2-UNITS Zigbee switch modules
 - Improved message parsing for late parsing and sub-parts and related tests; changed isCommand() to abstract
 - [zigbee] Improved USBConnector for concurrent events and request/response interleaving
 

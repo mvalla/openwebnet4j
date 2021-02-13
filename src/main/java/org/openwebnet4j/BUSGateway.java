@@ -135,7 +135,8 @@ public class BUSGateway extends OpenGateway {
             }
 
         } catch (OWNException e) {
-            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error(
+                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -154,7 +155,9 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected
+                && connector.isCmdConnected()
+                && (now - connector.getLastCmdFrameSentTs() < 120000)) {
             return true;
         } else {
             return false;
