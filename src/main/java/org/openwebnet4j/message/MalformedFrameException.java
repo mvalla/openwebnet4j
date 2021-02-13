@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,17 +15,15 @@
 package org.openwebnet4j.message;
 
 /**
- * MalformedFrameException class is used when a OpenWebNet frame is malformed (not valid according to the specs).
+ * MalformedFrameException class is used when a OpenWebNet frame is malformed (not valid according
+ * to the specs).
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class MalformedFrameException extends FrameException {
     private static final long serialVersionUID = 787536576655854L;
 
-    /**
-     * Constructs a new <code>MalformedFrameException</code> without a detail message.
-     */
+    /** Constructs a new <code>MalformedFrameException</code> without a detail message. */
     public MalformedFrameException() {
         super();
     }
@@ -40,7 +38,8 @@ public class MalformedFrameException extends FrameException {
     }
 
     /**
-     * Constructs a new <code>MalformedFrameException</code> with the specified detail message and cause.
+     * Constructs a new <code>MalformedFrameException</code> with the specified detail message and
+     * cause.
      *
      * @param s the detail message
      * @param cause the cause in form of a throwable object, can be <code>null</code>

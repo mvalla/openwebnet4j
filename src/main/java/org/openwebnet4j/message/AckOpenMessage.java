@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,7 +19,6 @@ package org.openwebnet4j.message;
  *
  * @author M. Valla - Initial contribution
  */
-
 public class AckOpenMessage extends OpenMessage {
 
     public static final AckOpenMessage ACK = new AckOpenMessage(FRAME_ACK);

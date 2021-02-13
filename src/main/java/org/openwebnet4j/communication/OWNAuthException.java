@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,17 +18,13 @@ package org.openwebnet4j.communication;
  * Authorisation exception
  *
  * @author M. Valla - Initial contribution
- *
  */
 public class OWNAuthException extends OWNException {
 
     private static final long serialVersionUID = 564111573600046L;
 
-    /**
-     * Constructs a new <code>OWNAuthException</code> without a detail message.
-     */
-    public OWNAuthException() {
-    }
+    /** Constructs a new <code>OWNAuthException</code> without a detail message. */
+    public OWNAuthException() {}
 
     /**
      * Constructs a new <code>OWNAuthException</code> with the specified detail message.
@@ -40,8 +36,7 @@ public class OWNAuthException extends OWNException {
     }
 
     /**
-     * Constructs a new <code>OWNAuthException</code> with the specified detail message and
-     * cause.
+     * Constructs a new <code>OWNAuthException</code> with the specified detail message and cause.
      *
      * @param s the detail message
      * @param cause the cause in form of a throwable object, can be <code>null</code>

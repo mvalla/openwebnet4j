@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,9 +19,7 @@ package org.openwebnet4j.message;
  *
  * @author M. Valla - Initial contribution
  */
-
 import java.util.Arrays;
-
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private int[] dimParams = null; // list of dimension params PAR1...PARn in the frame
     // *#WHO*WHERE*DIM#PAR1...#PARn*...##
     private String[] dimValues = null; // list of dimension values VAL1...VALn in the frame
-                                       // *#WHO*WHERE*DIM...*VAL1*...*VALn##
+    // *#WHO*WHERE*DIM...*VAL1*...*VALn##
 
     private int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
     // *WHO*WHAT#PAR1...#PARn*WHERE##
@@ -88,12 +86,14 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (frame == null) {
             throw new FrameException("Frame is null");
         }
-        if (OpenMessage.FRAME_ACK.equals(frame) || OpenMessage.FRAME_NACK.equals(frame)
+        if (OpenMessage.FRAME_ACK.equals(frame)
+                || OpenMessage.FRAME_NACK.equals(frame)
                 || OpenMessage.FRAME_BUSY_NACK.equals(frame)) {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException(
+                    "Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
@@ -107,7 +107,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
         for (char c : frame.toCharArray()) {
             if (!Character.isDigit(c)) {
                 if (c != '#' && c != '*') {
-                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
+                    throw new MalformedFrameException(
+                            "Frame can only contain '#', '*' or digits [0-9]");
                 }
             }
         }
@@ -281,7 +282,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Parse WHAT and its parameters and assigns it to {@link what} and {@link commandParams} obj attributes
+     * Parse WHAT and its parameters and assigns it to {@link what} and {@link commandParams} obj
+     * attributes
      *
      * @throws FrameException in case of error in frame
      */
@@ -293,7 +295,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (parts != null) {
             int partsIndex = 0;
             try {
-                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION) && parts.length > 1) {
+                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION)
+                        && parts.length > 1) {
                     // commandTranslation: 1000#WHAT
                     isCommandTranslation = true;
                     partsIndex++; // skip first 1000 value
@@ -325,8 +328,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     protected abstract void parseWhere() throws FrameException;
 
     /**
-     * Parse DIM, its params and values and assigns it to {@link dim}, {@link dimParams} and {@link dimValues}
-     * attributes
+     * Parse DIM, its params and values and assigns it to {@link dim}, {@link dimParams} and {@link
+     * dimValues} attributes
      */
     private void parseDim() throws FrameException {
         if (dimStr == null) {
@@ -386,8 +389,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if no parameters are
-     * present
+     * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if
+     * no parameters are present
      *
      * @return int[] of command parameters, or empty array if no parameters are present
      * @throws FrameException in case of error in frame
@@ -400,8 +403,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns an array with DIM parameters PAR1..PARN (*#WHO*DIM#PAR1..#PARN*...##), or empty array if no parameters
-     * are present
+     * Returns an array with DIM parameters PAR1..PARN (*#WHO*DIM#PAR1..#PARN*...##), or empty array
+     * if no parameters are present
      *
      * @return a int[] of DIM parameters, or empty array if no parameters are present
      * @throws FrameException in case of error in frame
@@ -422,7 +425,6 @@ public abstract class BaseOpenMessage extends OpenMessage {
         int[] tempArr = Arrays.stream(params).mapToInt(Integer::parseInt).toArray();
 
         dimParams = tempArr;
-
     }
 
     /**
@@ -439,9 +441,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Helper method to add to the given msg frame a list of values separated by <code>*</code> at the end of the frame:
-     *
-     * <code>*frame##</code> --&gt; <code>*frame*val1*val2*..*valN##</code>
+     * Helper method to add to the given msg frame a list of values separated by <code>*</code> at
+     * the end of the frame: <code>*frame##</code> --&gt; <code>*frame*val1*val2*..*valN##</code>
      *
      * @param msgStr the input frame String
      * @param vals Strings containing values to be added to the frame

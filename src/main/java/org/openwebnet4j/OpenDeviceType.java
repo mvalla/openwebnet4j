@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,13 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Device types enum according to OpenWebNet specs
+ *
  * @author M. Valla - Initial contribution
  */
 public enum OpenDeviceType {
-    /**
-     * OpenWebNet Device types. See OWN ZigBee docs pages 50-51
-     */
-
+    /** OpenWebNet Device types. See OWN ZigBee docs pages 50-51 */
     UNKNOWN(0),
     SCENARIO_CONTROL(2),
     // lighting

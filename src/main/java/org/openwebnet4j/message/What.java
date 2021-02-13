@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,12 +17,11 @@ package org.openwebnet4j.message;
 /**
  * Class to wrap WHAT part of frame
  *
- * @author Massimo Valla - Initial contribution
+ * @author M. Valla - Initial contribution
  */
 public interface What {
 
     public static final Integer WHAT_COMMAND_TRANSLATION = 1000;
 
     public Integer value();
-
 }

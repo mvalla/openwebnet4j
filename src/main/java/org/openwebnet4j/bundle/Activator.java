@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
  * Lifecycle class of the bundle
  *
  * @author M. Valla - Initial contribution
- *
  */
-
 public class Activator implements BundleActivator {
 
     private final Logger logger = LoggerFactory.getLogger(Activator.class);
@@ -39,5 +37,4 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext context) {
         logger.debug("@@@@@@@@@@@@ ===== Stopping openwebnet4j bundle");
     }
-
 }

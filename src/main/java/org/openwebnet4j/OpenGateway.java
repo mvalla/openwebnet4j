@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,7 +16,6 @@ package org.openwebnet4j;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
-
 import org.openwebnet4j.communication.ConnectorListener;
 import org.openwebnet4j.communication.OWNAuthException;
 import org.openwebnet4j.communication.OWNException;
@@ -39,7 +38,8 @@ public abstract class OpenGateway implements ConnectorListener {
     private final Logger logger = LoggerFactory.getLogger(OpenGateway.class);
 
     protected boolean isConnected = false;
-    protected boolean isDiscovering = false; // if true: we have already started a device discovery session
+    protected boolean isDiscovering =
+            false; // if true: we have already started a device discovery session
 
     protected final ArrayList<GatewayListener> listeners = new ArrayList<GatewayListener>();
     protected OpenConnector connector;
@@ -52,10 +52,7 @@ public abstract class OpenGateway implements ConnectorListener {
     protected byte[] macAddr;
     private String firmwareVersion = null;
 
-    /**
-     * Init the connector for this OpenGateway.
-     *
-     */
+    /** Init the connector for this OpenGateway. */
     protected abstract void initConnector();
 
     /**
@@ -100,10 +97,10 @@ public abstract class OpenGateway implements ConnectorListener {
     }
 
     /**
-     * Tries to reconnect to the OpenWebNet gateway, waiting increasing time intervals.
-     * {@link GatewayListener#onConnectionError} is called each time a connection is tried and fails
-     * {@link GatewayListener#onReconnected} is called when reconnection is successful.
-     * To stop trying, call {@link #closeConnection()}.
+     * Tries to reconnect to the OpenWebNet gateway, waiting increasing time intervals. {@link
+     * GatewayListener#onConnectionError} is called each time a connection is tried and fails {@link
+     * GatewayListener#onReconnected} is called when reconnection is successful. To stop trying,
+     * call {@link #closeConnection()}.
      *
      * @throws OWNAuthException in case of auth error (reconnect is stopped)
      */
@@ -123,8 +120,10 @@ public abstract class OpenGateway implements ConnectorListener {
                     if (connector.isMonConnected()) {
                         connector.openCmdConn();
                         if (connector.isCmdConnected()) {
-                            handleManagementDimensions(sendInternal(GatewayMgmt.requestMACAddress()));
-                            handleManagementDimensions(sendInternal(GatewayMgmt.requestFirmwareVersion()));
+                            handleManagementDimensions(
+                                    sendInternal(GatewayMgmt.requestMACAddress()));
+                            handleManagementDimensions(
+                                    sendInternal(GatewayMgmt.requestFirmwareVersion()));
                             isConnected = true;
                             notifyListeners((listener) -> listener.onReconnected());
                         }
@@ -177,8 +176,8 @@ public abstract class OpenGateway implements ConnectorListener {
     }
 
     /**
-     * Returns true if CMD connection is ready to send messages (connector must be connected and in case of BUS
-     * connection checks if a CMD was sent recently &lt; 120sec)
+     * Returns true if CMD connection is ready to send messages (connector must be connected and in
+     * case of BUS connection checks if a CMD was sent recently &lt; 120sec)
      *
      * @return boolean
      */
@@ -215,10 +214,12 @@ public abstract class OpenGateway implements ConnectorListener {
                             firmwareVersion = GatewayMgmt.parseFirmwareVersion(gmsg);
                             logger.info("##GW## FIRMWARE: {}", getFirmwareVersion());
                         } catch (FrameException e) {
-                            logger.warn("##GW## Cannot parse firmware version from message: {}", gmsg);
+                            logger.warn(
+                                    "##GW## Cannot parse firmware version from message: {}", gmsg);
                         }
                     } else {
-                        logger.debug("##GW## handleManagementDimensions DIM {} not supported", thisDim);
+                        logger.debug(
+                                "##GW## handleManagementDimensions DIM {} not supported", thisDim);
                     }
                 }
             }
@@ -253,8 +254,8 @@ public abstract class OpenGateway implements ConnectorListener {
     }
 
     /**
-     * Generic method to notify registered OpenListener about 'method' event. Thread safe. A (single) notification
-     * thread is used.
+     * Generic method to notify registered OpenListener about 'method' event. Thread safe. A
+     * (single) notification thread is used.
      *
      * @param method the method to be notified
      */
@@ -265,12 +266,14 @@ public abstract class OpenGateway implements ConnectorListener {
         }
         // TODO use notifierExecutor instead of Thread, like in OpenConnector
         // Execute 'method' on each of the listeners, using a new notifier Thread
-        Thread notifier = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                listenersCopy.forEach(method);
-            }
-        });
+        Thread notifier =
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                listenersCopy.forEach(method);
+                            }
+                        });
         notifier.start();
     }
 
@@ -297,7 +300,6 @@ public abstract class OpenGateway implements ConnectorListener {
      * Check if the gateway has started a device discovery session
      *
      * @return true if the gateway has started a device discovery session
-     *
      */
     public boolean isDiscovering() {
         return isDiscovering;
@@ -334,13 +336,10 @@ public abstract class OpenGateway implements ConnectorListener {
         }
     }
 
-    /**
-     * Closes connection to the gateway and releases resources
-     */
+    /** Closes connection to the gateway and releases resources */
     public void closeConnection() {
         connectionCloseRequested = true;
         connector.disconnect();
         isConnected = false;
     }
-
 }

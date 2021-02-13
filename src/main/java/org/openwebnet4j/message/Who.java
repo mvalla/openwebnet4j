@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -22,11 +22,8 @@ import java.util.function.Predicate;
  * OpenWebNet WHO types.
  *
  * @author M. Valla - Initial contribution for openwebnet4j
- *
  */
-
 public enum Who {
-
     SCENARIO(0),
     LIGHTING(1),
     AUTOMATION(2),
@@ -107,5 +104,4 @@ public enum Who {
     private static Optional<Who> findWho(Predicate<Who> isEqual) {
         return EnumSet.allOf(Who.class).stream().filter(isEqual).findFirst();
     }
-
 }

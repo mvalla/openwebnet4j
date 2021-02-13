@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,16 +19,11 @@ import static org.openwebnet4j.message.Who.GATEWAY_MANAGEMENT;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
-/**
- * OpenWebNet GatewayManagmenet messages
- */
+/** OpenWebNet GatewayManagmenet messages */
 
-/**
- * @author M. Valla - Initial contribution
- */
+/** @author M. Valla - Initial contribution */
 public class GatewayMgmt extends BaseOpenMessage {
 
     public enum WHAT implements What {
@@ -71,7 +66,6 @@ public class GatewayMgmt extends BaseOpenMessage {
         public Integer value() {
             return value;
         }
-
     }
 
     @Override
@@ -116,7 +110,6 @@ public class GatewayMgmt extends BaseOpenMessage {
         public Integer value() {
             return value;
         }
-
     }
 
     @Override
@@ -166,7 +159,8 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @throws FrameException in case of error in frame
      */
     public static byte[] parseMACAddress(GatewayMgmt msg) throws FrameException {
-        // MAC address is returned in VAL1-VAL6 or VAL1-VAL8 decimal dimensions of the MAC address response frame
+        // MAC address is returned in VAL1-VAL6 or VAL1-VAL8 decimal dimensions of the MAC address
+        // response frame
         String[] values = msg.getDimValues();
         byte[] mac = new byte[values.length];
         for (int i = 0; i < values.length; i++) {
@@ -190,7 +184,8 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestFirmwareVersion() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.FIRMWARE_VERSION.value()));
+        return new GatewayMgmt(
+                format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.FIRMWARE_VERSION.value()));
     }
 
     public static String parseFirmwareVersion(GatewayMgmt msg) throws FrameException {
@@ -211,14 +206,12 @@ public class GatewayMgmt extends BaseOpenMessage {
     /**
      * OpenWebNet message request for product information <code>*#13**66*index##</code>.
      *
-     * <p>
-     * <b>NOTE</b>
-     * Due to a bug in the USB gateway, request product info message must use <code>*</code> to separate index instead
-     * of <code>#</code>: <code>*#13**66*index##</code> instead of <code>*#13**66#index##</code> as documented in
-     * OpenWebNet specs.
+     * <p><b>NOTE</b> Due to a bug in the USB gateway, request product info message must use <code>*
+     * </code> to separate index instead of <code>#</code>: <code>*#13**66*index##</code> instead of
+     * <code>*#13**66#index##</code> as documented in OpenWebNet specs.
      *
-     * @param index The index of the product inside the gateway products database as returned from network scan. Index
-     *            starts at 0.
+     * @param index The index of the product inside the gateway products database as returned from
+     *     network scan. Index starts at 0.
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestProductInfo(int index) {
@@ -239,5 +232,4 @@ public class GatewayMgmt extends BaseOpenMessage {
     public OpenDeviceType detectDeviceType() {
         return null;
     }
-
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,15 +17,16 @@ package org.openwebnet4j.communication;
 import org.openwebnet4j.message.OpenMessage;
 
 /**
- * The {@link ConnectorListener} interface defines methods to receive MONITOR messages from OpenConnector
+ * The {@link ConnectorListener} interface defines methods to receive MONITOR messages from
+ * OpenConnector
  *
  * @author M. Valla - Initial contribution
  */
-
 public interface ConnectorListener {
 
     /**
-     * This method is called when a new {@link OpenMessage} is received by the OpenConnector MONITOR connection
+     * This method is called when a new {@link OpenMessage} is received by the OpenConnector MONITOR
+     * connection
      *
      * @param message the {@link OpenMessage} received
      */
@@ -37,5 +38,4 @@ public interface ConnectorListener {
      * @param e the Exception that caused disconnection
      */
     public void onMonDisconnected(OWNException e);
-
 }
