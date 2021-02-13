@@ -7,7 +7,7 @@ It enables a Java client to communicate locally with a gateway supporting the Op
 Supported features:
 
 * Device discovery
-* Feedback (monitoring events) from BUS/SCS and ZigBee wireless network 
+* Feedback (monitoring events) from BUS/SCS and ZigBee wireless network
 
 Supported frames:
 
@@ -18,7 +18,7 @@ Supported frames:
 * `WHO=18` Energy Management
 
 Supported Open Web Net gateways:
-- *IP gateways* or scenario programmers, such as: BTicino F453 / F454 / F455, MyHOMEServer1,  MyHOME_Screen10, MH201 / MH202 / MH200N 
+- *IP gateways* or scenario programmers, such as: BTicino F453 / F454 / F455, MyHOMEServer1,  MyHOME_Screen10, MH201 / MH202 / MH200N
 - *ZigBee USB Gateways*, such as: [BTicino 3578](https://catalogo.bticino.it/BTI-3578-IT), also known as Legrand 088328, to connect to wireless devices
 
 ### TODO
@@ -28,11 +28,11 @@ Supported Open Web Net gateways:
 - [x] Support for `WHO=2` Automation (shutters)
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
 - Add other `WHOs`
-    - [x] Energy
-    - [x] Thermo
-    - [ ] Thermo (advanced)
-    - [ ] CEN/CEN+
-    - [ ] AUX
+	- [x] Energy
+	- [x] Thermo
+	- [ ] Thermo (advanced)
+	- [ ] CEN/CEN+
+	- [ ] AUX
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
 
@@ -56,14 +56,14 @@ This library is available via Maven Central repository by adding the dependency 
 BUSGateway myGateway = new BUSGateway("192.168.1.50", 20000, "12345");
 myGateway.subscribe(this);
 try {
-    myGateway.connect();
-    // turns light WHERE=51 ON
-    Response res = myGateway.send(Lighting.requestTurnOn("51"));
-    if (res.isSuccess()) {
-        System.out.println("Request successful");
-    }
-    // requests status light WHERE=51
-    myGateway.send(Lighting.requestStatus("51"));
+	myGateway.connect();
+	// turns light WHERE=51 ON
+	Response res = myGateway.send(Lighting.requestTurnOn("51"));
+	if (res.isSuccess()) {
+		System.out.println("Request successful");
+	}
+	// requests status light WHERE=51
+	myGateway.send(Lighting.requestStatus("51"));
 } catch (OWNException e) {...}
 ```
 
@@ -79,5 +79,3 @@ mvn clean install
 - This library is not associated by any means with BTicino or Legrand companies
 - The Open Web Net protocol is maintained and Copyright by BTicino/Legrand. The documentation of the protocol if freely accessible for developers on the [Legrand developer web site](https://developer.legrand.com/documentation/open-web-net-for-myhome/)
 - "Open Web Net", "MyHOME_Up", "MyHome", "MyHome_Play" and "Living Now" are registered trademarks by BTicino/Legrand
-
-

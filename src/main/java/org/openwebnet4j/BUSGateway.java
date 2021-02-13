@@ -26,7 +26,6 @@ import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -173,12 +172,8 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-<<<<<<< HEAD
         if (isConnected && connector.isCmdConnected()
                 && (now - connector.getLastCmdFrameSentTs() < CONNECTION_TIMEOUT_MS)) {
-=======
-        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
->>>>>>> 6d75ea2 (added spotless dependency)
             return true;
         } else {
             return false;

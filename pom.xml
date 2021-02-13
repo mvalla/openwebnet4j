@@ -5,7 +5,7 @@
 
 	<groupId>io.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.4.1</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>openwebnet4j OpenWebNet Java library</name>
@@ -82,66 +82,6 @@
 	</dependencies>
 
 	<build>
-	
-	    <pluginManagement>
-          <plugins>
-            <plugin>
-			  <groupId>com.diffplug.spotless</groupId>
-			  <artifactId>spotless-maven-plugin</artifactId>
-			  <version>2.6.1</version>
-			  <configuration>
-			    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
-			    <ratchetFrom>origin/master</ratchetFrom>
-			    <formats>
-			      <!-- you can define as many formats as you want, each is independent -->
-			      <format>
-			        <!-- define the files to apply to -->
-			        <includes>
-			          <include>*.md</include>
-			          <include>.gitignore</include>
-			        </includes>
-			        <!-- define the steps to apply to those files -->
-			        <trimTrailingWhitespace/>
-			        <endWithNewline/>
-			        <indent>
-			          <tabs>true</tabs>
-			          <spacesPerTab>4</spacesPerTab>
-			        </indent>
-			      </format>
-			    </formats>
-			    <!-- define a language-specific format -->
-			    <java>			
-			      <!-- apply a specific flavor of google-java-format -->
-			      <googleJavaFormat>
-			        <version>1.8</version>
-			        <style>AOSP</style>
-			      </googleJavaFormat>
-			
-			      <!-- make sure every file has the following copyright header.
-			        optionally, Spotless can set copyright years by digging
-			        through git history (see "license" section below) -->
-			      <licenseHeader>
-			        <content>/**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License 2.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
- *
- */</content>  <!-- or <file>${basedir}/license-header</file> -->
-			      </licenseHeader>
-			    </java>
-			  </configuration>
-			</plugin>
-          </plugins>
-        </pluginManagement>
-	
 		<plugins>
 
 			<plugin>

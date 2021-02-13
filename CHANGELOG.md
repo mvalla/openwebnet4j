@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.x.x] - 2021-??-??
+## [0.5.0-SNAPSHOT] - 2021-??-??
 
 ### Changed
 - project description
