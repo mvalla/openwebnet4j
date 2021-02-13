@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -113,7 +113,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to send <i>STOP</i> <b>*2*0*WHERE##</b>.
+     * OpenWebNet message request to send <code>STOP</code> <code>*2*0*WHERE##</code>.
      *
      * @param w WHERE string
      * @return message
@@ -123,7 +123,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to send <i>UP</i> <b>*2*1*WHERE##</b>.
+     * OpenWebNet message request to send <code>UP</code> <code>*2*1*WHERE##</code>.
      *
      * @param w WHERE string
      * @return message
@@ -133,7 +133,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to send <i>DOWN</i> <b>*2*2*WHERE##</b>.
+     * OpenWebNet message request to send <code>DOWN</code> <code>*2*2*WHERE##</code>.
      *
      * @param w WHERE string
      * @return message
@@ -143,7 +143,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request automation status <b>*#2*WHERE##</b>.
+     * OpenWebNet message request automation status <code>*#2*WHERE##</code>.
      *
      * @param w WHERE string
      * @return message
@@ -153,7 +153,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * Verify OpenWebNet message is <i>STOP</i> (WHAT=0).
+     * Verify OpenWebNet message is <code>STOP</code> (WHAT=0).
      *
      * @return true if message is "STOP"
      */
@@ -166,7 +166,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * Verify OpenWebNet message is <i>UP</i> (WHAT=1).
+     * Verify OpenWebNet message is <code>UP</code> (WHAT=1).
      *
      * @return true if message is "UP"
      */
@@ -179,7 +179,7 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * Verify OpenWebNet message is <i>DOWN</i> (WHAT=2).
+     * Verify OpenWebNet message is <code>DOWN</code> (WHAT=2).
      *
      * @return true if message is "DOWN"
      */
@@ -192,17 +192,19 @@ public class Automation extends BaseOpenMessage {
     }
 
     /**
-     * Convert an Automation message UP<>DOWN
+     * Convert an Automation message UP&lt;&gt;DOWN
      *
+     * @param autMsg message to convert
      * @return converted Automation message
+     * @throws FrameException in case of error in frame
      */
-    public static Automation convertUpDown(Automation autmsg) throws FrameException {
-        if (autmsg.isUp()) {
-            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
-        } else if (autmsg.isDown()) {
-            return (Automation) BaseOpenMessage.parse(autmsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
+    public static Automation convertUpDown(Automation autMsg) throws FrameException {
+        if (autMsg.isUp()) {
+            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
+        } else if (autMsg.isDown()) {
+            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
         } else {
-            return autmsg;
+            return autMsg;
         }
     }
 

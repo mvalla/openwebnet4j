@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -43,14 +43,14 @@ public abstract class OpenMessage {
     }
 
     /**
-     * Is this OpenMessage a command? (<b>*WHO..</b>).
+     * Is this OpenMessage a command? (<code>*WHO..</code>).
      *
      * @return true if it's a command frame
      */
     public abstract boolean isCommand();
 
     /**
-     * Is this OpenMessage an ACK? (<b>*#*1##</b>).
+     * Is this OpenMessage an ACK? (<code>*#*1##</code>).
      *
      * @return true if it's an ACK
      */
@@ -59,7 +59,7 @@ public abstract class OpenMessage {
     }
 
     /**
-     * Is this OpenMessage an NACK? (<b>*#*0##</b>).
+     * Is this OpenMessage an NACK? (<code>*#*0##</code>).
      *
      * @return true if it's an NACK
      */
@@ -68,7 +68,7 @@ public abstract class OpenMessage {
     }
 
     /**
-     * Is this OpenMessage an BUSY_NACK? (<b>*#*6##</b>).
+     * Is this OpenMessage an BUSY_NACK? (<code>*#*6##</code>).
      *
      * @return true if it's an BUSY_NACK
      */

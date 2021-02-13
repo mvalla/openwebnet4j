@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -55,21 +55,21 @@ public abstract class OpenConnector {
     /**
      * Opens command (CMD) connection
      *
-     * @throws {@link OWNException}
+     * @throws OWNException in case of error
      */
     public abstract void openCmdConn() throws OWNException;
 
     /**
      * Opens monitor (MON) connection
      *
-     * @throws {@link OWNException}
+     * @throws OWNException in case of error
      */
     public abstract void openMonConn() throws OWNException;
 
     /**
      * Check if CMD is connected
      *
-     * @returns boolean true if connected
+     * @return boolean true if connected
      */
     public boolean isCmdConnected() {
         return isCmdConnected;
@@ -78,7 +78,7 @@ public abstract class OpenConnector {
     /**
      * Get timestamp of last CMD frame sent successfully
      *
-     * @returns long timestamp
+     * @return long timestamp
      */
     public long getLastCmdFrameSentTs() {
         return lastCmdFrameSentTs;
@@ -87,7 +87,7 @@ public abstract class OpenConnector {
     /**
      * Check if MON is connected
      *
-     * @returns boolean true if connected
+     * @return boolean true if connected
      */
     public boolean isMonConnected() {
         return isMonConnected;
@@ -104,7 +104,7 @@ public abstract class OpenConnector {
 
     /**
      * Send a command frame String on the connection, waits for a {@link AckOpenMessage} (ACN/NACK) or timeout and
-     * returns the received messages in a {@Link Response} object
+     * returns the received messages in a {@link Response} object
      *
      * @param frame the frame String to send
      * @return {@link Response} object with messages received as response
@@ -134,11 +134,15 @@ public abstract class OpenConnector {
 
     /**
      * Process a frame string received
+     *
+     * @param newFrame the new frame received
      */
     protected abstract void processFrame(String newFrame);
 
     /**
      * Notify new message on MON connection to OpenListener using notifierExecutor
+     *
+     * @param msg the {@link OpenMessage} to be notified
      */
     protected void notifyListener(OpenMessage msg) {
         logger.trace("notifyListener for message: {}", msg);
@@ -234,6 +238,8 @@ public abstract class OpenConnector {
 
     /**
      * Called when MON connection is disconnected
+     *
+     * @param e the {link OWNException} received when disconnected
      */
     protected void handleMonDisconnect(OWNException e) {
         logger.debug("##OPEN-conn## handleMonDisconnect() OWNException={}", e.getMessage());

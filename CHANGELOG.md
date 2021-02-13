@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0-SNAPSHOT] - 2021-02-??
+
+### Added
+- Initial support for Energy Management (WHO=18)
+
+### Fixed
+- Add support for OPEN password nonce with any number of digits (fixes #1 again)
+
+### Changed
+- const to FORMAT_DIMENSION_REQUEST and FORMAT_DIMENSION_WRITING_1P_1V
+
+
 ## [0.3.4] - 2021-01-07
 
 ### Fixed

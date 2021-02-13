@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -31,7 +31,10 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private final Logger logger = LoggerFactory.getLogger(BaseOpenMessage.class);
 
     protected static final int MAX_FRAME_LENGTH = 1024; // max OWN frame length
-    protected static final String FORMAT_DIMENSION = "*#%d*%s*%d##";
+
+    // TODO change to factory methods? (formatDimRequest(...) )
+    protected static final String FORMAT_DIMENSION_REQUEST = "*#%d*%s*%d##";
+    protected static final String FORMAT_DIMENSION_WRITING_1P_1V = "*#%d*%s*#%d#%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
@@ -77,7 +80,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      *
      * @return a new {@link OpenMessage} object representing the OpenWebNet frame
      *
-     * @throws FrameException in case the provided frame is not a valid OpenWebNet frame
+     * @throws FrameException in case the provided frame String is not a valid OpenWebNet frame
      *
      */
     public static OpenMessage parse(String frame) throws FrameException {
@@ -203,7 +206,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message DIM (dimension, *#WHO*#DIM*...##) or null id not DIM is present
+     * Returns message DIM (dimension, <code>*#WHO*#DIM*...##</code>) or null id not DIM is present
      *
      * @return message DIM, or null if no DIM is present
      */
@@ -222,7 +225,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Check if message is a dimension writing message (*#WHO*#DIM*...##)
+     * Check if message is a dimension writing message <code>*#WHO*#DIM*...##</code>
      *
      * @return true if it's a dimension writing message
      */
@@ -237,6 +240,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Parse WHO from given whoPart and returns a BaseOpenMessage of the corresponding type
      *
      * @param whoPart String containing the WHO
+     * @throws FrameException in case of error in frame
      */
     private static BaseOpenMessage parseWho(String whoPart, String frame) throws FrameException {
         Who who = null;
@@ -262,6 +266,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case AUTOMATION:
                 baseopenmsg = new Automation(frame);
                 break;
+            case ENERGY_MANAGEMENT:
+                baseopenmsg = new EnergyManagement(frame);
+                break;
             default:
                 break;
         }
@@ -275,6 +282,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     /**
      * Parse WHAT and its parameters and assigns it to {@link what} and {@link commandParams} obj attributes
+     *
+     * @throws FrameException in case of error in frame
      */
     private void parseWhat() throws FrameException {
         if (whatStr == null) {
@@ -311,6 +320,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Parse WHERE and assigns it to {@link where} attribute
      *
+     * @throws FrameException in case of error in frame
      */
     protected abstract void parseWhere() throws FrameException;
 
@@ -350,7 +360,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Tries to return a {@link OpenDeviceType} based on frame value
      *
      * @return recognized device type or null if not device can be recognized
-     * @throws FrameException
+     * @throws FrameException in case of error in frame
      */
     public abstract OpenDeviceType detectDeviceType() throws FrameException;
 
@@ -358,7 +368,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Check if message is a command translation (*WHO*1000#WHAT*...##)
      *
      * @return true if the WHAT part is prefixed with command translation: 1000#
-     * @throws FrameException
+     * @throws FrameException in case of error in frame
      */
     public boolean isCommandTranslation() throws FrameException {
         if (isCommand()) {
@@ -380,7 +390,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * present
      *
      * @return int[] of command parameters, or empty array if no parameters are present
-     * @throws FrameException
+     * @throws FrameException in case of error in frame
      */
     public int[] getCommandParams() throws FrameException {
         if (commandParams == null) {
@@ -394,7 +404,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * are present
      *
      * @return a int[] of DIM parameters, or empty array if no parameters are present
-     * @throws FrameException
+     * @throws FrameException in case of error in frame
      */
     public int[] getDimParams() throws FrameException {
         if (dimParams == null) {
@@ -406,7 +416,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Set Dim params to given array
      *
-     * @param values the String[] of Dim params
+     * @param params the String[] of Dim params
      */
     private void setDimParams(String[] params) throws NumberFormatException {
         int[] tempArr = Arrays.stream(params).mapToInt(Integer::parseInt).toArray();
@@ -419,7 +429,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Returns and array with DIM values, or empty array if no values are present
      *
      * @return a String[] of DIM values, or empty array if no values are present
-     * @throws FrameException
+     * @throws FrameException in case of error in frame
      */
     public String[] getDimValues() throws FrameException {
         if (dimValues == null) {
@@ -429,12 +439,13 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Helper method to add to the given msg frame a list of values separated by '*' at the end of the frame:
-     * *frame## --> *frame*val1*val2*..*valN##
+     * Helper method to add to the given msg frame a list of values separated by <code>*</code> at the end of the frame:
+     *
+     * <code>*frame##</code> --&gt; <code>*frame*val1*val2*..*valN##</code>
      *
      * @param msgStr the input frame String
      * @param vals Strings containing values to be added to the frame
-     * @return a String with the new msg frame with values added at the end
+     * @return a String with the new message frame with values added at the end
      */
     protected static String addValues(String msgStr, String... vals) {
         String str = msgStr.substring(0, msgStr.length() - 2);

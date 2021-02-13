@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 Contributors to the openwebnet4j project
+ * Copyright (c) 2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -38,6 +38,9 @@ public class Auth {
 
     /**
      * Convert [0-9] digits string to hex string
+     *
+     * @param digits string to convert
+     * @return hex string
      */
     protected static String digitToHex(String digits) {
         String out = "";
@@ -54,6 +57,9 @@ public class Auth {
 
     /**
      * Convert hex string to [0-9] digits string
+     *
+     * @param hexString string to convert
+     * @return digits string
      */
     protected static String hexToDigit(String hexString) {
         String out = "";
@@ -65,6 +71,9 @@ public class Auth {
 
     /**
      * Convert bytes array to hex string
+     *
+     * @param bytes array to convert
+     * @return hex string
      */
     protected static String bytesToHex(byte[] bytes) {
         final char[] hexArray = "0123456789abcdef".toCharArray();
@@ -79,6 +88,8 @@ public class Auth {
 
     /**
      * Generate Rb HMAC random hex string from: key=timeMSEC_SINCE_EPOCH using SHA-256
+     *
+     * @return the generated Rb HMAC
      */
     protected static String calcHmacRb() {
         return calcSHA256("time" + System.currentTimeMillis());
@@ -86,6 +97,9 @@ public class Auth {
 
     /**
      * Return SHA-256 hash of the input string
+     *
+     * @param message string to hash
+     * @return the hash string
      */
     protected static String calcSHA256(String message) {
         String response = null;

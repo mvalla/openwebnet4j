@@ -14,6 +14,7 @@ Supported frames:
 * `WHO=1` Lighting
 * `WHO=2` Automation
 * `WHO=13` Gateway Management
+* `WHO=18` Energy Management
 
 Supported Open Web Net gateways:
 - *IP gateways* or scenario programmers, such as: BTicino F453 / F454 / F455, MyHOMEServer1,  MyHOME_Screen10, MH201 / MH202 / MH200N 
@@ -26,7 +27,7 @@ Supported Open Web Net gateways:
 - [x] Support for `WHO=2` Automation (shutters)
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
 - Add other `WHOs`
-    - [ ] Energy
+    - [x] Energy
     - [ ] Thermo
     - [ ] CEN/CEN+
     - [ ] AUX
@@ -40,7 +41,7 @@ Supported Open Web Net gateways:
     <dependency>
       <groupId>com.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.3.2</version>
+      <version>0.4.0</version>
     </dependency>
 ```
 
