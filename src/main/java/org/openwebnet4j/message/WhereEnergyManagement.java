@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -29,7 +29,8 @@ package org.openwebnet4j.message;
  */
 public class WhereEnergyManagement extends Where {
 
-    // public static final Where GENERAL = new WhereEnergyManagement("51");
+    public static final Where GENERAL = new WhereEnergyManagement("51"); 
+    public static final String DISCOVERY = "0*7";
 
     public WhereEnergyManagement(String w) throws NullPointerException, IllegalArgumentException {
         super(w);

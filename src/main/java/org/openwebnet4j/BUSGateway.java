@@ -18,9 +18,12 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.EnergyManagement;
+import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Where;
+import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,8 @@ import org.slf4j.LoggerFactory;
  * {@link BUSGateway} to connect to BUS OpenWebNet gateways using {@link BUSConnector}
  *
  * @author M. Valla - Initial contribution
+ * @author Andrea Conte - Energy manager contribution
+ *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -114,6 +119,20 @@ public class BUSGateway extends OpenGateway {
                     if (type != null) {
                         Where w = amsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
+                    }
+                }
+            }
+
+            // DISCOVER ENERGY MANAGEMENT - request status for all energy items: *#1018*0*7##
+            logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
+            res = sendInternal(EnergyManagement.requestStatus(WhereEnergyManagement.DISCOVERY));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof EnergyManagementDiagnostic) {
+                    EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
+                    OpenDeviceType type = edmsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = edmsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, edmsg));
                     }
                 }
             }
