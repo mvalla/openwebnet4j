@@ -20,6 +20,7 @@ package org.openwebnet4j.message;
  * @author M. Valla - Initial contribution
  */
 import java.util.Arrays;
+
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,14 +88,12 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (frame == null) {
             throw new FrameException("Frame is null");
         }
-        if (OpenMessage.FRAME_ACK.equals(frame)
-                || OpenMessage.FRAME_NACK.equals(frame)
+        if (OpenMessage.FRAME_ACK.equals(frame) || OpenMessage.FRAME_NACK.equals(frame)
                 || OpenMessage.FRAME_BUSY_NACK.equals(frame)) {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException(
-                    "Frame does not end with terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
@@ -108,8 +107,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
         for (char c : frame.toCharArray()) {
             if (!Character.isDigit(c)) {
                 if (c != '#' && c != '*') {
-                    throw new MalformedFrameException(
-                            "Frame can only contain '#', '*' or digits [0-9]");
+                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
                 }
             }
         }
@@ -271,6 +269,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case ENERGY_MANAGEMENT:
                 baseopenmsg = new EnergyManagement(frame);
                 break;
+            case ENERGY_MANAGEMENT_DIAGNOSTIC:
+                baseopenmsg = new EnergyManagementDiagnostic(frame);
+                break;
             case THERMOREGULATION:
                 baseopenmsg = new Thermoregulation(frame);
                 break;
@@ -299,8 +300,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (parts != null) {
             int partsIndex = 0;
             try {
-                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION)
-                        && parts.length > 1) {
+                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION) && parts.length > 1) {
                     // commandTranslation: 1000#WHAT
                     isCommandTranslation = true;
                     partsIndex++; // skip first 1000 value

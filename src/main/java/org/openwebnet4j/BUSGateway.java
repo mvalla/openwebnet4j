@@ -18,10 +18,13 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.EnergyManagement;
+import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Where;
+import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
 import org.slf4j.Logger;
@@ -31,6 +34,8 @@ import org.slf4j.LoggerFactory;
  * {@link BUSGateway} to connect to BUS OpenWebNet gateways using {@link BUSConnector}
  *
  * @author M. Valla - Initial contribution
+ * @author Andrea Conte - Energy manager contribution
+ *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -119,7 +124,19 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-
+            // DISCOVER ENERGY MANAGEMENT - request status for all energy items: *#1018*0*7##
+            logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
+            res = sendInternal(EnergyManagement.requestStatus(WhereEnergyManagement.DISCOVERY));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof EnergyManagementDiagnostic) {
+                    EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
+                    OpenDeviceType type = edmsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = edmsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, edmsg));
+                    }
+                }
+            }
             // DISCOVER THERMOREGULATION - request status for all thermoregulation devices: *#4*0##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
             res = sendInternal(Thermoregulation.requestActuatorStatus(WhereThermo.GENERAL.value()));
@@ -133,10 +150,8 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-
         } catch (OWNException e) {
-            logger.error(
-                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -155,9 +170,7 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected
-                && connector.isCmdConnected()
-                && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
             return true;
         } else {
             return false;
