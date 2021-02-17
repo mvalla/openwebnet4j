@@ -4,13 +4,14 @@
 
 ### Added
 - Initial support for Energy Management (WHO=18)
-- Spotless check and JavaDoc plugins
+- Spotless check and JavaDoc maven plugins
 
 ### Fixed
 - Add support for OPEN password nonce with any number of digits (fixes #1 again)
 
 ### Changed
 - const to FORMAT_DIMENSION_REQUEST and FORMAT_DIMENSION_WRITING_1P_1V
+- const SCS_ENERGY_CENTRAL_UNIT to SCS_ENERGY_METER
 
 
 ## [0.3.4] - 2021-01-07
@@ -53,7 +54,7 @@
 
 ### Fixed
 - [zigbee] Response to device info 2-UNITS for buggy older ZigBee USB gateways
-- [zigbee] Discovery of 2-UNITS Zigbee switch modules 
+- [zigbee] Discovery of 2-UNITS Zigbee switch modules
 - Improved message parsing for late parsing and sub-parts and related tests; changed isCommand() to abstract
 - [zigbee] Improved USBConnector for concurrent events and request/response interleaving
 

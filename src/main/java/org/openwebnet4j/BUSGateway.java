@@ -18,9 +18,11 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Where;
+import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +31,15 @@ import org.slf4j.LoggerFactory;
  * {@link BUSGateway} to connect to BUS OpenWebNet gateways using {@link BUSConnector}
  *
  * @author M. Valla - Initial contribution
+ * @author Andrea Conte - Energy manager contribution
+ *
  */
 public class BUSGateway extends OpenGateway {
 
     private final Logger logger = LoggerFactory.getLogger(BUSGateway.class);
 
     private final int DEFAULT_PORT = 20000; // Default OWN gateway port is 20000
+    private final int CONNECTION_TIMEOUT_MS = 120000;
 
     private int port = DEFAULT_PORT;
     private String host;
@@ -117,9 +122,22 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
+            // DISCOVER ENERGY MANAGEMENT - request diagnostic for all energy devices: *#1018*0*7##
+            // response <<<< *#1018*WHERE*7*BITS##
+            logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
+            res = sendInternal(EnergyManagementDiagnostic.requestDiagnostic(WhereEnergyManagement.GENERAL.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof EnergyManagementDiagnostic) {
+                    EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
+                    OpenDeviceType type = edmsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = edmsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, edmsg));
+                    }
+                }
+            }
         } catch (OWNException e) {
-            logger.error(
-                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -138,12 +156,11 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected
-                && connector.isCmdConnected()
-                && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected && connector.isCmdConnected()
+                && (now - connector.getLastCmdFrameSentTs() < CONNECTION_TIMEOUT_MS)) {
             return true;
         } else {
             return false;
         }
     }
-} /* class */
+}

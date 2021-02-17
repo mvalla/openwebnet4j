@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -92,7 +92,7 @@ public class EnergyManagement extends BaseOpenMessage {
         }
     }
 
-    private static final int WHO = org.openwebnet4j.message.Who.ENERGY_MANAGEMENT.value();
+    private static final int WHO = Who.ENERGY_MANAGEMENT.value();
 
     protected EnergyManagement(String value) {
         super(value);
@@ -125,7 +125,7 @@ public class EnergyManagement extends BaseOpenMessage {
     @Override
     public OpenDeviceType detectDeviceType() throws FrameException {
         if (getWhere().value().startsWith("5")) {
-            return OpenDeviceType.SCS_ENERGY_CENTRAL_UNIT;
+            return OpenDeviceType.SCS_ENERGY_METER;
         } else {
             return null;
         }
