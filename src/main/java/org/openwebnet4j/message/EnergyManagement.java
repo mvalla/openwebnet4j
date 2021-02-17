@@ -92,9 +92,8 @@ public class EnergyManagement extends BaseOpenMessage {
         }
     }
 
-    private static final int WHO = org.openwebnet4j.message.Who.ENERGY_MANAGEMENT.value();
-    private static final int WHO_DIAGNOSTIC = org.openwebnet4j.message.Who.ENERGY_MANAGEMENT_DIAGNOSTIC.value();
-    
+    private static final int WHO = Who.ENERGY_MANAGEMENT.value();
+
     protected EnergyManagement(String value) {
         super(value);
         this.who = Who.ENERGY_MANAGEMENT;
@@ -126,22 +125,10 @@ public class EnergyManagement extends BaseOpenMessage {
     @Override
     public OpenDeviceType detectDeviceType() throws FrameException {
         if (getWhere().value().startsWith("5")) {
-            return OpenDeviceType.SCS_ENERGY_CENTRAL_UNIT;
+            return OpenDeviceType.SCS_ENERGY_METER;
         } else {
             return null;
         }
-    }
-
-    /**
-     * OpenWebNet diagnostic message <b>*#1018*WHERE*7##</b>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static EnergyManagement requestStatus(String where) {
-        // 'where' can't be only "0" but must be "0*7"
-        String w = where + "*7";
-        return new EnergyManagement(format(FORMAT_STATUS, WHO_DIAGNOSTIC, w));
     }
 
     /**

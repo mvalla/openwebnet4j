@@ -18,25 +18,28 @@ package org.openwebnet4j.message;
  * WHERE for Energy Management frames
  *
  * <p>
- * == Where Table:
- *
+ * Where Table:
  * <p>
- * 1N N=[1-127] Stop &amp; Go 5N N= [1-255] Energy Management Central Unit, Pulse Counter, Power
- * Meter: BTicino reference: F520, F523, 3522; Legrand reference: 03555,03557, 03554 7N#0 N= [1-255]
- * Energy Management Actuators: BTicino reference: F522, F523; Legrand reference: 03558, 03559
+ * 1N N=[1-127] Stop &amp; Go
+ *
+ * 5N N= [1-255] Energy Management Central Unit, Pulse Counter, Power
+ * Meter: BTicino reference: F520, F523, 3522; Legrand reference: 03555,03557, 03554
+ *
+ * 7N#0 N= [1-255] Energy Management Actuators: BTicino reference: F522, F523; Legrand reference: 03558, 03559
  *
  * @author Andrea Conte - Initial contribution
  */
 public class WhereEnergyManagement extends Where {
 
-    public static final Where GENERAL = new WhereEnergyManagement("51"); 
-    public static final String DISCOVERY = "0*7";
+    public static final Where GENERAL = new WhereEnergyManagement("0");
 
     public WhereEnergyManagement(String w) throws NullPointerException, IllegalArgumentException {
         super(w);
 
         try {
             switch (w.charAt(0)) {
+                case '0': // GENERAL
+                    break;
                 case '1':
                     // check N=[1-127]
                     int N1 = Integer.parseInt(w.substring(1, w.length()));
@@ -64,9 +67,9 @@ public class WhereEnergyManagement extends Where {
 
                     // check N=[1-255]
                     int N7 = Integer.parseInt(w.substring(1, w.length() - 2));
-                    if (N7 < 1 || N7 > 127) {
+                    if (N7 < 1 || N7 > 255) {
                         throw new IllegalArgumentException(
-                                "WHERE address '" + w + "' is invalid: not in range [1-127].");
+                                "WHERE address '" + w + "' is invalid: not in range [1-255].");
                     }
 
                     break;

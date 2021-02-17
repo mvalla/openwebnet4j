@@ -10,25 +10,50 @@
  * http://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- */
- 
- /*
- * OpenWebNet Energy Management Diagnostic messages (WHO=1018)
  *
- * @author Andrea Conte - Initial contribution
  */
 package org.openwebnet4j.message;
 
+import static java.lang.String.format;
+
 import org.openwebnet4j.OpenDeviceType;
 
+/**
+ * OpenWebNet Energy Management Diagnostic messages (WHO=1018)
+ *
+ * @author Andrea Conte - Initial contribution
+ * @author M. Valla - updated diagnostic part
+ */
 public class EnergyManagementDiagnostic extends BaseOpenMessage {
+
+    private static final int WHO = Who.ENERGY_MANAGEMENT_DIAGNOSTIC.value();
 
     protected EnergyManagementDiagnostic(String value) {
         super(value);
+        this.who = Who.ENERGY_MANAGEMENT_DIAGNOSTIC;
+    }
+
+    /**
+     * OpenWebNet message to request diagnostic DIM 7 (undocumented) <code>*#1018*WHERE*7##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static EnergyManagementDiagnostic requestDiagnostic(String where) {
+        return new EnergyManagementDiagnostic(format(FORMAT_DIMENSION_REQUEST, WHO, where, 7));
     }
 
     @Override
     protected void parseWhere() throws FrameException {
+        if (whereStr == null) {
+            throw new FrameException("Frame has no WHERE part: " + whereStr);
+        } else {
+            if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
+                where = new WhereZigBee(whereStr);
+            } else {
+                where = new WhereEnergyManagement(whereStr);
+            }
+        }
     }
 
     @Override
@@ -42,12 +67,11 @@ public class EnergyManagementDiagnostic extends BaseOpenMessage {
     }
 
     @Override
-    public OpenDeviceType detectDeviceType()  {
+    public OpenDeviceType detectDeviceType() {
         if (getWhere().value().startsWith("5")) {
-            return OpenDeviceType.SCS_ENERGY_CENTRAL_UNIT;
+            return OpenDeviceType.SCS_ENERGY_METER;
         } else {
             return null;
         }
     }
-    
-}  /* class */
+}

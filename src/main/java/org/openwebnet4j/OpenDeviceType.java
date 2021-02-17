@@ -65,7 +65,7 @@ public enum OpenDeviceType {
     // video
     VIDEO_SWITCHER(1536),
     // energy management (not defined by BTicino)
-    SCS_ENERGY_CENTRAL_UNIT(1830),
+    SCS_ENERGY_METER(1830),
     // dry contacts and IR interfaces (not defined by BTicino)
     SCS_DRY_CONTACT_IR(2510);
 
