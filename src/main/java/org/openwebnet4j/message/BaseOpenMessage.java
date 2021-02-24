@@ -14,17 +14,17 @@
  */
 package org.openwebnet4j.message;
 
-/**
- * BaseOpenMessage class is the abstract base class for other OpenWebNet message types.
- *
- * @author M. Valla - Initial contribution
- */
 import java.util.Arrays;
 
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * BaseOpenMessage class is the abstract base class for other OpenWebNet message types.
+ *
+ * @author M. Valla - Initial contribution
+ */
 public abstract class BaseOpenMessage extends OpenMessage {
 
     private final Logger logger = LoggerFactory.getLogger(BaseOpenMessage.class);

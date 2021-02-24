@@ -6,17 +6,18 @@
 - Initial support for Thermoregulation (WHO=4)
 
 
-## [0.4.0-SNAPSHOT] - 2021-02-??
+## [0.4.0] - 2021-02-17
 
 ### Added
 - Initial support for Energy Management (WHO=18)
-- Spotless check and JavaDoc plugins
+- Spotless check and JavaDoc maven plugins
 
 ### Fixed
 - Add support for OPEN password nonce with any number of digits (fixes #1 again)
 
 ### Changed
 - const to FORMAT_DIMENSION_REQUEST and FORMAT_DIMENSION_WRITING_1P_1V
+- const SCS_ENERGY_CENTRAL_UNIT to SCS_ENERGY_METER
 
 
 ## [0.3.4] - 2021-01-07

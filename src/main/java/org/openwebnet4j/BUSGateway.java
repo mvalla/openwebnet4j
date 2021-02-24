@@ -18,7 +18,6 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
-import org.openwebnet4j.message.EnergyManagement;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
@@ -42,6 +41,7 @@ public class BUSGateway extends OpenGateway {
     private final Logger logger = LoggerFactory.getLogger(BUSGateway.class);
 
     private final int DEFAULT_PORT = 20000; // Default OWN gateway port is 20000
+    private final int CONNECTION_TIMEOUT_MS = 120000;
 
     private int port = DEFAULT_PORT;
     private String host;
@@ -124,9 +124,10 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-            // DISCOVER ENERGY MANAGEMENT - request status for all energy items: *#1018*0*7##
+            // DISCOVER ENERGY MANAGEMENT - request diagnostic for all energy devices: *#1018*0*7##
+            // response <<<< *#1018*WHERE*7*BITS##
             logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
-            res = sendInternal(EnergyManagement.requestStatus(WhereEnergyManagement.DISCOVERY));
+            res = sendInternal(EnergyManagementDiagnostic.requestDiagnostic(WhereEnergyManagement.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof EnergyManagementDiagnostic) {
                     EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
@@ -170,10 +171,11 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected && connector.isCmdConnected() && (now - connector.getLastCmdFrameSentTs() < 120000)) {
+        if (isConnected && connector.isCmdConnected()
+                && (now - connector.getLastCmdFrameSentTs() < CONNECTION_TIMEOUT_MS)) {
             return true;
         } else {
             return false;
         }
     }
-} /* class */
+}

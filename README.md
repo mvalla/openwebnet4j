@@ -43,7 +43,7 @@ Supported Open Web Net gateways:
 	<dependency>
 	<groupId>com.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.4.0</version>
+	<version>0.5.0</version>
 	</dependency>
 ```
 
