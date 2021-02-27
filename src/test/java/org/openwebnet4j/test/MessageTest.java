@@ -26,6 +26,7 @@ import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereZigBee;
 import org.openwebnet4j.message.Who;
@@ -35,16 +36,17 @@ import org.openwebnet4j.message.Who;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy Management contribution
+ * @author G. Cocchi - Thermoregulation contribution
  */
 public class MessageTest {
 
     @Test
     public void testLightingOn() {
-        /*
-         * Lighting lm = Lighting.requestTurnOn("789309801#9");
-         * assertNotNull(lm.getWhere());
-         * assertEquals("789309801#9", lm.getWhere().value());
-         */
+
+        Lighting lm = Lighting.requestTurnOn("789309801#9");
+        assertNotNull(lm.getWhere());
+        assertEquals("789309801#9", lm.getWhere().value());
+
         Lighting lightMsg = Lighting.requestTurnOn("0311#4#01");
 
         assertNotNull(lightMsg);
@@ -117,6 +119,31 @@ public class MessageTest {
             Assertions.fail();
         }
     }
+
+    @Test
+    public void testThermoregulation() {
+        Thermoregulation thermoMsg;
+        try {
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*#4*6*12*1048*3##");
+            assertNotNull(thermoMsg);
+            assertEquals(Who.THERMOREGULATION, thermoMsg.getWho());
+            assertFalse(thermoMsg.isCommand());
+            assertEquals("6", thermoMsg.getWhere().value());
+            assertEquals(Thermoregulation.DIM.TEMP_TARGET, thermoMsg.getDim());
+            assertNotNull(thermoMsg.getDimValues());
+            assertEquals("1048", thermoMsg.getDimValues()[0]);
+            // encoding tests
+            assertEquals(-4.8, Thermoregulation.parseTemperature(thermoMsg));
+            System.out.println(
+                    "Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
+            assertEquals("1214", Thermoregulation.encodeTemperature(-21.4));
+            System.out.println(thermoMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    // TODO thestWhereThermo
 
     @Test
     public void testZigBeeLightingWhere() {
