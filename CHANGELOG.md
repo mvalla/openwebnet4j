@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - 2021-0?-??
+
+### Fixed
+- OpenConnector.sendCommandSynch is now synchronized to avoid cmd fails while opening a new CMD connection (fixes #12)
+
+
 ## [0.4.0] - 2021-02-17
 
 ### Added
