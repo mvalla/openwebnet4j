@@ -2,6 +2,9 @@
 
 ## [0.5.0-SNAPSHOT] - 2021-??-??
 
+### Fixed
+- Maven is unable to find javadoc command
+
 ### Added
 - Initial support for Thermoregulation (WHO=4)
 
