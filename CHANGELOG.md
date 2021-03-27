@@ -6,6 +6,15 @@
 - Initial support for Thermoregulation (WHO=4)
 
 
+## [0.4.1] - 2021-03-27
+
+### Fixed
+- OpenConnector.sendCommandSynch is now synchronized to avoid cmd fails while opening a new CMD connection (fixes #12)
+
+### Changed
+- update groupId and POM for publication to Maven Central via OSSRH (fixes #13)
+
+
 ## [0.4.0] - 2021-02-17
 
 ### Added
