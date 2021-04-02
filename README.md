@@ -37,17 +37,20 @@ Supported Open Web Net gateways:
 ## Dependency Management
 
 ### Maven
+
+This library is available via Maven Central repository by adding the dependency in your POM.xml:
+
 ```xml   
     <dependency>
-      <groupId>com.github.openwebnet4j</groupId>
+      <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.4.0</version>
+      <version>0.4.1</version>
     </dependency>
 ```
 
 ## Usage example
 ```java
-// create BUS gateway with IP=192.168.1.50 and password=12345
+// create BUS gateway connetion with IP=192.168.1.50 and password=12345
 BUSGateway myGateway = new BUSGateway("192.168.1.50", 20000, "12345");
 myGateway.subscribe(this);
 try {

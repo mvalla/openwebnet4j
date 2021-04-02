@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.x.x] - 2021-??-??
+
+### Changed
+- project description
+
+
 ## [0.4.1] - 2021-03-27
 
 ### Fixed
@@ -7,6 +13,7 @@
 
 ### Changed
 - update groupId and POM for publication to Maven Central via OSSRH (fixes #13)
+
 
 ## [0.4.0] - 2021-02-17
 

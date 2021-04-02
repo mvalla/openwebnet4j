@@ -13,17 +13,26 @@
 	<url>https://openwebnet4j.github.io</url>
 
 	<scm>
-		<url>https://github.com/mvalla/openwebnet4j.git</url>
+	   <connection>scm:git:https://github.com/mvalla/openwebnet4j.git</connection>
+	   <developerConnection>scm:git:git@github.com:mvalla/openwebnet4j.git</developerConnection>
+	   <url>https://github.com/mvalla/openwebnet4j</url>
 	</scm>
 	<licenses>
 		<license>
-			<name>Eclipse Public License - v 2.0</name>
+			<name>Eclipse Public License 2.0</name>
 			<url>https://www.eclipse.org/legal/epl-2.0</url>
+			<distribution>repo</distribution>
 		</license>
 	</licenses>
 	<developers>
 		<developer>
+			<id>mvalla</id>
 			<name>M. Valla</name>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>Europe/Rome</timezone>
 		</developer>
 	</developers>
 
