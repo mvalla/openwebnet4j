@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.openwebnet4j.message.AckOpenMessage;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
@@ -47,8 +48,7 @@ public abstract class OpenConnector {
     protected OWNReceiveThread monRcvThread;
 
     protected ConnectorListener listener;
-    protected ExecutorService notifierExecutor =
-            Executors.newSingleThreadExecutor(); // single thread executor to
+    protected ExecutorService notifierExecutor = Executors.newSingleThreadExecutor(); // single thread executor to
     // notify listener
 
     /**
@@ -110,39 +110,26 @@ public abstract class OpenConnector {
      * @throws OWNException in case of error while sending command frame or reading response
      */
     // TODO add timeout??
-    public Response sendCommandSynch(String frame) throws OWNException {
+    public synchronized Response sendCommandSynch(String frame) throws OWNException {
         if (!isCmdConnected()) {
             throw new OWNException("CMD is not connected");
         }
         try {
             return sendCommandSynchInternal(frame);
         } catch (IOException e) {
-            logger.debug(
-                    "##OPEN-conn## IOException while sending frame {} or reading response: {}",
-                    frame,
+            logger.debug("##OPEN-conn## IOException while sending frame {} or reading response: {}", frame,
                     e.getMessage());
             throw new OWNException(
-                    "IOException while sending frame "
-                            + frame
-                            + " or reading response: "
-                            + e.getMessage(),
-                    e);
+                    "IOException while sending frame " + frame + " or reading response: " + e.getMessage(), e);
         } catch (FrameException e) {
-            logger.warn(
-                    "##OPEN-conn## FrameException while sending frame {} or reading response: {}",
-                    frame,
+            logger.warn("##OPEN-conn## FrameException while sending frame {} or reading response: {}", frame,
                     e.getMessage());
             throw new OWNException(
-                    "FrameException while sending frame "
-                            + frame
-                            + " or reading response: "
-                            + e.getMessage(),
-                    e);
+                    "FrameException while sending frame " + frame + " or reading response: " + e.getMessage(), e);
         }
     }
 
-    protected abstract Response sendCommandSynchInternal(String frame)
-            throws IOException, FrameException;
+    protected abstract Response sendCommandSynchInternal(String frame) throws IOException, FrameException;
 
     /**
      * Process a frame string received
@@ -158,22 +145,16 @@ public abstract class OpenConnector {
      */
     protected void notifyListener(OpenMessage msg) {
         logger.trace("notifyListener for message: {}", msg);
-        notifierExecutor.submit(
-                () -> {
-                    try {
-                        logger.trace(
-                                "##OPEN-conn## notifyListener:Executing EXECUTOR : {}, message={}",
-                                Thread.currentThread().getName(),
-                                msg);
-                        listener.onMessage(msg);
-                    } catch (Exception e) {
-                        logger.warn(
-                                "##OPEN-conn## Error while notifying message {} to listener: {}",
-                                msg,
-                                e.getMessage());
-                        e.printStackTrace();
-                    }
-                });
+        notifierExecutor.submit(() -> {
+            try {
+                logger.trace("##OPEN-conn## notifyListener:Executing EXECUTOR : {}, message={}",
+                        Thread.currentThread().getName(), msg);
+                listener.onMessage(msg);
+            } catch (Exception e) {
+                logger.warn("##OPEN-conn## Error while notifying message {} to listener: {}", msg, e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
     /** OWNReceiveThread is a thread to read frames from MON InputStream */
@@ -197,8 +178,7 @@ public abstract class OpenConnector {
                     if (fr == null) {
                         logger.debug("{} readFrame() returned null", getName());
                         if (!stopRequested) {
-                            handleMonDisconnect(
-                                    new OWNException(getName() + " readFrame() returned null"));
+                            handleMonDisconnect(new OWNException(getName() + " readFrame() returned null"));
                             break;
                         }
                     } else {
@@ -212,35 +192,23 @@ public abstract class OpenConnector {
                         if (!isMonConnected) {
                             logger.debug("{} - MON is not connected, do nothing.", getName());
                         } else {
-                            logger.info(
-                                    "{} - sending CMD message to see if gw is still reachable...",
-                                    getName());
+                            logger.info("{} - sending CMD message to see if gw is still reachable...", getName());
                             try {
-                                Response res =
-                                        sendCommandSynchInternal(
-                                                GatewayMgmt.requestModel().getFrameValue());
+                                Response res = sendCommandSynchInternal(GatewayMgmt.requestModel().getFrameValue());
                                 if (res.isSuccess()) {
                                     logger.debug("{} - gw is still reachable!", getName());
                                 } else {
-                                    handleMonDisconnect(
-                                            new OWNException(
-                                                    getName()
-                                                            + " - gw response while checking if still reachable: "
-                                                            + res,
-                                                    st));
+                                    handleMonDisconnect(new OWNException(
+                                            getName() + " - gw response while checking if still reachable: " + res,
+                                            st));
                                     break;
                                 }
                             } catch (IOException | FrameException e) {
-                                logger.debug(
-                                        "{} - Exception while checking if gw is still reachable: {}",
-                                        getName(),
+                                logger.debug("{} - Exception while checking if gw is still reachable: {}", getName(),
                                         e.getMessage());
-                                handleMonDisconnect(
-                                        new OWNException(
-                                                getName()
-                                                        + " - exception while checking if gw is still reachable: "
-                                                        + e.getMessage(),
-                                                e));
+                                handleMonDisconnect(new OWNException(getName()
+                                        + " - exception while checking if gw is still reachable: " + e.getMessage(),
+                                        e));
                                 break;
                             }
                         }
@@ -248,9 +216,7 @@ public abstract class OpenConnector {
                 } catch (IOException e) {
                     logger.debug("{} - got IOException: {}", getName(), e.getMessage());
                     if (!stopRequested) {
-                        handleMonDisconnect(
-                                new OWNException(
-                                        getName() + " got IOException: " + e.getMessage(), e));
+                        handleMonDisconnect(new OWNException(getName() + " got IOException: " + e.getMessage(), e));
                         break;
                     }
                 }

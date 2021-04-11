@@ -3,14 +3,14 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.openwebnet4j</groupId>
+	<groupId>io.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
 	<version>0.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>openwebnet4j OpenWebNet Java library</name>
 	<description>openwebnet4j is a Java library for the Open Web Net protocol</description>
-	<url>https://github.com/mvalla/openwebnet4j</url>
+	<url>https://openwebnet4j.github.io</url>
 
 	<scm>
 		<url>https://github.com/mvalla/openwebnet4j.git</url>
@@ -125,6 +125,9 @@
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
+					<excludes>
+						<exclude>**/integration/*</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -134,7 +137,7 @@
 					</execution>
 				</executions>
 			</plugin>
-
+    
 			<!-- ==== BUNDLE MANIFEST ==== -->
 			<plugin>
 				<groupId>org.apache.felix</groupId>
@@ -239,16 +242,13 @@
 	</build>
 
 	<distributionManagement>
-		<!-- <repository> <id>bintray-mvalla-maven</id> <name>mvalla-maven</name> -->
-		<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/;publish=1</url> -->
-		<!-- <url>https://api.bintray.com/maven/mvalla/maven/openwebnet4j/</url> </repository> -->
 		<snapshotRepository>
 			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<repository>
 			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
 
@@ -256,8 +256,8 @@
 		<profile>
 			<id>release</id>
 			<build>
-				<plugins>
-					<!-- ==== GPG and SONATYPE PLUGINS ==== -->
+				<plugins>		
+					<!-- ==== GPG and NEXUS STAGING PLUGINS ==== -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
@@ -279,8 +279,8 @@
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>false</autoReleaseAfterClose>
 						</configuration>
 					</plugin>
 				</plugins>
