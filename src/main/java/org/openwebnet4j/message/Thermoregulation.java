@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author G. Cocchi - Contribution for new lib
+ * @author A. Conte - Added fancoil speed support
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -100,10 +102,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static MODE fromValue(Integer i) {
-            Optional<MODE> m =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<MODE> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue()).findFirst();
             return m.orElse(null);
         }
 
@@ -132,8 +131,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static LOCAL_OFFSET fromValue(String s) {
-            Optional<LOCAL_OFFSET> offset =
-                    Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
+            Optional<LOCAL_OFFSET> offset = Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
             return offset.orElse(null);
         }
 
@@ -144,10 +142,10 @@ public class Thermoregulation extends BaseOpenMessage {
 
     public enum FAN_COIL_SPEED {
         AUTO(0),
-        VEL1(1),
-        VEL2(2),
-        VEL3(3);
-        // OFF(15);  present in documentation but not handled on real bus
+        SPEED_1(1),
+        SPEED_2(2),
+        SPEED_3(3);
+        // OFF(15); present in documentation but not handled on real bus
 
         private final Integer value;
 
@@ -215,10 +213,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static ACTUATOR_STATUS fromValue(Integer i) {
-            Optional<ACTUATOR_STATUS> a =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<ACTUATOR_STATUS> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
             return a.orElse(null);
         }
 
@@ -253,26 +249,18 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
-    public static Thermoregulation requestWriteSetpointTemperature(
-            String where, double newSetPointTemperature, Thermoregulation.MODE mode)
-            throws MalformedFrameException {
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            Thermoregulation.MODE mode) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
-            throw new MalformedFrameException(
-                    "Set Point Temperature should be between 5° and 40° Celsius.");
+            throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
         // Round new Set Point Temperature to close 0.5° C value
-        return new Thermoregulation(
-                format(
-                        FORMAT_DIMENSION_WRITING_2V,
-                        WHO,
-                        where,
-                        DIM.TEMP_SETPOINT.value(),
-                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
-                        mode.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DIM.TEMP_SETPOINT.value(),
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), mode.value()));
     }
 
     /**
-     * OpenWebNet to set the Fan Coil Speed<b>*#4*where*11*speed##</b>.
+     * OpenWebNet to set the Fan Coil Speed <code>*#4*where*#11*speed##</code>.
      *
      * @param where WHERE string
      * @param newFanCoilSpeed Speed of the Fan Coil
@@ -283,9 +271,9 @@ public class Thermoregulation extends BaseOpenMessage {
         return new Thermoregulation(
                 format(FORMAT_DIMENSION_WRITING_1V, WHO, where, DIM.FAN_COIL_SPEED.value(), newFanCoilSpeed.value()));
     }
-	
+
     /**
-     * OpenWebNet message request the Fan Coil Speed<b>*#4*where*11##</b>.
+     * OpenWebNet message request the Fan Coil Speed <code>*#4*where*11##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -325,8 +313,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestTemperature(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.TEMPERATURE.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.TEMPERATURE.value()));
     }
 
     /**
@@ -337,8 +324,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestSetPointTemperature(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.TEMP_SETPOINT.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.TEMP_SETPOINT.value()));
     }
 
     /**
@@ -348,8 +334,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestActuatorStatus(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTUATOR_STATUS.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTUATOR_STATUS.value()));
     }
 
     /**
@@ -369,8 +354,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestValvesStatus(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.VALVES_STATUS.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.VALVES_STATUS.value()));
     }
 
     @Override
@@ -379,8 +363,7 @@ public class Thermoregulation extends BaseOpenMessage {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
             // TODO the original where string of the message should not be modified here: instead
-            // thermo id and actuator
-            // id should be parsed in WhereThermo
+            // thermo id and actuator id should be parsed in WhereThermo
             if (whereStr.indexOf("#") > 0) {
                 // Correct Actuator Where value x#y to value x in case of Thermostat device without
                 // Central Unit
@@ -434,21 +417,17 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @throws NumberFormatException in case of error in msg
      */
-    public static Double parseTemperature(Thermoregulation msg)
-            throws NumberFormatException, FrameException {
+    public static Double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         // temp is in the first dim value for thermostats (dim=0,12,14), in the second in case of
         // probes (dim=15)
         // TODO check min,max values
-        if (msg.getDim() == DIM.TEMPERATURE
-                || msg.getDim() == DIM.TEMP_SETPOINT
-                || msg.getDim() == DIM.TEMP_TARGET) {
+        if (msg.getDim() == DIM.TEMPERATURE || msg.getDim() == DIM.TEMP_SETPOINT || msg.getDim() == DIM.TEMP_TARGET) {
             return decodeTemperature(values[0]);
         } else if (msg.getDim() == DIM.PROBE_TEMPERATURE) {
             return decodeTemperature(values[1]);
         } else {
-            throw new NumberFormatException(
-                    "Could not parse temperature from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
         }
     }
 
@@ -506,12 +485,12 @@ public class Thermoregulation extends BaseOpenMessage {
         return sign + digits;
     }
 
-     /*
-     * Parse fancoil speed from Thermoregulation msg (dimensions: 11)
+    /*
+     * Parse fan coil speed from Thermoregulation msg (dimensions: 11)
      *
      * @param msg Thermoregulation message
      *
-     * @return parsed fancoil speed as enumeration (AUTO, VEL1, VEL2, VEL3)
+     * @return parsed fan coil speed as enumeration (AUTO, SPEED_1, SPEED_2, SPEED_3)
      *
      * @throws NumberFormatException
      */
@@ -523,7 +502,7 @@ public class Thermoregulation extends BaseOpenMessage {
             throw new NumberFormatException("Could not parse fancoil speed from: " + msg.getFrameValue());
         }
     }
-	
+
     @Override
     public OpenDeviceType detectDeviceType() {
         Where w = getWhere();
