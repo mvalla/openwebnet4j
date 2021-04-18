@@ -142,8 +142,33 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    public enum FAN_COIL_SPEED {
+        AUTO(0),
+        VEL1(1),
+        VEL2(2),
+        VEL3(3);
+        // OFF(15);  present in documentation but not handled on real bus
+
+        private final Integer value;
+
+        private FAN_COIL_SPEED(Integer value) {
+            this.value = value;
+        }
+
+        public static FAN_COIL_SPEED fromValue(Integer i) {
+            Optional<FAN_COIL_SPEED> fcs = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
+            return fcs.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
+        }
+    }
+
     public enum DIM implements Dim {
         TEMPERATURE(0),
+        FAN_COIL_SPEED(11),
         TEMP_TARGET(12),
         OFFSET(13),
         TEMP_SETPOINT(14),
@@ -244,6 +269,29 @@ public class Thermoregulation extends BaseOpenMessage {
                         DIM.TEMP_SETPOINT.value(),
                         encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
                         mode.value()));
+    }
+
+    /**
+     * OpenWebNet to set the Fan Coil Speed<b>*#4*where*11*speed##</b>.
+     *
+     * @param where WHERE string
+     * @param newFanCoilSpeed Speed of the Fan Coil
+     * @return message
+     */
+    public static Thermoregulation requestWriteFanCoilSpeed(String where,
+            Thermoregulation.FAN_COIL_SPEED newFanCoilSpeed) {
+        return new Thermoregulation(
+                format(FORMAT_DIMENSION_WRITING_1V, WHO, where, DIM.FAN_COIL_SPEED.value(), newFanCoilSpeed.value()));
+    }
+	
+    /**
+     * OpenWebNet message request the Fan Coil Speed<b>*#4*where*11##</b>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestFanCoilSpeed(String where) {
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.FAN_COIL_SPEED.value()));
     }
 
     /**
@@ -458,6 +506,24 @@ public class Thermoregulation extends BaseOpenMessage {
         return sign + digits;
     }
 
+     /*
+     * Parse fancoil speed from Thermoregulation msg (dimensions: 11)
+     *
+     * @param msg Thermoregulation message
+     *
+     * @return parsed fancoil speed as enumeration (AUTO, VEL1, VEL2, VEL3)
+     *
+     * @throws NumberFormatException
+     */
+    public static FAN_COIL_SPEED parseFanCoilSpeed(Thermoregulation msg) throws NumberFormatException, FrameException {
+        String[] values = msg.getDimValues();
+        if (msg.getDim() == DIM.FAN_COIL_SPEED) {
+            return FAN_COIL_SPEED.fromValue(Integer.parseInt(values[0]));
+        } else {
+            throw new NumberFormatException("Could not parse fancoil speed from: " + msg.getFrameValue());
+        }
+    }
+	
     @Override
     public OpenDeviceType detectDeviceType() {
         Where w = getWhere();
