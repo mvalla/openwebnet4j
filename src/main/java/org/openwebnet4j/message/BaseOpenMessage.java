@@ -33,6 +33,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     // TODO change to factory methods? (formatDimRequest(...) )
     protected static final String FORMAT_DIMENSION_REQUEST = "*#%d*%s*%d##";
+    protected static final String FORMAT_DIMENSION_WRITING_1V = "*#%d*%s*#%d*%d##";
     protected static final String FORMAT_DIMENSION_WRITING_2V = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_DIMENSION_WRITING_1P_1V = "*#%d*%s*#%d#%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
