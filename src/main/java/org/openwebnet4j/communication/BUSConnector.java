@@ -142,7 +142,7 @@ public class BUSConnector extends OpenConnector {
             // another CMD connection
             cmdSk.close();
             isCmdConnected = false;
-            logger.debug("##BUS-conn## trying NEW CMD connection...");
+            logger.info("##BUS-conn## trying NEW CMD connection...");
             try {
                 openCmdConn();
             } catch (OWNException oe) {
@@ -183,6 +183,7 @@ public class BUSConnector extends OpenConnector {
                             ufe.getMessage());
                 }
             } else {
+                msgLogger.info("BUS-CMD <<<<==== X");
                 throw new IOException("Received null frame while reading responses to command");
             }
         }
