@@ -193,6 +193,30 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    public enum FUNCTION {
+        HEATING(1),
+        COOLING(2),
+        GENERIC(3);
+
+        private final Integer value;
+
+        private FUNCTION(Integer value) {
+            this.value = value;
+        }
+
+        public static FUNCTION fromValue(Integer i) {
+            Optional<FUNCTION> m =
+                    Arrays.stream(values())
+                            .filter(val -> i.intValue() == val.value.intValue())
+                            .findFirst();
+            return m.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
+        }
+    }
+
     public enum DIM implements Dim {
         TEMPERATURE(0),
         FAN_COIL_SPEED(11),
@@ -325,6 +349,33 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestFanCoilSpeed(String where) {
         return new Thermoregulation(
                 format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.FAN_COIL_SPEED.value()));
+    }
+
+    /**
+     * OpenWebNet to set the funcion.
+     *
+     * @param where WHERE string
+     * @param newFunction Function (HEATING, COOLING, GENERIC). HEATING <code> *4*102*where##</code>
+     *     COOLING <code> *4*202*where##</code> GENERIC <code> *4*302*where##</code>
+     * @return message
+     */
+    public static Thermoregulation requestWriteFunction(
+            String where, Thermoregulation.FUNCTION newFunction) {
+
+        switch (newFunction) {
+            case HEATING:
+                return new Thermoregulation(
+                        format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_HEATING.value(), where));
+            case COOLING:
+                return new Thermoregulation(
+                        format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_CONDITIONING.value(), where));
+
+                // this is allow only with central unit
+            case GENERIC:
+                return new Thermoregulation(
+                        format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_GENERIC.value(), where));
+        }
+        return null;
     }
 
     /**
@@ -608,7 +659,7 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @return parsed mode as enumeration (MANUAL, PROTECTION, OFF)
      *
-     * @throws NumberFormatException
+     * @throws FrameException
      */
     public static OPERATION_MODE parseMode(Thermoregulation msg) throws FrameException {
 
@@ -634,6 +685,41 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         throw new FrameException("Invalid Mode from: " + msg.getFrameValue());
+    }
+
+    /*
+     * Parse fuction from Thermoregulation msg (*4*what*where##)
+     *
+     * @param msg Thermoregulation message
+     *
+     * @return parsed mode as enumeration (COOLING, HEATING, GENERIC)
+     *
+     * @throws FrameException
+     */
+    public static FUNCTION parseFunction(Thermoregulation msg) throws FrameException {
+
+        if (msg.getWhat() == null)
+            throw new FrameException("Could not parse Fuction from: " + msg.getFrameValue());
+
+        WHAT w = WHAT.fromValue(msg.getWhat().value());
+        switch (w) {
+            case CONDITIONING:
+            case PROTECTION_CONDITIONING:
+            case OFF_CONDITIONING:
+                return FUNCTION.COOLING;
+
+            case HEATING:
+            case PROTECTION_HEATING:
+            case OFF_HEATING:
+                return FUNCTION.HEATING;
+
+            case GENERIC:
+            case PROTECTION_GENERIC:
+            case OFF_GENERIC:
+                return FUNCTION.GENERIC;
+        }
+
+        throw new FrameException("Invalid Fuction from: " + msg.getFrameValue());
     }
 
     @Override
