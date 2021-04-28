@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy manager contribution
- *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -127,7 +126,10 @@ public class BUSGateway extends OpenGateway {
             // DISCOVER ENERGY MANAGEMENT - request diagnostic for all energy devices: *#1018*0*7##
             // response <<<< *#1018*WHERE*7*BITS##
             logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
-            res = sendInternal(EnergyManagementDiagnostic.requestDiagnostic(WhereEnergyManagement.GENERAL.value()));
+            res =
+                    sendInternal(
+                            EnergyManagementDiagnostic.requestDiagnostic(
+                                    WhereEnergyManagement.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof EnergyManagementDiagnostic) {
                     EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
@@ -152,7 +154,8 @@ public class BUSGateway extends OpenGateway {
                 }
             }
         } catch (OWNException e) {
-            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error(
+                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -171,7 +174,8 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected && connector.isCmdConnected()
+        if (isConnected
+                && connector.isCmdConnected()
                 && (now - connector.getLastCmdFrameSentTs() < CONNECTION_TIMEOUT_MS)) {
             return true;
         } else {

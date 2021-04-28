@@ -129,7 +129,7 @@ public class MessageTest {
             assertEquals(Who.THERMOREGULATION, thermoMsg.getWho());
             assertFalse(thermoMsg.isCommand());
             assertEquals("6", thermoMsg.getWhere().value());
-            assertEquals(Thermoregulation.DIM.TEMP_TARGET, thermoMsg.getDim());
+            assertEquals(Thermoregulation.DIM.COMPLETE_PROBE_STATUS, thermoMsg.getDim());
             assertNotNull(thermoMsg.getDimValues());
             assertEquals("1048", thermoMsg.getDimValues()[0]);
             // encoding tests
@@ -164,14 +164,15 @@ public class MessageTest {
 
     @Test
     public void testMalformedCmdAndDimFrames() {
-        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
+        String[] wrongFrames = {"*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##"};
         for (String frame : wrongFrames) {
             try {
                 BaseOpenMessage.parse(frame);
                 // if we can parse this message, this test fails
                 Assertions.fail("MalformedFrameException not detected: " + frame);
             } catch (FrameException e) {
-                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                System.out.println(
+                        "correctly got FrameException for frame: " + frame + ": " + e.getMessage());
                 assertTrue(e instanceof MalformedFrameException);
             }
         }
