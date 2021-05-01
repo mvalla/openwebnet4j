@@ -129,7 +129,7 @@ public class MessageTest {
             assertEquals(Who.THERMOREGULATION, thermoMsg.getWho());
             assertFalse(thermoMsg.isCommand());
             assertEquals("6", thermoMsg.getWhere().value());
-            assertEquals(Thermoregulation.DIM.TEMP_TARGET, thermoMsg.getDim());
+            assertEquals(Thermoregulation.DIM.COMPLETE_PROBE_STATUS, thermoMsg.getDim());
             assertNotNull(thermoMsg.getDimValues());
             assertEquals("1048", thermoMsg.getDimValues()[0]);
             // encoding tests

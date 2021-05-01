@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy manager contribution
- *
  */
 public class BUSGateway extends OpenGateway {
 
