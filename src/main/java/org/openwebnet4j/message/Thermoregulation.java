@@ -89,30 +89,6 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    public enum MODE {
-        HEATING(1),
-        CONDITIONING(2),
-        GENERIC(3);
-
-        private final Integer value;
-
-        private MODE(Integer value) {
-            this.value = value;
-        }
-
-        public static MODE fromValue(Integer i) {
-            Optional<MODE> m =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
-            return m.orElse(null);
-        }
-
-        public Integer value() {
-            return value;
-        }
-    }
-
     public enum LOCAL_OFFSET {
         PLUS_3("03", "+3"),
         PLUS_2("02", "+2"),
@@ -300,12 +276,12 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param where Zone between #1 and #99
      * @param newSetPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step)
-     * @param mode MODE
+     * @param function HEATING/COOLING/GENERIC
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
     public static Thermoregulation requestWriteSetpointTemperature(
-            String where, double newSetPointTemperature, Thermoregulation.MODE mode)
+            String where, double newSetPointTemperature, Thermoregulation.FUNCTION function)
             throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
             throw new MalformedFrameException(
@@ -319,7 +295,7 @@ public class Thermoregulation extends BaseOpenMessage {
                         where,
                         DIM.TEMP_SETPOINT.value(),
                         encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
-                        mode.value()));
+                        function.value()));
     }
 
     /**
@@ -355,8 +331,10 @@ public class Thermoregulation extends BaseOpenMessage {
      * OpenWebNet to set the funcion.
      *
      * @param where WHERE string
-     * @param newFunction Function (HEATING, COOLING, GENERIC). HEATING <code> *4*102*where##</code>
-     *     COOLING <code> *4*202*where##</code> GENERIC <code> *4*302*where##</code>
+     * @param newFunction Function (HEATING, COOLING, GENERIC). 
+     *     HEATING <code> *4*102*where##</code>
+     *     COOLING <code> *4*202*where##</code> 
+     *     GENERIC <code> *4*302*where##</code>
      * @return message
      */
     public static Thermoregulation requestWriteFunction(
@@ -382,29 +360,61 @@ public class Thermoregulation extends BaseOpenMessage {
      * OpenWebNet to set the operation mode.
      *
      * @param where WHERE string
-     * @param newOperationMode Operation mode (MANUAL, PROTECTION, OFF). MANUAL <code>
-     *     *#4*where*#14*T*M##</code> (requestWriteSetPointTemperature) PROTECTION <code>
-     *     *4*302*where##</code> (generic protection) OFF <code>*4*303*where##</code> (generic OFF)
+     * @param newOperationMode Operation mode (MANUAL, PROTECTION, OFF). 
+     *     MANUAL <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature) 
+     *     PROTECTION <code>*4*302*where##</code> (generic protection) 
+     *     OFF <code>*4*303*where##</code> (generic OFF)
+     * @param currentFunction current thermostat function (HEATING/COOLING/GENERIC)
+     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be setted when switching to function=MANUAL
      * @return message
      */
     public static Thermoregulation requestWriteMode(
-            String where, Thermoregulation.OPERATION_MODE newOperationMode) {
+            String where, Thermoregulation.OPERATION_MODE newOperationMode, Thermoregulation.FUNCTION currentFunction,
+            double setPointTemperature) {
 
         switch (newOperationMode) {
             case MANUAL:
                 try {
-                    return requestWriteSetpointTemperature(
-                            where, 11.5d, Thermoregulation.MODE.GENERIC);
+                    switch (currentFunction) {
+                        case HEATING:
+                            return requestWriteSetpointTemperature(
+                                where, setPointTemperature, Thermoregulation.FUNCTION.HEATING);
+                        case COOLING:
+                            return requestWriteSetpointTemperature(
+                                where, setPointTemperature, Thermoregulation.FUNCTION.COOLING);
+                        case GENERIC:
+                            return requestWriteSetpointTemperature(
+                                where, setPointTemperature, Thermoregulation.FUNCTION.GENERIC);
+                    }
                 } catch (MalformedFrameException ex) {
                     return null;
                 }
+
             case PROTECTION:
-                return new Thermoregulation(
-                        format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_GENERIC.value(), where));
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_HEATING.value(), where));
+                    case COOLING:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_CONDITIONING.value(), where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_GENERIC.value(), where));
+                }
 
             case OFF:
-                return new Thermoregulation(
-                        format(FORMAT_REQUEST, WHO, WHAT.OFF_GENERIC.value(), where));
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.OFF_HEATING.value(), where));
+                    case COOLING:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.OFF_CONDITIONING.value(), where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                            format(FORMAT_REQUEST, WHO, WHAT.OFF_GENERIC.value(), where));
+                }
         }
         return null;
     }
