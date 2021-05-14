@@ -123,8 +123,8 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-
+							</plugin>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -137,15 +137,22 @@
 						<exclude>**/integration/*</exclude>
 					</excludes>
 				</configuration>
-				<executions>
+			<!-- 	<executions>
 					<execution>
+						<id>test_ex</id>
+						<configuration>
+							<excludes>
+								<exclude>**/integration/*</exclude>
+								<exclude>**/*.MF</exclude>
+							</excludes>
+						</configuration>
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
 					</execution>
-				</executions>
-			</plugin>
-    
+				</executions>  -->
+			</plugin>    
+
 			<!-- ==== BUNDLE MANIFEST ==== -->
 			<plugin>
 				<groupId>org.apache.felix</groupId>
