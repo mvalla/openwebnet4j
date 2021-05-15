@@ -21,7 +21,7 @@ import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
-import org.openwebnet4j.message.Thermoregulation;
+import org.openwebnet4j.message.ThermoregulationDiagnostic;
 import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
@@ -136,17 +136,17 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-
-            // DISCOVER THERMOREGULATION - request status for all thermoregulation devices: *#4*0##
+            // DISCOVER THERMOREGULATION - request diagnostic for all thermoregulation devices: *#1004*0*7##
+            // response <<<< *#1004*WHERE*7*BITS##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
-            res = sendInternal(Thermoregulation.requestActuatorStatus(WhereThermo.GENERAL.value()));
+            res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
-                if (msg instanceof Thermoregulation) {
-                    Thermoregulation amsg = ((Thermoregulation) msg);
-                    OpenDeviceType type = amsg.detectDeviceType();
+                if (msg instanceof ThermoregulationDiagnostic) {
+                    ThermoregulationDiagnostic tdMsg = ((ThermoregulationDiagnostic) msg);
+                    OpenDeviceType type = tdMsg.detectDeviceType();
                     if (type != null) {
-                        Where w = amsg.getWhere();
-                        notifyListeners((listener) -> listener.onNewDevice(w, type, amsg));
+                        Where w = tdMsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, tdMsg));
                     }
                 }
             }
