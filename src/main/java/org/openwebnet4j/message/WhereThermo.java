@@ -17,20 +17,23 @@ package org.openwebnet4j.message;
 /**
  * WHERE for Thermoregulation frames
  *
- * <p>== Where Table:
+ * <p>
+ * == Where Table:
  *
- * <p>=== Probes 0 - all probes Z - master probe of zone Z [1-99] 0ZZ - all slave probes of zone ZZ
+ * <p>
+ * === Probes 0 - all probes Z - master probe of zone Z [1-99] 0ZZ - all slave probes of zone ZZ
  * [01-99] sZZ - slave probe s[1-8] of zone ZZ [01-99] s00 - external probe s[1-9] of external zone
  * 00
  *
- * <p>=== Actuators (thermostats) #0 - central unit #Z - zone Z [1-99] via central unit 0#0 - all
+ * <p>
+ * === Actuators (thermostats) #0 - central unit #Z - zone Z [1-99] via central unit 0#0 - all
  * zones, all actuators Z#0 - zone Z [1-99], all actuators Z#N - zone Z [1-99], actuator N [1-9]
  *
  * @author M. Valla - Initial contribution
  */
 public class WhereThermo extends Where {
 
-    public static final Where GENERAL = new WhereThermo("0#0");
+    public static final Where GENERAL = new WhereThermo("0");
 
     public WhereThermo(String w) throws NullPointerException {
         // TODO check range for WHERE
