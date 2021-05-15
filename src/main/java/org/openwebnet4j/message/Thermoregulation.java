@@ -206,6 +206,35 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    public enum VALVE_STATUS {
+        OFF(0),
+        ON(1),
+        OPENED(2),
+        CLOSED(3),
+        STOP(4),
+        OFF_FAN_COIL(5),
+        ON_SPEED_1(6),
+        ON_SPEED_2(7),
+        ON_SPEED_3(8),
+        STANDBY_FAN_COIL(14);
+
+        private final Integer value;
+
+        private VALVE_STATUS(Integer value) {
+            this.value = value;
+        }
+
+        public static VALVE_STATUS fromValue(Integer i) {
+            Optional<VALVE_STATUS> fcs = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
+            return fcs.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
+        }
+    }
+
     public enum DIM implements Dim {
         TEMPERATURE(0),
         FAN_COIL_SPEED(11),
@@ -409,6 +438,17 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestMode(String where) {
         return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.COMPLETE_PROBE_STATUS.value()));
     }
+
+    /**
+     * OpenWebNet message request valves status (conditioning (CV) and heating (HV)) <code>
+     * *#4*where*19##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestValveStatus(String where) {
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.VALVES_STATUS.value()));
+    }    
 
     /**
      * OpenWebNet to set the Thermoregulation device mode.
@@ -629,6 +669,34 @@ public class Thermoregulation extends BaseOpenMessage {
             return FAN_COIL_SPEED.fromValue(Integer.parseInt(values[0]));
         } else {
             throw new NumberFormatException("Could not parse fancoil speed from: " + msg.getFrameValue());
+        }
+    }
+
+    /*
+     * Parse valve status (CV and HV) from Thermoregulation msg (dimensions: 19)
+     *
+     * @param msg Thermoregulation message
+     * @param what Look for COOLING (CV) or HEATING (HV) valve
+     *
+     * @return parsed valve status as enumeration (OFF, ON, OPENED, CLOSED, STOP, OFF FAN COIL, ON SPEED 1/2/3, STANDBY FAN COIL)
+     *
+     * @throws NumberFormatException, FrameException
+     */
+    public static VALVE_STATUS parseValveStatus(Thermoregulation msg, WHAT what) throws NumberFormatException, FrameException {
+        if (what != WHAT.CONDITIONING && what != WHAT.HEATING) throw new FrameException("GENERIC is not allowed as input parameter.");
+
+        String[] values = msg.getDimValues();
+        logger.debug("====parseValveStatus {} --> : CV <{}> HV <{}>", msg.getFrameValue(), values[0], values[1]);
+
+        if (msg.getDim() == DIM.VALVES_STATUS) {
+            if (what == WHAT.CONDITIONING)
+                return VALVE_STATUS.fromValue(Integer.parseInt(values[0]));
+            if (what == WHAT.HEATING)
+                return VALVE_STATUS.fromValue(Integer.parseInt(values[1]));
+                
+            return null;
+        } else {
+            throw new NumberFormatException("Could not parse valve status from: " + msg.getFrameValue());
         }
     }
 
