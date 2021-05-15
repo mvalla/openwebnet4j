@@ -39,34 +39,45 @@ public class Thermoregulation extends BaseOpenMessage {
     public enum WHAT implements What {
         CONDITIONING(0),
         HEATING(1),
-        GENERIC(3),
+        GENERIC(3),        
         // protection
-        PROTECTION_HEATING(102), // antifreeze
-        PROTECTION_CONDITIONING(202), // thermal-protection
-        PROTECTION_GENERIC(302),
+        PROTECTION_HEATING(102, FUNCTION.HEATING, OPERATION_MODE.PROTECTION), // antifreeze
+        PROTECTION_CONDITIONING(202, FUNCTION.COOLING, OPERATION_MODE.PROTECTION), // thermal-protection
+        PROTECTION_GENERIC(302, FUNCTION.GENERIC, OPERATION_MODE.PROTECTION),
         // off
-        OFF_HEATING(103),
-        OFF_CONDITIONING(203),
-        OFF_GENERIC(303),
+        OFF_HEATING(103, FUNCTION.HEATING, OPERATION_MODE.OFF),
+        OFF_CONDITIONING(203, FUNCTION.COOLING, OPERATION_MODE.OFF),
+        OFF_GENERIC(303, FUNCTION.GENERIC, OPERATION_MODE.OFF),
         // manual
-        MANUAL_HEATING(110),
-        MANUAL_CONDITIONING(210),
-        MANUAL_GENERIC(310),
-        // programming (zone is following the program of the central unit)
-        PROGRAM_HEATING(111),
-        PROGRAM_CONDITIONING(211),
-        PROGRAM_GENERIC(311),
-        // holiday (zone is following the holiday program set on the central unit)
-        HOLIDAY_HEATING(115),
-        HOLIDAY_CONDITIONING(215),
-        HOLIDAY_GENERIC(315);
+        MANUAL_HEATING(110, FUNCTION.HEATING, OPERATION_MODE.MANUAL),
+        MANUAL_CONDITIONING(210, FUNCTION.COOLING, OPERATION_MODE.MANUAL),
+        MANUAL_GENERIC(310, FUNCTION.GENERIC, OPERATION_MODE.MANUAL);
+        // // programming (zone is following the program of the central unit)
+        // PROGRAM_HEATING(111),
+        // PROGRAM_CONDITIONING(211),
+        // PROGRAM_GENERIC(311),
+        // // holiday (zone is following the holiday program set on the central unit)
+        // HOLIDAY_HEATING(115),
+        // HOLIDAY_CONDITIONING(215),
+        // HOLIDAY_GENERIC(315);
 
         private static Map<Integer, WHAT> mapping;
 
         private final int value;
+        private final FUNCTION function;
+        private final OPERATION_MODE mode;
 
         private WHAT(int value) {
             this.value = value;
+
+            this.function = FUNCTION.GENERIC;
+            this.mode = OPERATION_MODE.MANUAL;
+        }
+
+        private WHAT(int value, FUNCTION function, OPERATION_MODE mode) {
+            this.value = value;
+            this.function = function;
+            this.mode = mode;
         }
 
         private static void initMapping() {
@@ -86,6 +97,14 @@ public class Thermoregulation extends BaseOpenMessage {
         @Override
         public Integer value() {
             return value;
+        }
+
+        public FUNCTION function() {
+            return function;
+        }
+
+        public OPERATION_MODE mode() {
+            return mode;
         }
     }
 
@@ -375,17 +394,7 @@ public class Thermoregulation extends BaseOpenMessage {
         switch (newOperationMode) {
             case MANUAL:
                 try {
-                    switch (currentFunction) {
-                        case HEATING:
-                            return requestWriteSetpointTemperature(
-                                where, setPointTemperature, Thermoregulation.FUNCTION.HEATING);
-                        case COOLING:
-                            return requestWriteSetpointTemperature(
-                                where, setPointTemperature, Thermoregulation.FUNCTION.COOLING);
-                        case GENERIC:
-                            return requestWriteSetpointTemperature(
-                                where, setPointTemperature, Thermoregulation.FUNCTION.GENERIC);
-                    }
+                    return requestWriteSetpointTemperature(where, setPointTemperature, currentFunction);
                 } catch (MalformedFrameException ex) {
                     return null;
                 }
@@ -671,31 +680,31 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @throws FrameException
      */
-    public static OPERATION_MODE parseMode(Thermoregulation msg) throws FrameException {
+    // public static OPERATION_MODE parseMode(Thermoregulation msg) throws FrameException {
 
-        if (msg.getWhat() == null)
-            throw new FrameException("Could not parse Mode from: " + msg.getFrameValue());
+    //     if (msg.getWhat() == null)
+    //         throw new FrameException("Could not parse Mode from: " + msg.getFrameValue());
 
-        WHAT w = WHAT.fromValue(msg.getWhat().value());
-        switch (w) {
-            case CONDITIONING:
-            case HEATING:
-            case GENERIC:
-                return OPERATION_MODE.MANUAL;
+    //     WHAT w = WHAT.fromValue(msg.getWhat().value());
+    //     switch (w) {
+    //         case CONDITIONING:
+    //         case HEATING:
+    //         case GENERIC:
+    //             return OPERATION_MODE.MANUAL;
 
-            case PROTECTION_HEATING:
-            case PROTECTION_CONDITIONING:
-            case PROTECTION_GENERIC:
-                return OPERATION_MODE.PROTECTION;
+    //         case PROTECTION_HEATING:
+    //         case PROTECTION_CONDITIONING:
+    //         case PROTECTION_GENERIC:
+    //             return OPERATION_MODE.PROTECTION;
 
-            case OFF_HEATING:
-            case OFF_CONDITIONING:
-            case OFF_GENERIC:
-                return OPERATION_MODE.OFF;
-        }
+    //         case OFF_HEATING:
+    //         case OFF_CONDITIONING:
+    //         case OFF_GENERIC:
+    //             return OPERATION_MODE.OFF;
+    //     }
 
-        throw new FrameException("Invalid Mode from: " + msg.getFrameValue());
-    }
+    //     throw new FrameException("Invalid Mode from: " + msg.getFrameValue());
+    // }
 
     /*
      * Parse fuction from Thermoregulation msg (*4*what*where##)
@@ -706,31 +715,31 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @throws FrameException
      */
-    public static FUNCTION parseFunction(Thermoregulation msg) throws FrameException {
+    // public static FUNCTION parseFunction(Thermoregulation msg) throws FrameException {
 
-        if (msg.getWhat() == null)
-            throw new FrameException("Could not parse Fuction from: " + msg.getFrameValue());
+    //     if (msg.getWhat() == null)
+    //         throw new FrameException("Could not parse Fuction from: " + msg.getFrameValue());
 
-        WHAT w = WHAT.fromValue(msg.getWhat().value());
-        switch (w) {
-            case CONDITIONING:
-            case PROTECTION_CONDITIONING:
-            case OFF_CONDITIONING:
-                return FUNCTION.COOLING;
+    //     WHAT w = WHAT.fromValue(msg.getWhat().value());
+    //     switch (w) {
+    //         case CONDITIONING:
+    //         case PROTECTION_CONDITIONING:
+    //         case OFF_CONDITIONING:
+    //             return FUNCTION.COOLING;
 
-            case HEATING:
-            case PROTECTION_HEATING:
-            case OFF_HEATING:
-                return FUNCTION.HEATING;
+    //         case HEATING:
+    //         case PROTECTION_HEATING:
+    //         case OFF_HEATING:
+    //             return FUNCTION.HEATING;
 
-            case GENERIC:
-            case PROTECTION_GENERIC:
-            case OFF_GENERIC:
-                return FUNCTION.GENERIC;
-        }
+    //         case GENERIC:
+    //         case PROTECTION_GENERIC:
+    //         case OFF_GENERIC:
+    //             return FUNCTION.GENERIC;
+    //     }
 
-        throw new FrameException("Invalid Fuction from: " + msg.getFrameValue());
-    }
+    //     throw new FrameException("Invalid Fuction from: " + msg.getFrameValue());
+    // }
 
     @Override
     public OpenDeviceType detectDeviceType() {
