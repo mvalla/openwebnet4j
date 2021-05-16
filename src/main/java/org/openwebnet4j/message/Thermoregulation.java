@@ -683,7 +683,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @throws NumberFormatException, FrameException
      */
     public static VALVE_STATUS parseValveStatus(Thermoregulation msg, WHAT what) throws NumberFormatException, FrameException {
-        if (what != WHAT.CONDITIONING && what != WHAT.HEATING) throw new FrameException("GENERIC is not allowed as input parameter.");
+        if (what != WHAT.CONDITIONING && what != WHAT.HEATING) throw new FrameException("Only CONDITIONING and HEATING are allowed as what input parameter.");
 
         String[] values = msg.getDimValues();
         logger.debug("====parseValveStatus {} --> : CV <{}> HV <{}>", msg.getFrameValue(), values[0], values[1]);
