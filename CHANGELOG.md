@@ -8,6 +8,9 @@
 ### Added
 - Initial support for Thermoregulation (WHO=4)
 
+### Changed
+- removed .gitignore
+
 
 ## [0.4.1] - 2021-03-27
 

@@ -216,7 +216,8 @@ public class Thermoregulation extends BaseOpenMessage {
         ON_SPEED_1(6),
         ON_SPEED_2(7),
         ON_SPEED_3(8),
-        STANDBY_FAN_COIL(14);
+        ON_FAN_COIL(9),
+        STANDBY_FAN_COIL(14); // undocumented
 
         private final Integer value;
 
@@ -225,8 +226,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static VALVE_OR_ACTUATOR_STATUS fromValue(Integer i) {
-            Optional<VALVE_OR_ACTUATOR_STATUS> fcs = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
-                    .findFirst();
+            Optional<VALVE_OR_ACTUATOR_STATUS> fcs = Arrays.stream(values())
+                    .filter(val -> i.intValue() == val.value.intValue()).findFirst();
             return fcs.orElse(null);
         }
 
@@ -273,26 +274,29 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    public enum ACTUATOR_STATUS {
-        OFF(0),
-        ON(1);
-
-        private final Integer value;
-
-        private ACTUATOR_STATUS(Integer value) {
-            this.value = value;
-        }
-
-        public static ACTUATOR_STATUS fromValue(Integer i) {
-            Optional<ACTUATOR_STATUS> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
-                    .findFirst();
-            return a.orElse(null);
-        }
-
-        public Integer value() {
-            return value;
-        }
-    }
+    /*
+     * == TO BE REMOVED == substituted by VALVE_OR_ACTUATOR_STATUS
+     * public enum ACTUATOR_STATUS {
+     * OFF(0),
+     * ON(1);
+     *
+     * private final Integer value;
+     *
+     * private ACTUATOR_STATUS(Integer value) {
+     * this.value = value;
+     * }
+     *
+     * public static ACTUATOR_STATUS fromValue(Integer i) {
+     * Optional<ACTUATOR_STATUS> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+     * .findFirst();
+     * return a.orElse(null);
+     * }
+     *
+     * public Integer value() {
+     * return value;
+     * }
+     * }
+     */
 
     private static final int WHO = THERMOREGULATION.value();
 
@@ -440,15 +444,14 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request valves status (conditioning (CV) and heating (HV)) <code>
-     * *#4*where*19##</code>.
+     * OpenWebNet message request valves status (conditioning (CV) and heating (HV)) <code>*#4*where*19##</code>.
      *
      * @param where WHERE string
      * @return message
      */
     public static Thermoregulation requestValveStatus(String where) {
         return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.VALVES_STATUS.value()));
-    }    
+    }
 
     /**
      * OpenWebNet to set the Thermoregulation device mode.
@@ -496,16 +499,6 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message N actuator status request <code>*#4*where*20##</code>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static Thermoregulation requestActuatorStatus(String where) {
-        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTUATOR_STATUS.value()));
-    }
-
-    /**
      * OpenWebNet message N zone device status request <code>*#4*where##</code>.
      *
      * @param where WHERE string
@@ -523,6 +516,16 @@ public class Thermoregulation extends BaseOpenMessage {
      */
     public static Thermoregulation requestValvesStatus(String where) {
         return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.VALVES_STATUS.value()));
+    }
+
+    /**
+     * OpenWebNet message N actuator status request <code>*#4*where*20##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestActuatorStatus(String where) {
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTUATOR_STATUS.value()));
     }
 
     @Override
@@ -659,7 +662,7 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param msg Thermoregulation message
      *
-     * @return parsed fan coil speed as enumeration (AUTO, SPEED_1, SPEED_2, SPEED_3)
+     * @return parsed fan coil speed as {@link FAN_COIL_SPEED}
      *
      * @throws NumberFormatException
      */
@@ -676,24 +679,30 @@ public class Thermoregulation extends BaseOpenMessage {
      * Parse valve status (CV and HV) from Thermoregulation msg (dimensions: 19)
      *
      * @param msg Thermoregulation message
+     *
      * @param what Look for COOLING (CV) or HEATING (HV) valve
      *
-     * @return parsed valve status as enumeration (OFF, ON, OPENED, CLOSED, STOP, OFF FAN COIL, ON SPEED 1/2/3, STANDBY FAN COIL)
+     * @return parsed valve status as {@link VALVE_OR_ACTUATOR_STATUS}
      *
      * @throws NumberFormatException, FrameException
      */
-    public static VALVE_OR_ACTUATOR_STATUS parseValveStatus(Thermoregulation msg, WHAT what) throws NumberFormatException, FrameException {
-        if (what != WHAT.CONDITIONING && what != WHAT.HEATING) throw new FrameException("Only CONDITIONING and HEATING are allowed as what input parameter.");
+    public static VALVE_OR_ACTUATOR_STATUS parseValveStatus(Thermoregulation msg, WHAT what)
+            throws NumberFormatException, FrameException {
+        if (what != WHAT.CONDITIONING && what != WHAT.HEATING) {
+            throw new FrameException("Only CONDITIONING and HEATING are allowed as what input parameter.");
+        }
 
         String[] values = msg.getDimValues();
         logger.debug("====parseValveStatus {} --> : CV <{}> HV <{}>", msg.getFrameValue(), values[0], values[1]);
 
         if (msg.getDim() == DIM.VALVES_STATUS) {
-            if (what == WHAT.CONDITIONING)
+            if (what == WHAT.CONDITIONING) {
                 return VALVE_OR_ACTUATOR_STATUS.fromValue(Integer.parseInt(values[0]));
-            if (what == WHAT.HEATING)
+            }
+            if (what == WHAT.HEATING) {
                 return VALVE_OR_ACTUATOR_STATUS.fromValue(Integer.parseInt(values[1]));
-                
+            }
+
             return null;
         } else {
             throw new NumberFormatException("Could not parse valve status from: " + msg.getFrameValue());
@@ -705,11 +714,12 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param msg Thermoregulation message
      *
-     * @return parsed actuator status as enumeration (OFF, ON, OPENED, CLOSED, STOP, OFF FAN COIL, ON SPEED 1/2/3, STANDBY FAN COIL)
+     * @return parsed actuator status as {@link VALVE_OR_ACTUATOR_STATUS}
      *
      * @throws NumberFormatException, FrameException
      */
-    public static VALVE_OR_ACTUATOR_STATUS parseActuatorStatus(Thermoregulation msg) throws NumberFormatException, FrameException {
+    public static VALVE_OR_ACTUATOR_STATUS parseActuatorStatus(Thermoregulation msg)
+            throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         logger.debug("====parseActuatorStatus {} --> : <{}>", msg.getFrameValue(), values[0]);
 
