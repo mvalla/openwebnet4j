@@ -15,6 +15,7 @@
 package org.openwebnet4j.message;
 
 import java.util.Arrays;
+
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
         return isCommand;
     }
 
-    /*
+    /**
      * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach": other parts (WHERE,
      * WHAT, DIM, parameters, etc.) are not parsed until requested.
      *
@@ -78,22 +79,21 @@ public abstract class BaseOpenMessage extends OpenMessage {
      *
      * @return a new {@link OpenMessage} object representing the OpenWebNet frame
      *
-     * @throws FrameException in case the provided frame String is not a valid OpenWebNet frame
+     * @throws MalformedFrameException in case the provided frame String is not a valid OpenWebNet frame
+     * @throws UnsupportedFrameException in case the provided frame String is not a supported OpenWebNet frame
      *
      */
-    public static OpenMessage parse(String frame) throws FrameException {
+    public static OpenMessage parse(String frame) throws MalformedFrameException, UnsupportedFrameException {
         boolean isCmd = true;
         if (frame == null) {
-            throw new FrameException("Frame is null");
+            throw new MalformedFrameException("Frame is null");
         }
-        if (OpenMessage.FRAME_ACK.equals(frame)
-                || OpenMessage.FRAME_NACK.equals(frame)
+        if (OpenMessage.FRAME_ACK.equals(frame) || OpenMessage.FRAME_NACK.equals(frame)
                 || OpenMessage.FRAME_BUSY_NACK.equals(frame)) {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException(
-                    "Frame does not end with terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
@@ -107,8 +107,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
         for (char c : frame.toCharArray()) {
             if (!Character.isDigit(c)) {
                 if (c != '#' && c != '*') {
-                    throw new MalformedFrameException(
-                            "Frame can only contain '#', '*' or digits [0-9]");
+                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
                 }
             }
         }
@@ -241,9 +240,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Parse WHO from given whoPart and returns a BaseOpenMessage of the corresponding type
      *
      * @param whoPart String containing the WHO
-     * @throws FrameException in case of error in frame
+     * @param frame the frame string
+     * @throws MalformedFrameException in case of error in frame
      */
-    private static BaseOpenMessage parseWho(String whoPart, String frame) throws FrameException {
+    private static BaseOpenMessage parseWho(String whoPart, String frame)
+            throws MalformedFrameException, UnsupportedFrameException {
         Who who = null;
         try {
             int whoInt = Integer.parseInt(whoPart);
@@ -271,7 +272,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 baseopenmsg = new EnergyManagement(frame);
                 break;
 
-                // DIAGNOSTIC
+            // DIAGNOSTIC
             case ENERGY_MANAGEMENT_DIAGNOSTIC:
                 baseopenmsg = new EnergyManagementDiagnostic(frame);
 
@@ -300,8 +301,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (parts != null) {
             int partsIndex = 0;
             try {
-                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION)
-                        && parts.length > 1) {
+                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION) && parts.length > 1) {
                     // commandTranslation: 1000#WHAT
                     isCommandTranslation = true;
                     partsIndex++; // skip first 1000 value
