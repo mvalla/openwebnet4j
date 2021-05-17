@@ -97,7 +97,7 @@ public class BUSGateway extends OpenGateway {
         logger.debug("##BUS## ----- ### STARTING A NEW DISCOVERY...");
         try {
             // DISCOVER LIGHTS - request status for all lights: *#1*0##
-            logger.debug("##BUS## ----- # LIGHTS discovery");
+            logger.debug("##BUS## ----- LIGHTS discovery -----");
             res = sendInternal(Lighting.requestStatus(WhereLightAutom.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof Lighting) {
@@ -110,7 +110,7 @@ public class BUSGateway extends OpenGateway {
                 }
             }
             // DISCOVER AUTOMATION - request status for all automations: *#2*0##
-            logger.debug("##BUS## ----- AUTOMATION discovery");
+            logger.debug("##BUS## ----- AUTOMATION discovery -----");
             res = sendInternal(Automation.requestStatus(WhereLightAutom.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof Automation) {
@@ -124,7 +124,7 @@ public class BUSGateway extends OpenGateway {
             }
             // DISCOVER ENERGY MANAGEMENT - request diagnostic for all energy devices: *#1018*0*7##
             // response <<<< *#1018*WHERE*7*BITS##
-            logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery");
+            logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery -----");
             res = sendInternal(EnergyManagementDiagnostic.requestDiagnostic(WhereEnergyManagement.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof EnergyManagementDiagnostic) {

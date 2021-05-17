@@ -2,8 +2,13 @@
 
 ## [0.x.x] - 2021-??-??
 
+### Fixed
+- ignore unsupported frames in CMD response instead of returning error
+
+
 ### Changed
 - project description
+- removed test-jar
 
 
 ## [0.4.1] - 2021-03-27
