@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0-SNAPSHOT] - 2021-??-??
+## [0.5.0] - 2021-05-23
 
 ### Fixed
 - Maven is unable to find javadoc command
