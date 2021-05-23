@@ -67,17 +67,18 @@ public class ThermoregulationDiagnostic extends BaseOpenMessage {
 
     @Override
     public OpenDeviceType detectDeviceType() {
-        Where w = getWhere();
+        WhereThermo w = (WhereThermo) getWhere();
         if (w == null) {
             return null;
         } else {
-            if (w.value().startsWith("5")) {
-                return OpenDeviceType.SCS_TEMP_SENSOR;
-            } else if (w.value().startsWith("#0")) {
-                return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
-            } else if (w.value().startsWith("0")) {
-                // "all probes", not supported for now
+            if (w.value().startsWith("0")) {
+                // "all probes/zones", not supported for now
                 return null;
+            }
+            if (w.isProbe()) {
+                return OpenDeviceType.SCS_TEMP_SENSOR;
+            } else if (w.isCentralUnit()) {
+                return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
             } else {
                 return OpenDeviceType.SCS_THERMOSTAT;
             }

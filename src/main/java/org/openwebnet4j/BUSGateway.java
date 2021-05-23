@@ -140,7 +140,7 @@ public class BUSGateway extends OpenGateway {
             // DISCOVER THERMOREGULATION - request diagnostic for all thermoregulation devices: *#1004*0*7##
             // response <<<< *#1004*WHERE*7*BITS##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
-            res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.GENERAL.value()));
+            res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.ALL_MASTER_PROBES.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof ThermoregulationDiagnostic) {
                     ThermoregulationDiagnostic tdMsg = ((ThermoregulationDiagnostic) msg);

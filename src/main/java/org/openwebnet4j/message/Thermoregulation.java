@@ -274,30 +274,6 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    /*
-     * == TO BE REMOVED == substituted by VALVE_OR_ACTUATOR_STATUS
-     * public enum ACTUATOR_STATUS {
-     * OFF(0),
-     * ON(1);
-     *
-     * private final Integer value;
-     *
-     * private ACTUATOR_STATUS(Integer value) {
-     * this.value = value;
-     * }
-     *
-     * public static ACTUATOR_STATUS fromValue(Integer i) {
-     * Optional<ACTUATOR_STATUS> a = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
-     * .findFirst();
-     * return a.orElse(null);
-     * }
-     *
-     * public Integer value() {
-     * return value;
-     * }
-     * }
-     */
-
     private static final int WHO = THERMOREGULATION.value();
 
     protected Thermoregulation(String value) {
@@ -391,7 +367,7 @@ public class Thermoregulation extends BaseOpenMessage {
      *            PROTECTION <code>*4*302*where##</code> (generic protection)
      *            OFF <code>*4*303*where##</code> (generic OFF)
      * @param currentFunction current thermostat function (HEATING/COOLING/GENERIC)
-     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be setted when switching to
+     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set when switching to
      *            function=MANUAL
      * @return message
      */
@@ -405,7 +381,6 @@ public class Thermoregulation extends BaseOpenMessage {
                 } catch (MalformedFrameException ex) {
                     return null;
                 }
-
             case PROTECTION:
                 switch (currentFunction) {
                     case HEATING:
@@ -418,7 +393,6 @@ public class Thermoregulation extends BaseOpenMessage {
                         return new Thermoregulation(
                                 format(FORMAT_REQUEST, WHO, WHAT.PROTECTION_GENERIC.value(), where));
                 }
-
             case OFF:
                 switch (currentFunction) {
                     case HEATING:
@@ -533,13 +507,6 @@ public class Thermoregulation extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            // TODO the original where string of the message should not be modified here: instead
-            // thermo id and actuator id should be parsed in WhereThermo
-            if (whereStr.indexOf("#") > 0) {
-                // Correct Actuator Where value x#y to value x in case of Thermostat device without
-                // Central Unit
-                whereStr = whereStr.substring(0, whereStr.indexOf("#"));
-            }
             where = new WhereThermo(whereStr);
         }
     }
@@ -552,7 +519,9 @@ public class Thermoregulation extends BaseOpenMessage {
     public int getActuator() {
         // TODO move this parsing to WhereThermo and here just return the actuator part of the where
         // object
-        return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
+        // return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
+        WhereThermo wt = (WhereThermo) where;
+        return wt.getActuator();
     }
 
     /**
@@ -579,14 +548,13 @@ public class Thermoregulation extends BaseOpenMessage {
         return LOCAL_OFFSET.fromValue(values[0]);
     }
 
-    /*
-     * Parse temperature from a Thermoregulation msg (dimensions: 0, 12, 14 or 15)
+    /**
+     * Parse temperature from a Thermoregulation message (dimensions: 0, 12, 14 or 15)
      *
      * @param msg Thermoregulation message
-     *
      * @return parsed temperature in degrees Celsius
-     *
-     * @throws NumberFormatException in case of error in msg
+     * @throws NumberFormatException if the temperature cannot be parsed
+     * @throws FrameException in case of error in message
      */
     public static Double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
@@ -657,14 +625,13 @@ public class Thermoregulation extends BaseOpenMessage {
         return sign + digits;
     }
 
-    /*
-     * Parse fan coil speed from Thermoregulation msg (dimensions: 11)
+    /**
+     * Parse fan coil speed from Thermoregulation message (dimensions: 11)
      *
      * @param msg Thermoregulation message
-     *
      * @return parsed fan coil speed as {@link FAN_COIL_SPEED}
-     *
-     * @throws NumberFormatException
+     * @throws NumberFormatException in case of invalid speed
+     * @throws FrameException in case of error in message
      */
     public static FAN_COIL_SPEED parseFanCoilSpeed(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
@@ -675,16 +642,14 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    /*
-     * Parse valve status (CV and HV) from Thermoregulation msg (dimensions: 19)
+    /**
+     * Parse valve status (CV and HV) from Thermoregulation message (dimensions: 19)
      *
      * @param msg Thermoregulation message
-     *
      * @param what Look for COOLING (CV) or HEATING (HV) valve
-     *
      * @return parsed valve status as {@link VALVE_OR_ACTUATOR_STATUS}
-     *
-     * @throws NumberFormatException, FrameException
+     * @throws NumberFormatException in case of invalid status
+     * @throws FrameException in case of error in message
      */
     public static VALVE_OR_ACTUATOR_STATUS parseValveStatus(Thermoregulation msg, WHAT what)
             throws NumberFormatException, FrameException {
@@ -709,14 +674,13 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    /*
-     * Parse actuator status from Thermoregulation msg (dimensions: 20)
+    /**
+     * Parse actuator status from Thermoregulation message (dimensions: 20)
      *
      * @param msg Thermoregulation message
-     *
      * @return parsed actuator status as {@link VALVE_OR_ACTUATOR_STATUS}
-     *
-     * @throws NumberFormatException, FrameException
+     * @throws NumberFormatException in case of invalid status
+     * @throws FrameException in case of error in message
      */
     public static VALVE_OR_ACTUATOR_STATUS parseActuatorStatus(Thermoregulation msg)
             throws NumberFormatException, FrameException {
@@ -800,17 +764,18 @@ public class Thermoregulation extends BaseOpenMessage {
 
     @Override
     public OpenDeviceType detectDeviceType() {
-        Where w = getWhere();
+        WhereThermo w = (WhereThermo) getWhere();
         if (w == null) {
             return null;
         } else {
-            if (w.value().startsWith("5")) {
-                return OpenDeviceType.SCS_TEMP_SENSOR;
-            } else if (w.value().startsWith("#0")) {
-                return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
-            } else if (w.value().startsWith("0")) {
-                // "all probes", not supported for now
+            if (w.value().startsWith("0")) {
+                // "all probes/zones", not supported for now
                 return null;
+            }
+            if (w.isProbe()) {
+                return OpenDeviceType.SCS_TEMP_SENSOR;
+            } else if (w.isCentralUnit()) {
+                return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
             } else {
                 return OpenDeviceType.SCS_THERMOSTAT;
             }

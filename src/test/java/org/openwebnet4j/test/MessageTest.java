@@ -28,6 +28,7 @@ import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereThermo;
 import org.openwebnet4j.message.WhereZigBee;
 import org.openwebnet4j.message.Who;
 
@@ -132,10 +133,9 @@ public class MessageTest {
             assertEquals(Thermoregulation.DIM.COMPLETE_PROBE_STATUS, thermoMsg.getDim());
             assertNotNull(thermoMsg.getDimValues());
             assertEquals("1048", thermoMsg.getDimValues()[0]);
-            // encoding tests
+            // temperature encoding tests
             assertEquals(-4.8, Thermoregulation.parseTemperature(thermoMsg));
-            System.out.println(
-                    "Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
+            System.out.println("Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
             assertEquals("1214", Thermoregulation.encodeTemperature(-21.4));
             System.out.println(thermoMsg.toStringVerbose());
         } catch (FrameException e) {
@@ -143,7 +143,110 @@ public class MessageTest {
         }
     }
 
-    // TODO thestWhereThermo
+    @Test
+    public void testWhereThermo() {
+        Thermoregulation thermoMsg;
+        try {
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*#4*1#1*20*0##");
+            assertNotNull(thermoMsg);
+            assertTrue(thermoMsg.getWhere() instanceof WhereThermo);
+            WhereThermo wt = (WhereThermo) (thermoMsg.getWhere());
+            assertEquals(1, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertEquals(1, wt.getActuator());
+
+            wt = new WhereThermo("2");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(2, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("002");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(2, wt.getZone());
+            assertEquals(0, wt.getProbe());
+            assertTrue(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("500");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(0, wt.getZone());
+            assertEquals(5, wt.getProbe());
+            assertTrue(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("202");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(2, wt.getZone());
+            assertEquals(2, wt.getProbe());
+            assertTrue(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("0");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(0, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("#0");
+            assertFalse(wt.isStandalone());
+            assertTrue(wt.isCentralUnit());
+            assertEquals(0, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("#1");
+            assertFalse(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(1, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("#34");
+            assertFalse(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(34, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(-1, wt.getActuator());
+            wt = new WhereThermo("5#8");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(5, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(8, wt.getActuator());
+            wt = new WhereThermo("99#0");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(99, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(0, wt.getActuator());
+            wt = new WhereThermo("0#0");
+            assertTrue(wt.isStandalone());
+            assertFalse(wt.isCentralUnit());
+            assertEquals(0, wt.getZone());
+            assertEquals(-1, wt.getProbe());
+            assertFalse(wt.isProbe());
+            assertEquals(0, wt.getActuator());
+
+            try {
+                wt = new WhereThermo("1#12");
+                // if we can parse this where, this test fails
+                Assertions.fail("IllegalArgumentException not detected: " + wt);
+            } catch (Exception e) {
+                System.out.println("correctly got IllegalArgumentException for WhereThermo 1#12: " + e.getMessage());
+                assertTrue(e instanceof IllegalArgumentException);
+            }
+
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+
+    }
 
     @Test
     public void testZigBeeLightingWhere() {
@@ -164,15 +267,14 @@ public class MessageTest {
 
     @Test
     public void testMalformedCmdAndDimFrames() {
-        String[] wrongFrames = {"*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##"};
+        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
         for (String frame : wrongFrames) {
             try {
                 BaseOpenMessage.parse(frame);
                 // if we can parse this message, this test fails
                 Assertions.fail("MalformedFrameException not detected: " + frame);
             } catch (FrameException e) {
-                System.out.println(
-                        "correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
                 assertTrue(e instanceof MalformedFrameException);
             }
         }
