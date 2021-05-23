@@ -1,14 +1,22 @@
 # Changelog
 
-## [0.x.x] - 2021-??-??
+## [0.5.0-SNAPSHOT] - 2021-??-??
+
+### Fixed
+- Maven is unable to find javadoc command
+- ignored unsupported frames in response instead of returning error
+
+### Added
+- Initial support for Thermoregulation (WHO=4) with WereThermo, Thermoregulation and ThermoregulationDigagnostic classes
+  NOTE for this release only Thermostats in standalone installations have been tested
 
 ### Fixed
 - ignore unsupported frames in CMD response instead of returning error
 
-
 ### Changed
 - project description
-- removed test-jar
+- removed .gitignore
+- removed test-jar causing bundle conflict
 
 
 ## [0.4.1] - 2021-03-27

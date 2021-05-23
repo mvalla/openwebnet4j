@@ -21,9 +21,11 @@ import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.ThermoregulationDiagnostic;
 import org.openwebnet4j.message.Where;
 import org.openwebnet4j.message.WhereEnergyManagement;
 import org.openwebnet4j.message.WhereLightAutom;
+import org.openwebnet4j.message.WhereThermo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy manager contribution
- *
  */
 public class BUSGateway extends OpenGateway {
 
@@ -136,6 +137,21 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
+            // DISCOVER THERMOREGULATION - request diagnostic for all thermoregulation devices: *#1004*0*7##
+            // response <<<< *#1004*WHERE*7*BITS##
+            logger.debug("##BUS## ----- THERMOREGULATION discovery");
+            res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.ALL_MASTER_PROBES.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof ThermoregulationDiagnostic) {
+                    ThermoregulationDiagnostic tdMsg = ((ThermoregulationDiagnostic) msg);
+                    OpenDeviceType type = tdMsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = tdMsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, tdMsg));
+                    }
+                }
+            }
+
         } catch (OWNException e) {
             logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;

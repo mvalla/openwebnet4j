@@ -33,6 +33,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     // TODO change to factory methods? (formatDimRequest(...) )
     protected static final String FORMAT_DIMENSION_REQUEST = "*#%d*%s*%d##";
+    protected static final String FORMAT_DIMENSION_WRITING_1V = "*#%d*%s*#%d*%s##";
+    protected static final String FORMAT_DIMENSION_WRITING_2V = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_DIMENSION_WRITING_1P_1V = "*#%d*%s*#%d#%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
     protected static final String FORMAT_STATUS = "*#%d*%s##";
@@ -271,11 +273,16 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case ENERGY_MANAGEMENT:
                 baseopenmsg = new EnergyManagement(frame);
                 break;
-
+            case THERMOREGULATION:
+                baseopenmsg = new Thermoregulation(frame);
+                break;
             // DIAGNOSTIC
             case ENERGY_MANAGEMENT_DIAGNOSTIC:
                 baseopenmsg = new EnergyManagementDiagnostic(frame);
-
+                break;
+            case THERMOREGULATION_DIAGNOSTIC:
+                baseopenmsg = new ThermoregulationDiagnostic(frame);
+                break;
             default:
                 break;
         }

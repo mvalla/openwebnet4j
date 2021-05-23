@@ -133,7 +133,7 @@ public class BUSConnector extends OpenConnector {
     @Override
     protected synchronized Response sendCommandSynchInternal(String frame) throws IOException, FrameException {
         try {
-            Response r = sendCmdAndReadResp(frame);
+            Response r = sendCmdAndReadResp(frame, false);
             logger.debug("##BUS-conn## ^^^^^^^^ REUSED    CONNECTION    ^^^^^^^^");
             return r;
         } catch (IOException ie) {
@@ -142,7 +142,7 @@ public class BUSConnector extends OpenConnector {
             // another CMD connection
             cmdSk.close();
             isCmdConnected = false;
-            logger.debug("##BUS-conn## trying NEW CMD connection...");
+            logger.info("##BUS-conn## trying NEW CMD connection...");
             try {
                 openCmdConn();
             } catch (OWNException oe) {
@@ -151,8 +151,9 @@ public class BUSConnector extends OpenConnector {
                         oe.getMessage());
                 throw new IOException("Cannot create NEW CMD connection to send message " + frame, oe);
             }
+
             try {
-                Response r = sendCmdAndReadResp(frame);
+                Response r = sendCmdAndReadResp(frame, true);
                 logger.debug("##BUS-conn## ^^^^^^^^ USED NEW    CONNECTION    ^^^^^^^^");
                 return r;
             } catch (IOException | FrameException e) {
@@ -164,12 +165,12 @@ public class BUSConnector extends OpenConnector {
     }
 
     /** helper method for sendCommandSynchInternal() */
-    private Response sendCmdAndReadResp(String frame) throws IOException, FrameException {
+    private Response sendCmdAndReadResp(String frame, boolean reopen) throws IOException, FrameException {
         // TODO add timeout? or CMD_SOCKET_READ_TIMEOUT is enough?
         Response res = new Response(BaseOpenMessage.parse(frame));
         cmdChannel.sendFrame(frame);
         lastCmdFrameSentTs = System.currentTimeMillis();
-        msgLogger.info("BUS-CMD ====>>>> {}", frame);
+        msgLogger.info("BUS-CMD ====>>>> {}" + (reopen ? " REOPEN" : ""), frame);
         String fr;
         while (!res.hasFinalResponse()) {
             logger.trace("now reading new frame...");
@@ -183,6 +184,7 @@ public class BUSConnector extends OpenConnector {
                             ufe.getMessage());
                 }
             } else {
+                msgLogger.info("BUS-CMD <<<<==== X");
                 throw new IOException("Received null frame while reading responses to command");
             }
         }
