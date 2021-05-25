@@ -217,7 +217,9 @@ public class Thermoregulation extends BaseOpenMessage {
         ON_SPEED_2(7),
         ON_SPEED_3(8),
         ON_FAN_COIL(9),
-        STANDBY_FAN_COIL(14); // undocumented
+        OFF_SPEED_1(14),
+        OFF_SPEED_2(15),
+        OFF_SPEED_3(16);
 
         private final Integer value;
 
