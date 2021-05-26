@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2021-05-26
+
+### Changed
+- updated VALVE_OR_ACTUATOR_STATUS (14, 15, 16)
+
+
 ## [0.5.0] - 2021-05-23
 
 ### Fixed
@@ -9,9 +15,6 @@
 ### Added
 - Initial support for Thermoregulation (WHO=4) with WereThermo, Thermoregulation and ThermoregulationDigagnostic classes
   NOTE for this release only Thermostats in standalone installations have been tested
-
-### Fixed
-- ignore unsupported frames in CMD response instead of returning error
 
 ### Changed
 - project description

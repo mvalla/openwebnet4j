@@ -170,7 +170,7 @@ public class BUSConnector extends OpenConnector {
         Response res = new Response(BaseOpenMessage.parse(frame));
         cmdChannel.sendFrame(frame);
         lastCmdFrameSentTs = System.currentTimeMillis();
-        msgLogger.info("BUS-CMD ====>>>> {}" + (reopen ? " REOPEN" : ""), frame);
+        msgLogger.info("BUS-CMD ====>>>> {}" + (reopen ? " [ REOPEN ]" : ""), frame);
         String fr;
         while (!res.hasFinalResponse()) {
             logger.trace("now reading new frame...");
@@ -184,7 +184,7 @@ public class BUSConnector extends OpenConnector {
                             ufe.getMessage());
                 }
             } else {
-                msgLogger.info("BUS-CMD <<<<==== X");
+                msgLogger.info("BUS-CMD <<<<==== X [no frames]");
                 throw new IOException("Received null frame while reading responses to command");
             }
         }
