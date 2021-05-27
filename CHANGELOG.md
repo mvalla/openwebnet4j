@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.2] - 2021-05-28
+
+### Changed
+- CamelCase for enums in Thermo message
+
+
 ## [0.5.1] - 2021-05-26
 
 ### Changed
