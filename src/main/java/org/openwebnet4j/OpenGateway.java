@@ -202,14 +202,14 @@ public abstract class OpenGateway implements ConnectorListener {
                     GatewayMgmt gmsg = (GatewayMgmt) msg;
                     logger.debug("##GW## handleManagementDimensions() for frame: {}", gmsg);
                     Dim thisDim = gmsg.getDim();
-                    if (thisDim == GatewayMgmt.DIM.MAC_ADDRESS) {
+                    if (thisDim == GatewayMgmt.DimGatewayMgmt.MAC_ADDRESS) {
                         try {
                             macAddr = GatewayMgmt.parseMACAddress(gmsg);
                             logger.info("##GW## MAC ADDRESS: {}", getMACAddr());
                         } catch (FrameException e) {
                             logger.warn("##GW## Cannot parse MAC address from message: {}", gmsg);
                         }
-                    } else if (thisDim == GatewayMgmt.DIM.FIRMWARE_VERSION) {
+                    } else if (thisDim == GatewayMgmt.DimGatewayMgmt.FIRMWARE_VERSION) {
                         try {
                             firmwareVersion = GatewayMgmt.parseFirmwareVersion(gmsg);
                             logger.info("##GW## FIRMWARE: {}", getFirmwareVersion());

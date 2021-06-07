@@ -91,7 +91,7 @@ public class USBGateway extends OpenGateway {
      * handle a discovery event msg (number of products in the network)
      */
     private void handleDiscoveryEvent(GatewayMgmt message) {
-        if (message.getDim() == GatewayMgmt.DIM.NB_NETW_PROD) {
+        if (message.getDim() == GatewayMgmt.DimGatewayMgmt.NB_NETW_PROD) {
             try {
                 discoveredProducts = Integer.parseInt(message.getDimValues()[0]);
                 logger.debug("##USB## ----- # {} products found!", discoveredProducts);
@@ -126,7 +126,7 @@ public class USBGateway extends OpenGateway {
         // ACK/NACK
         while (r.getResponseMessages().get(i) instanceof GatewayMgmt) {
             gMsg = (GatewayMgmt) r.getResponseMessages().get(i);
-            if (gMsg != null && gMsg.getDim() == GatewayMgmt.DIM.PRODUCT_INFO) {
+            if (gMsg != null && gMsg.getDim() == GatewayMgmt.DimGatewayMgmt.PRODUCT_INFO) {
                 WhereZigBee w = (WhereZigBee) (gMsg.getWhere());
                 logger.debug("##USB## ----- # new product found: WHERE={}", w);
                 // notify new endpoint found

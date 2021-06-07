@@ -53,7 +53,7 @@ public class MessageTest {
         assertNotNull(lightMsg);
         assertEquals(Who.LIGHTING, lightMsg.getWho());
         assertNull(lightMsg.getDim());
-        assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
+        assertEquals(Lighting.WhatLighting.ON, lightMsg.getWhat());
         assertNotNull(lightMsg.getWhere());
         assertTrue(lightMsg.isCommand());
         assertEquals("0311#4#01", lightMsg.getWhere().value());
@@ -72,7 +72,7 @@ public class MessageTest {
             assertTrue(lightMsg.isCommandTranslation());
             assertNull(lightMsg.getDim());
             assertEquals("0311#4#01", lightMsg.getWhere().value());
-            assertEquals(Lighting.WHAT.ON, lightMsg.getWhat());
+            assertEquals(Lighting.WhatLighting.ON, lightMsg.getWhat());
             assertTrue(lightMsg.isOn());
             assertFalse(lightMsg.isOff());
             assertNotNull(lightMsg.getCommandParams());
@@ -97,7 +97,7 @@ public class MessageTest {
             assertTrue(automMsg.isCommandTranslation());
             assertEquals("55", automMsg.getWhere().value());
             assertNull(automMsg.getDim());
-            assertEquals(Automation.WHAT.STOP, automMsg.getWhat());
+            assertEquals(Automation.WhatAutomation.STOP, automMsg.getWhat());
             assertTrue(automMsg.isStop());
             assertFalse(automMsg.isUp());
             System.out.println(automMsg.toStringVerbose());
@@ -108,7 +108,7 @@ public class MessageTest {
             assertFalse(automMsg.isCommand());
             assertFalse(automMsg.isCommandTranslation());
             assertEquals("55", automMsg.getWhere().value());
-            assertEquals(Automation.DIM.SHUTTER_STATUS, automMsg.getDim());
+            assertEquals(Automation.DimAutomation.SHUTTER_STATUS, automMsg.getDim());
             assertNotNull(automMsg.getDimValues());
             assertEquals(4, automMsg.getDimValues().length);
             assertEquals("10", automMsg.getDimValues()[0]);
@@ -321,7 +321,7 @@ public class MessageTest {
             assertNotNull(gwMsg);
             assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
-            assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
+            assertEquals(GatewayMgmt.DimGatewayMgmt.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimValues());
             assertEquals(3, gwMsg.getDimValues().length);
             assertEquals("1", gwMsg.getDimValues()[0]);
@@ -342,7 +342,7 @@ public class MessageTest {
             assertNotNull(gwMsg);
             assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
             assertFalse(gwMsg.isCommand());
-            assertEquals(GatewayMgmt.DIM.FIRMWARE_VERSION, gwMsg.getDim());
+            assertEquals(GatewayMgmt.DimGatewayMgmt.FIRMWARE_VERSION, gwMsg.getDim());
             assertNotNull(gwMsg.getDimParams());
             assertEquals(2, gwMsg.getDimParams().length);
             assertEquals(5, gwMsg.getDimParams()[0]);
@@ -363,7 +363,7 @@ public class MessageTest {
         assertNotNull(gwMsg);
         assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
         assertFalse(gwMsg.isCommand());
-        assertEquals(GatewayMgmt.DIM.MAC_ADDRESS, gwMsg.getDim());
+        assertEquals(GatewayMgmt.DimGatewayMgmt.MAC_ADDRESS, gwMsg.getDim());
         assertNull(gwMsg.getWhere());
         assertNull(gwMsg.getWhat());
     }
@@ -377,7 +377,7 @@ public class MessageTest {
             assertEquals(Who.ENERGY_MANAGEMENT, energyMsg.getWho());
             assertFalse(energyMsg.isCommand());
             assertEquals("51", energyMsg.getWhere().value());
-            assertEquals(EnergyManagement.DIM.ACTIVE_POWER, energyMsg.getDim());
+            assertEquals(EnergyManagement.DimEnergyMgmt.ACTIVE_POWER, energyMsg.getDim());
             assertNotNull(energyMsg.getDimValues());
         } catch (FrameException e) {
             System.out.println(e.getMessage());

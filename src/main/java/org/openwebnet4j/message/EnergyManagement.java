@@ -28,26 +28,26 @@ import org.openwebnet4j.OpenDeviceType;
  */
 public class EnergyManagement extends BaseOpenMessage {
 
-    public enum WHAT implements What {
+    public enum WhatEnergyMgmt implements What {
         AUTOMATIC_RESET_ON(26),
         AUTOMATIC_RESET_OFF(27);
 
-        private static Map<Integer, WHAT> mapping;
+        private static Map<Integer, WhatEnergyMgmt> mapping;
 
         private final int value;
 
-        private WHAT(int value) {
+        private WhatEnergyMgmt(int value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, WHAT>();
-            for (WHAT w : values()) {
+            mapping = new HashMap<Integer, WhatEnergyMgmt>();
+            for (WhatEnergyMgmt w : values()) {
                 mapping.put(w.value, w);
             }
         }
 
-        public static WHAT fromValue(int i) {
+        public static WhatEnergyMgmt fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -60,26 +60,26 @@ public class EnergyManagement extends BaseOpenMessage {
         }
     }
 
-    public enum DIM implements Dim {
+    public enum DimEnergyMgmt implements Dim {
         ACTIVE_POWER(113),
         ACTIVE_POWER_NOTIFICATION_TIME(1200);
 
-        private static Map<Integer, DIM> mapping;
+        private static Map<Integer, DimEnergyMgmt> mapping;
 
         private final int value;
 
-        private DIM(Integer value) {
+        private DimEnergyMgmt(Integer value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, DIM>();
-            for (DIM d : values()) {
+            mapping = new HashMap<Integer, DimEnergyMgmt>();
+            for (DimEnergyMgmt d : values()) {
                 mapping.put(d.value, d);
             }
         }
 
-        public static DIM fromValue(int i) {
+        public static DimEnergyMgmt fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -114,12 +114,12 @@ public class EnergyManagement extends BaseOpenMessage {
 
     @Override
     protected Dim dimFromValue(int i) {
-        return DIM.fromValue(i);
+        return DimEnergyMgmt.fromValue(i);
     }
 
     @Override
     protected What whatFromValue(int i) {
-        return WHAT.fromValue(i);
+        return WhatEnergyMgmt.fromValue(i);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class EnergyManagement extends BaseOpenMessage {
      * @return message
      */
     public static EnergyManagement requestActivePower(String where) {
-        return new EnergyManagement(format(FORMAT_DIMENSION_REQUEST, WHO, where, DIM.ACTIVE_POWER.value()));
+        return new EnergyManagement(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.ACTIVE_POWER.value()));
     }
 
     /**
@@ -155,6 +155,6 @@ public class EnergyManagement extends BaseOpenMessage {
             time = 0;
         }
         return new EnergyManagement(format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where,
-                DIM.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
+                DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
     }
 }

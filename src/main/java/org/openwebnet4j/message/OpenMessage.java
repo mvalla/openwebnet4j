@@ -89,22 +89,13 @@ public abstract class OpenMessage {
 
     @Override
     public boolean equals(Object obj) {
-        // If the object is compared with itself then return true
         if (obj == this) {
             return true;
         }
-        /*
-         * Check if obj is an instance of OpenMessage or not
-         * "null instanceof [type]" also returns false
-         */
         if (!(obj instanceof OpenMessage)) {
             return false;
         }
-
-        // typecast obj to OpenMessage so that we can compare frame
         OpenMessage c = (OpenMessage) obj;
-
-        // Compare data
         return c.frameValue.equals(frameValue);
     }
 }

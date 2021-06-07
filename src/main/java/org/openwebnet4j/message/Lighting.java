@@ -19,6 +19,7 @@ import static org.openwebnet4j.message.Who.LIGHTING;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -28,7 +29,7 @@ import org.openwebnet4j.OpenDeviceType;
  */
 public class Lighting extends BaseOpenMessage {
 
-    public enum WHAT implements What {
+    public enum WhatLighting implements What {
         // base switch
         OFF(0), // OFF
         ON(1), // ON
@@ -49,22 +50,22 @@ public class Lighting extends BaseOpenMessage {
         MOVEMENT_DETECTED(34),
         END_MOVEMENT_DETECTED(39);
 
-        private static Map<Integer, WHAT> mapping;
+        private static Map<Integer, WhatLighting> mapping;
 
         private final int value;
 
-        private WHAT(int value) {
+        private WhatLighting(int value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, WHAT>();
-            for (WHAT w : values()) {
+            mapping = new HashMap<Integer, WhatLighting>();
+            for (WhatLighting w : values()) {
                 mapping.put(w.value, w);
             }
         }
 
-        public static WHAT fromValue(int i) {
+        public static WhatLighting fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -79,28 +80,28 @@ public class Lighting extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return WHAT.fromValue(i);
+        return WhatLighting.fromValue(i);
     }
 
-    public enum DIM implements Dim {
+    public enum DimLighting implements Dim {
         DIMMER_LEVEL_100(1);
 
-        private static Map<Integer, DIM> mapping;
+        private static Map<Integer, DimLighting> mapping;
 
         private final int value;
 
-        private DIM(Integer value) {
+        private DimLighting(Integer value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, DIM>();
-            for (DIM d : values()) {
+            mapping = new HashMap<Integer, DimLighting>();
+            for (DimLighting d : values()) {
                 mapping.put(d.value, d);
             }
         }
 
-        public static DIM fromValue(int i) {
+        public static DimLighting fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -115,7 +116,7 @@ public class Lighting extends BaseOpenMessage {
 
     @Override
     protected Dim dimFromValue(int i) {
-        return DIM.fromValue(i);
+        return DimLighting.fromValue(i);
     }
 
     private static final int WHO = LIGHTING.value();
@@ -135,7 +136,7 @@ public class Lighting extends BaseOpenMessage {
      * @return message
      */
     public static Lighting requestTurnOn(String where) {
-        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.ON.value, where));
+        return new Lighting(format(FORMAT_REQUEST, WHO, WhatLighting.ON.value, where));
     }
 
     /**
@@ -145,7 +146,7 @@ public class Lighting extends BaseOpenMessage {
      * @return message
      */
     public static Lighting requestTurnOff(String where) {
-        return new Lighting(format(FORMAT_REQUEST, WHO, WHAT.OFF.value, where));
+        return new Lighting(format(FORMAT_REQUEST, WHO, WhatLighting.OFF.value, where));
     }
 
     /**
@@ -153,7 +154,7 @@ public class Lighting extends BaseOpenMessage {
      *
      * @param where WHERE string
      * @param level What level (0=Off, 1=On, 2-10=level, 30=Up one level, 31=Down one level,
-     *     32=Toggle). See {@link WHAT}
+     *            32=Toggle). See {@link WhatLighting}
      * @return message
      */
     public static Lighting requestDimTo(String where, What level) {
@@ -179,7 +180,7 @@ public class Lighting extends BaseOpenMessage {
         if (getWhat() == null) {
             return false;
         } else {
-            return getWhat().equals(WHAT.ON);
+            return getWhat().equals(WhatLighting.ON);
         }
     }
 
@@ -192,7 +193,7 @@ public class Lighting extends BaseOpenMessage {
         if (getWhat() == null) {
             return false;
         } else {
-            return getWhat().equals(WHAT.OFF);
+            return getWhat().equals(WhatLighting.OFF);
         }
     }
 
@@ -203,7 +204,7 @@ public class Lighting extends BaseOpenMessage {
      * @throws FrameException in case of frame error
      */
     public int parseDimmerLevel100() throws FrameException {
-        if (getDim() == Lighting.DIM.DIMMER_LEVEL_100) {
+        if (getDim() == Lighting.DimLighting.DIMMER_LEVEL_100) {
             int level100 = Integer.parseInt(getDimValues()[0]);
             if (level100 >= DIMMER_LEVEL_100_OFF && level100 <= DIMMER_LEVEL_100_MAX) {
                 return level100 - 100;
@@ -238,7 +239,7 @@ public class Lighting extends BaseOpenMessage {
      */
     public static What percentToWhat(int percent) {
         if (percent >= 0 && percent <= 100) {
-            return WHAT.fromValue(percentToWhatLevel(percent));
+            return WhatLighting.fromValue(percentToWhatLevel(percent));
         } else {
             throw new IllegalArgumentException("Percent must be between 0 and 100");
         }
@@ -280,10 +281,8 @@ public class Lighting extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WHAT.OFF
-                        || w == WHAT.ON
-                        || w == WHAT.MOVEMENT_DETECTED
-                        || w == WHAT.END_MOVEMENT_DETECTED) {
+                if (w == WhatLighting.OFF || w == WhatLighting.ON || w == WhatLighting.MOVEMENT_DETECTED
+                        || w == WhatLighting.END_MOVEMENT_DETECTED) {
                     type = OpenDeviceType.SCS_ON_OFF_SWITCH;
                 } else if (w.value() >= 2 && w.value() <= 10) {
                     type = OpenDeviceType.SCS_DIMMER_SWITCH;

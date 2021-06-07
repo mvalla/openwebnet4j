@@ -46,7 +46,6 @@ public class WhereThermo extends Where {
     private final boolean standalone;
 
     public WhereThermo(String w) throws NullPointerException, IllegalArgumentException {
-        // TODO check range for WHERE
         super(w);
         int z, p = -1, a = -1;
         int pos = whereStr.indexOf("#");

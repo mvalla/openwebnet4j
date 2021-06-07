@@ -18,6 +18,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -27,27 +28,27 @@ import org.openwebnet4j.OpenDeviceType;
  */
 public class Automation extends BaseOpenMessage {
 
-    public enum WHAT implements What {
+    public enum WhatAutomation implements What {
         STOP(0),
         UP(1),
         DOWN(2);
 
-        private static Map<Integer, WHAT> mapping;
+        private static Map<Integer, WhatAutomation> mapping;
 
         private final int value;
 
-        private WHAT(int value) {
+        private WhatAutomation(int value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, WHAT>();
-            for (WHAT w : values()) {
+            mapping = new HashMap<Integer, WhatAutomation>();
+            for (WhatAutomation w : values()) {
                 mapping.put(w.value, w);
             }
         }
 
-        public static WHAT fromValue(int i) {
+        public static WhatAutomation fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -62,29 +63,29 @@ public class Automation extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return WHAT.fromValue(i);
+        return WhatAutomation.fromValue(i);
     }
 
-    public enum DIM implements Dim {
+    public enum DimAutomation implements Dim {
         SHUTTER_STATUS(10),
         GOTO_LEVEL(11);
 
-        private static Map<Integer, DIM> mapping;
+        private static Map<Integer, DimAutomation> mapping;
 
         private final int value;
 
-        private DIM(Integer value) {
+        private DimAutomation(Integer value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, DIM>();
-            for (DIM d : values()) {
+            mapping = new HashMap<Integer, DimAutomation>();
+            for (DimAutomation d : values()) {
                 mapping.put(d.value, d);
             }
         }
 
-        public static DIM fromValue(int i) {
+        public static DimAutomation fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -99,10 +100,10 @@ public class Automation extends BaseOpenMessage {
 
     @Override
     protected Dim dimFromValue(int i) {
-        return DIM.fromValue(i);
+        return DimAutomation.fromValue(i);
     }
 
-    private static final int WHO = org.openwebnet4j.message.Who.AUTOMATION.value();
+    private static final int WHO = Who.AUTOMATION.value();
 
     protected Automation(String value) {
         super(value);
@@ -116,7 +117,7 @@ public class Automation extends BaseOpenMessage {
      * @return message
      */
     public static Automation requestStop(String w) {
-        return new Automation(format(FORMAT_REQUEST, WHO, WHAT.STOP.value, w));
+        return new Automation(format(FORMAT_REQUEST, WHO, WhatAutomation.STOP.value, w));
     }
 
     /**
@@ -126,7 +127,7 @@ public class Automation extends BaseOpenMessage {
      * @return message
      */
     public static Automation requestMoveUp(String w) {
-        return new Automation(format(FORMAT_REQUEST, WHO, WHAT.UP.value, w));
+        return new Automation(format(FORMAT_REQUEST, WHO, WhatAutomation.UP.value, w));
     }
 
     /**
@@ -136,7 +137,7 @@ public class Automation extends BaseOpenMessage {
      * @return message
      */
     public static Automation requestMoveDown(String w) {
-        return new Automation(format(FORMAT_REQUEST, WHO, WHAT.DOWN.value, w));
+        return new Automation(format(FORMAT_REQUEST, WHO, WhatAutomation.DOWN.value, w));
     }
 
     /**
@@ -158,7 +159,7 @@ public class Automation extends BaseOpenMessage {
         if (getWhat() == null) {
             return false;
         } else {
-            return getWhat().equals(WHAT.STOP);
+            return getWhat().equals(WhatAutomation.STOP);
         }
     }
 
@@ -171,7 +172,7 @@ public class Automation extends BaseOpenMessage {
         if (getWhat() == null) {
             return false;
         } else {
-            return getWhat().equals(WHAT.UP);
+            return getWhat().equals(WhatAutomation.UP);
         }
     }
 
@@ -184,7 +185,7 @@ public class Automation extends BaseOpenMessage {
         if (getWhat() == null) {
             return false;
         } else {
-            return getWhat().equals(WHAT.DOWN);
+            return getWhat().equals(WhatAutomation.DOWN);
         }
     }
 
@@ -197,13 +198,9 @@ public class Automation extends BaseOpenMessage {
      */
     public static Automation convertUpDown(Automation autMsg) throws FrameException {
         if (autMsg.isUp()) {
-            return (Automation)
-                    BaseOpenMessage.parse(
-                            autMsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
+            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
         } else if (autMsg.isDown()) {
-            return (Automation)
-                    BaseOpenMessage.parse(
-                            autMsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
+            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
         } else {
             return autMsg;
         }

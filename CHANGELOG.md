@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5-SNAPSHOT] - 2021-??-??
+
+### Changed
+- CamelCase for all enums
+
+
 ## [0.5.2] - 2021-05-28
 
 ### Changed

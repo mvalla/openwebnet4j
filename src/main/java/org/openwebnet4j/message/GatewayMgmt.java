@@ -26,7 +26,7 @@ import org.openwebnet4j.OpenDeviceType;
 /** @author M. Valla - Initial contribution */
 public class GatewayMgmt extends BaseOpenMessage {
 
-    public enum WHAT implements What {
+    public enum WhatGatewayMgmt implements What {
         // USB Gateway
         BOOT_MODE(12),
         RESET_DEVICE(22),
@@ -40,22 +40,22 @@ public class GatewayMgmt extends BaseOpenMessage {
         SUPERVISOR(66),
         TEST(9999); // not defined in OWN specs, only for testing
 
-        private static Map<Integer, WHAT> mapping;
+        private static Map<Integer, WhatGatewayMgmt> mapping;
 
         private final int value;
 
-        private WHAT(int value) {
+        private WhatGatewayMgmt(int value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, WHAT>();
-            for (WHAT w : values()) {
+            mapping = new HashMap<Integer, WhatGatewayMgmt>();
+            for (WhatGatewayMgmt w : values()) {
                 mapping.put(w.value, w);
             }
         }
 
-        public static WHAT fromValue(int i) {
+        public static WhatGatewayMgmt fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -70,10 +70,10 @@ public class GatewayMgmt extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return WHAT.fromValue(i);
+        return WhatGatewayMgmt.fromValue(i);
     }
 
-    public enum DIM implements Dim {
+    public enum DimGatewayMgmt implements Dim {
         MAC_ADDRESS(12),
         MODEL(15),
         FIRMWARE_VERSION(16),
@@ -84,22 +84,22 @@ public class GatewayMgmt extends BaseOpenMessage {
         IDENTIFY(70),
         ZIGBEE_CHANNEL(71);
 
-        private static Map<Integer, DIM> mapping;
+        private static Map<Integer, DimGatewayMgmt> mapping;
 
         private final int value;
 
-        private DIM(Integer value) {
+        private DimGatewayMgmt(Integer value) {
             this.value = value;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, DIM>();
-            for (DIM d : values()) {
+            mapping = new HashMap<Integer, DimGatewayMgmt>();
+            for (DimGatewayMgmt d : values()) {
                 mapping.put(d.value, d);
             }
         }
 
-        public static DIM fromValue(int i) {
+        public static DimGatewayMgmt fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
@@ -114,7 +114,7 @@ public class GatewayMgmt extends BaseOpenMessage {
 
     @Override
     protected Dim dimFromValue(int i) {
-        return DIM.fromValue(i);
+        return DimGatewayMgmt.fromValue(i);
     }
 
     private static final int WHO = GATEWAY_MANAGEMENT.value();
@@ -130,7 +130,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestSupervisor() {
-        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WHAT.SUPERVISOR.value(), ""));
+        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WhatGatewayMgmt.SUPERVISOR.value(), ""));
     }
 
     /**
@@ -139,7 +139,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestKeepConnect() {
-        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WHAT.KEEP_CONNECT.value(), ""));
+        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WhatGatewayMgmt.KEEP_CONNECT.value(), ""));
     }
 
     /**
@@ -148,7 +148,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestMACAddress() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.MAC_ADDRESS.value()));
+        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MAC_ADDRESS.value()));
     }
 
     /**
@@ -175,7 +175,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestModel() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.MODEL.value()));
+        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MODEL.value()));
     }
 
     /**
@@ -185,7 +185,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      */
     public static GatewayMgmt requestFirmwareVersion() {
         return new GatewayMgmt(
-                format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.FIRMWARE_VERSION.value()));
+                format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.FIRMWARE_VERSION.value()));
     }
 
     public static String parseFirmwareVersion(GatewayMgmt msg) throws FrameException {
@@ -200,7 +200,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestScanNetwork() {
-        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WHAT.SCAN.value(), ""));
+        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WhatGatewayMgmt.SCAN.value(), ""));
     }
 
     /**
@@ -216,7 +216,7 @@ public class GatewayMgmt extends BaseOpenMessage {
      */
     public static GatewayMgmt requestProductInfo(int index) {
         // we must use here addValues instead of addDimensions to be compatible with gateway bug
-        String req = format(FORMAT_DIMENSION_REQUEST, WHO, "", DIM.PRODUCT_INFO.value());
+        String req = format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.PRODUCT_INFO.value());
         req = addValues(req, index + "");
         return new GatewayMgmt(req);
     }
