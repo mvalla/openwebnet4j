@@ -52,15 +52,15 @@ public class Thermoregulation extends BaseOpenMessage {
         // manual
         MANUAL_HEATING(110, Function.HEATING, OperationMode.MANUAL),
         MANUAL_CONDITIONING(210, Function.COOLING, OperationMode.MANUAL),
-        MANUAL_GENERIC(310, Function.GENERIC, OperationMode.MANUAL);
-        // // programming (zone is following the program of the central unit)
-        // PROGRAM_HEATING(111),
-        // PROGRAM_CONDITIONING(211),
-        // PROGRAM_GENERIC(311),
-        // // holiday (zone is following the holiday program set on the central unit)
-        // HOLIDAY_HEATING(115),
-        // HOLIDAY_CONDITIONING(215),
-        // HOLIDAY_GENERIC(315);
+        MANUAL_GENERIC(310, Function.GENERIC, OperationMode.MANUAL),
+        // programming (zone is following the program of the central unit)
+        PROGRAM_HEATING(111),
+        PROGRAM_CONDITIONING(211),
+        PROGRAM_GENERIC(311),
+        // holiday (zone is following the holiday program set on the central unit)
+        HOLIDAY_HEATING(115),
+        HOLIDAY_CONDITIONING(215),
+        HOLIDAY_GENERIC(315);
 
         private static Map<Integer, WhatThermo> mapping;
 
@@ -293,10 +293,10 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to Manual setting of "N" zone to T temperature <code>*#4*where*#14*T*M##
+     * OpenWebNet message to set set point temperature T<code>*#4*where*#14*T*M##
      * </code>.
      *
-     * @param where Zone between #1 and #99
+     * @param where WHERE string
      * @param newSetPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param function HEATING/COOLING/GENERIC
      * @return message
@@ -313,20 +313,20 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet to set the Fan Coil Speed <code>*#4*where*#11*speed##</code>.
+     * OpenWebNet message to set fan coil speed <code>*#4*where*#11*speed##</code>.
      *
      * @param where WHERE string
-     * @param newFanCoilSpeed Speed of the Fan Coil
+     * @param newFanCoilSpeed Speed of the fan coil
      * @return message
      */
     public static Thermoregulation requestWriteFanCoilSpeed(String where,
             Thermoregulation.FanCoilSpeed newFanCoilSpeed) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_WRITING_1V, WHO, where, DimThermo.FAN_COIL_SPEED.value(), newFanCoilSpeed.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_1V, WHO, where, DimThermo.FAN_COIL_SPEED.value(),
+                newFanCoilSpeed.value()));
     }
 
     /**
-     * OpenWebNet message request the Fan Coil Speed <code>*#4*where*11##</code>.
+     * OpenWebNet message to request the current fan coil speed <code>*#4*where*11##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -336,13 +336,13 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet to set the funcion.
+     * OpenWebNet message to set the function (HEATING, COOLING, GENERIC).
+     * HEATING <code>*4*102*where##</code>
+     * COOLING <code>*4*202*where##</code>
+     * GENERIC <code>*4*302*where##</code>
      *
      * @param where WHERE string
-     * @param newFunction Function (HEATING, COOLING, GENERIC).
-     *            HEATING <code> *4*102*where##</code>
-     *            COOLING <code> *4*202*where##</code>
-     *            GENERIC <code> *4*302*where##</code>
+     * @param newFunction Function (HEATING, COOLING, GENERIC)
      * @return message
      */
     public static Thermoregulation requestWriteFunction(String where, Thermoregulation.Function newFunction) {
@@ -351,7 +351,8 @@ public class Thermoregulation extends BaseOpenMessage {
             case HEATING:
                 return new Thermoregulation(format(FORMAT_REQUEST, WHO, WhatThermo.PROTECTION_HEATING.value(), where));
             case COOLING:
-                return new Thermoregulation(format(FORMAT_REQUEST, WHO, WhatThermo.PROTECTION_CONDITIONING.value(), where));
+                return new Thermoregulation(
+                        format(FORMAT_REQUEST, WHO, WhatThermo.PROTECTION_CONDITIONING.value(), where));
 
             // this is allow only with central unit
             case GENERIC:
@@ -361,13 +362,13 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet to set the operation mode.
+     * OpenWebNet message to set the operation mode (MANUAL, PROTECTION, OFF).
+     * MANUAL <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature)
+     * PROTECTION <code>*4*302*where##</code> (generic protection)
+     * OFF <code>*4*303*where##</code> (generic OFF)
      *
      * @param where WHERE string
-     * @param newOperationMode Operation mode (MANUAL, PROTECTION, OFF).
-     *            MANUAL <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature)
-     *            PROTECTION <code>*4*302*where##</code> (generic protection)
-     *            OFF <code>*4*303*where##</code> (generic OFF)
+     * @param newOperationMode Operation mode
      * @param currentFunction current thermostat function (HEATING/COOLING/GENERIC)
      * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set when switching to
      *            function=MANUAL
@@ -400,7 +401,8 @@ public class Thermoregulation extends BaseOpenMessage {
                     case HEATING:
                         return new Thermoregulation(format(FORMAT_REQUEST, WHO, WhatThermo.OFF_HEATING.value(), where));
                     case COOLING:
-                        return new Thermoregulation(format(FORMAT_REQUEST, WHO, WhatThermo.OFF_CONDITIONING.value(), where));
+                        return new Thermoregulation(
+                                format(FORMAT_REQUEST, WHO, WhatThermo.OFF_CONDITIONING.value(), where));
                     case GENERIC:
                         return new Thermoregulation(format(FORMAT_REQUEST, WHO, WhatThermo.OFF_GENERIC.value(), where));
                 }
@@ -409,30 +411,32 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request set-point temperature with local offset and operation mode <code>
-     * *#4*where*12##</code>.
+     * OpenWebNet message to request the set point temperature with local offset and operation mode
+     * <code>*#4*where*12##</code>.
      *
      * @param where WHERE string
      * @return message
      */
     public static Thermoregulation requestMode(String where) {
-        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.COMPLETE_PROBE_STATUS.value()));
+        return new Thermoregulation(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.COMPLETE_PROBE_STATUS.value()));
     }
 
     /**
-     * OpenWebNet message request valves status (conditioning (CV) and heating (HV)) <code>*#4*where*19##</code>.
+     * OpenWebNet message to request current valves status (conditioning (CV) and heating (HV))
+     * <code>*#4*where*19##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Thermoregulation requestValveStatus(String where) {
+    public static Thermoregulation requestValvesStatus(String where) {
         return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.VALVES_STATUS.value()));
     }
 
     /**
-     * OpenWebNet to set the Thermoregulation device mode.
+     * OpenWebNet message to set the Thermoregulation device mode.
      *
-     * @param where Zone between #1 and #99
+     * @param where WHERE string
      * @param newMode the new MODE
      * @return message
      * @throws MalformedFrameException in case of error in parameters
@@ -443,7 +447,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to turn off the thermostat <code>OFF</code> <code>*4*303*where##
+     * OpenWebNet message to turn off the thermostat <code>*4*303*where##
      * </code>.
      *
      * @param where WHERE string
@@ -454,7 +458,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request temperature <code>*#4*where*0##</code>.
+     * OpenWebNet message to request current sensed temperature <code>*#4*where*0##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -464,7 +468,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request the current Thermostat Set Point temperature <code>*#4*where*14##
+     * OpenWebNet message to request the current set point temperature <code>*#4*where*14##
      * </code>.
      *
      * @param where WHERE string
@@ -475,7 +479,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message N zone device status request <code>*#4*where##</code>.
+     * OpenWebNet message to request the device status <code>*#4*where##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -485,22 +489,12 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message N zone valves status request <code>*#4*where*19##</code>.
+     * OpenWebNet message to request actuators status <code>*#4*where*20##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Thermoregulation requestValvesStatus(String where) {
-        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.VALVES_STATUS.value()));
-    }
-
-    /**
-     * OpenWebNet message N actuator status request <code>*#4*where*20##</code>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static Thermoregulation requestActuatorStatus(String where) {
+    public static Thermoregulation requestActuatorsStatus(String where) {
         return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.ACTUATOR_STATUS.value()));
     }
 
@@ -514,14 +508,11 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Returns the actuator form the message WHERE part. WHERE=Z#N --&gt; returns N
+     * Returns the actuator from the message WHERE part. WHERE=Z#N --&gt; returns N
      *
      * @return id (int 1-9) of the actuator
      */
     public int getActuator() {
-        // TODO move this parsing to WhereThermo and here just return the actuator part of the where
-        // object
-        // return Integer.parseInt(where.value().substring(where.value().lastIndexOf("#") + 1));
         WhereThermo wt = (WhereThermo) where;
         return wt.getActuator();
     }
@@ -609,7 +600,7 @@ public class Thermoregulation extends BaseOpenMessage {
      */
     public static String encodeTemperature(double temp) {
         // +23.51 °C --> '0235'; -4.86 °C --> '1049'
-        // checkRange(5, 40, Math.round(temp));
+        // TODO checkRange(5, 40, Math.round(temp)); ??
         char sign = (temp >= 0 ? '0' : '1');
         String digits = "";
         int absTemp = (int) Math.abs(Math.round(temp * 10));
@@ -628,7 +619,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Parse fan coil speed from Thermoregulation message (dimensions: 11)
+     * Parse fan coil speed from Thermoregulation message (dimension: 11)
      *
      * @param msg Thermoregulation message
      * @return parsed fan coil speed as {@link FanCoilSpeed}
@@ -640,12 +631,12 @@ public class Thermoregulation extends BaseOpenMessage {
         if (msg.getDim() == DimThermo.FAN_COIL_SPEED) {
             return FanCoilSpeed.fromValue(Integer.parseInt(values[0]));
         } else {
-            throw new NumberFormatException("Could not parse fancoil speed from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse fan coil speed from: " + msg.getFrameValue());
         }
     }
 
     /**
-     * Parse valve status (CV and HV) from Thermoregulation message (dimensions: 19)
+     * Parse valve status (CV and HV) from Thermoregulation message (dimension: 19)
      *
      * @param msg Thermoregulation message
      * @param what Look for COOLING (CV) or HEATING (HV) valve
@@ -677,7 +668,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Parse actuator status from Thermoregulation message (dimensions: 20)
+     * Parse actuator status from Thermoregulation message (dimension: 20)
      *
      * @param msg Thermoregulation message
      * @return parsed actuator status as {@link ValveOrActuatorStatus}

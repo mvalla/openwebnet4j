@@ -4,6 +4,10 @@
 
 ### Changed
 - CamelCase for all enums
+- method name requestActuatorsStatus
+
+### Added
+- PROGRAM and HOLIDAY WHAT
 
 
 ## [0.5.2] - 2021-05-28
