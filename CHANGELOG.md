@@ -5,6 +5,7 @@
 ### Changed
 - CamelCase for all enums
 - method name requestActuatorsStatus
+- renamed to SCS_THERMO_SENSOR and SCS_THERMO_ZONE
 
 ### Added
 - PROGRAM and HOLIDAY WHAT

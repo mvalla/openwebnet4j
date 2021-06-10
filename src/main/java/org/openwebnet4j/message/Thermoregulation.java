@@ -766,11 +766,11 @@ public class Thermoregulation extends BaseOpenMessage {
                 return null;
             }
             if (w.isProbe()) {
-                return OpenDeviceType.SCS_TEMP_SENSOR;
+                return OpenDeviceType.SCS_THERMO_SENSOR;
             } else if (w.isCentralUnit()) {
                 return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
             } else {
-                return OpenDeviceType.SCS_THERMOSTAT;
+                return OpenDeviceType.SCS_THERMO_ZONE;
             }
         }
     }

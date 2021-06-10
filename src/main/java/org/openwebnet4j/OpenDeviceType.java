@@ -54,8 +54,8 @@ public enum OpenDeviceType {
     SCS_SHUTTER_CONTROL(514),
     SCS_SHUTTER_SWITCH(515),
     // thermoregulation (not defined by BTicino)
-    SCS_TEMP_SENSOR(410),
-    SCS_THERMOSTAT(420),
+    SCS_THERMO_SENSOR(410),
+    SCS_THERMO_ZONE(420),
     SCS_THERMO_CENTRAL_UNIT(430),
     // interface
     SCS_1_SYSTEM_1_4_GATEWAY(1024),
