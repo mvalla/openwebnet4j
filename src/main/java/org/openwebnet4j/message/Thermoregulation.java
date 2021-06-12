@@ -369,7 +369,7 @@ public class Thermoregulation extends BaseOpenMessage {
      *
      * @param where WHERE string
      * @param newOperationMode Operation mode
-     * @param currentFunction current thermostat function (HEATING/COOLING/GENERIC)
+     * @param currentFunction current zone function (HEATING/COOLING/GENERIC)
      * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set when switching to
      *            function=MANUAL
      * @return message
@@ -434,7 +434,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to set the Thermoregulation device mode.
+     * OpenWebNet message to set the zone mode.
      *
      * @param where WHERE string
      * @param newMode the new MODE
@@ -447,7 +447,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to turn off the thermostat <code>*4*303*where##
+     * OpenWebNet message to turn off the zone <code>*4*303*where##
      * </code>.
      *
      * @param where WHERE string
@@ -479,7 +479,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to request the device status <code>*#4*where##</code>.
+     * OpenWebNet message to request the zone status <code>*#4*where##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -568,28 +568,28 @@ public class Thermoregulation extends BaseOpenMessage {
      * Convert temperature from BTicino format to number For example: 0235 --&gt; +23.5 (°C) and
      * 1048 --&gt; -4.8 (°C)
      *
-     * @param _temperature the temperature as String
+     * @param temperature the temperature as String
      * @return the temperature as Double
      */
-    public static double decodeTemperature(String _temperature) throws NumberFormatException {
+    public static double decodeTemperature(String temperature) throws NumberFormatException {
         int tempInt;
         int sign = 1;
-        String temperature = _temperature;
-        if (temperature.charAt(0) == '#') { // remove leading '#' if present
-            temperature = temperature.substring(1);
+        String t = temperature;
+        if (t.charAt(0) == '#') { // remove leading '#' if present
+            t = t.substring(1);
         }
-        if (temperature.length() == 4) {
-            if (temperature.charAt(0) == '1') {
+        if (t.length() == 4) {
+            if (t.charAt(0) == '1') {
                 sign = -1;
             }
-            tempInt = Integer.parseInt(temperature.substring(1)); // leave out first sign digit
-        } else if (temperature.length() == 3) { // 025 -> 2.5°C
-            tempInt = Integer.parseInt(temperature);
+            tempInt = Integer.parseInt(t.substring(1)); // leave out first sign digit
+        } else if (t.length() == 3) { // 025 -> 2.5°C
+            tempInt = Integer.parseInt(t);
         } else {
-            throw new NumberFormatException("Unrecognized temperature format: " + temperature);
+            throw new NumberFormatException("Unrecognized temperature format: " + t);
         }
-        double t = sign * tempInt / 10.0;
-        return (Math.round(t * 100.0)) / 100.0; // round it to 2 decimal digits
+        double tempDouble = sign * tempInt / 10.0;
+        return (Math.round(tempDouble * 100.0)) / 100.0; // round it to 2 decimal digits
     }
 
     /**
