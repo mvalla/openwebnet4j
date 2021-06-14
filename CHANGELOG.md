@@ -1,14 +1,14 @@
 # Changelog
 
-## [0.5-SNAPSHOT] - 2021-??-??
+## [0.5.3] - 2021-06-14
 
 ### Changed
 - CamelCase for all enums
-- method name requestActuatorsStatus
+- new method name requestActuatorsStatus
 - renamed to SCS_THERMO_SENSOR and SCS_THERMO_ZONE
 
 ### Added
-- PROGRAM and HOLIDAY WHAT
+- PROGRAM and HOLIDAY to Thermo WHAT
 
 
 ## [0.5.2] - 2021-05-28
