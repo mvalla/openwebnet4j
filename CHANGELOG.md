@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0-SNAPSHOT] - 2021-??-??
+
+### Changed
+- todo
+
+
 ## [0.5.3] - 2021-06-14
 
 ### Changed
