@@ -20,6 +20,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.CENPlusScenario;
+import org.openwebnet4j.message.CENPlusScenario.CENPlusPressure;
+import org.openwebnet4j.message.CENPlusScenario.WhatCENPlus;
+import org.openwebnet4j.message.CENScenario;
+import org.openwebnet4j.message.CENScenario.CENPressure;
+import org.openwebnet4j.message.CENScenario.WhatCEN;
 import org.openwebnet4j.message.EnergyManagement;
 import org.openwebnet4j.message.FrameException;
 import org.openwebnet4j.message.GatewayMgmt;
@@ -246,6 +252,46 @@ public class MessageTest {
             Assertions.fail();
         }
 
+    }
+
+    @Test
+    public void testCEN() {
+        CENScenario cenMsg;
+        try {
+            cenMsg = (CENScenario) BaseOpenMessage.parse("*15*01#3*0001##");
+            assertNotNull(cenMsg);
+            assertEquals(Who.CEN_SCENARIO_SCHEDULER, cenMsg.getWho());
+            assertTrue(cenMsg.isCommand());
+            assertFalse(cenMsg.isCommandTranslation());
+            assertEquals("0001", cenMsg.getWhere().value());
+            assertNull(cenMsg.getDim());
+            assertEquals(WhatCEN.BUTTON_01, cenMsg.getWhat());
+            assertEquals(1, cenMsg.getButtonNumber());
+            assertEquals(CENPressure.EXT_PRESSURE, cenMsg.getButtonPressure());
+            System.out.println(cenMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testCENPlus() {
+        CENPlusScenario cenPlusMsg;
+        try {
+            cenPlusMsg = (CENPlusScenario) BaseOpenMessage.parse("*25*22#2*22047##");
+            assertNotNull(cenPlusMsg);
+            assertEquals(Who.CEN_PLUS_SCENARIO_SCHEDULER, cenPlusMsg.getWho());
+            assertTrue(cenPlusMsg.isCommand());
+            assertFalse(cenPlusMsg.isCommandTranslation());
+            assertEquals("22047", cenPlusMsg.getWhere().value());
+            assertNull(cenPlusMsg.getDim());
+            assertEquals(WhatCENPlus.START_EXT_PRESSURE, cenPlusMsg.getWhat());
+            assertEquals(2, cenPlusMsg.getButtonNumber());
+            assertEquals(CENPlusPressure.START_EXT_PRESSURE, cenPlusMsg.getButtonPressure());
+            System.out.println(cenPlusMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
     }
 
     @Test

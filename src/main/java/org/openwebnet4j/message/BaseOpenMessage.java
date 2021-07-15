@@ -37,6 +37,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
     protected static final String FORMAT_DIMENSION_WRITING_2V = "*#%d*%s*#%d*%s*%s##";
     protected static final String FORMAT_DIMENSION_WRITING_1P_1V = "*#%d*%s*#%d#%s*%s##";
     protected static final String FORMAT_REQUEST = "*%d*%d*%s##";
+    protected static final String FORMAT_REQUEST_WHAT_STR = "*%d*%s*%s##";
+    protected static final String FORMAT_REQUEST_PARAM_STR = "*%d*%s#%d*%s##";
+
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
     private String whoStr = null; // WHO part of the frame
@@ -275,6 +278,12 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 break;
             case THERMOREGULATION:
                 baseopenmsg = new Thermoregulation(frame);
+                break;
+            case CEN_SCENARIO_SCHEDULER:
+                baseopenmsg = new CENScenario(frame);
+                break;
+            case CEN_PLUS_SCENARIO_SCHEDULER:
+                baseopenmsg = new CENPlusScenario(frame);
                 break;
             // DIAGNOSTIC
             case ENERGY_MANAGEMENT_DIAGNOSTIC:
