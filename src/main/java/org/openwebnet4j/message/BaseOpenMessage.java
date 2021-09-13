@@ -283,6 +283,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case THERMOREGULATION_DIAGNOSTIC:
                 baseopenmsg = new ThermoregulationDiagnostic(frame);
                 break;
+            case AUX:
+                baseopenmsg=new Auxiliary(frame);
             default:
                 break;
         }
