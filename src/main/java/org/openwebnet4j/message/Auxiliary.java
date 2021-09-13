@@ -2,6 +2,7 @@ package org.openwebnet4j.message;
 
 import org.openwebnet4j.OpenDeviceType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +19,13 @@ public class Auxiliary extends BaseOpenMessage {
         ON(1),
         TOGGLE(2),
         STOP(3),
-        UP(4);
+        UP(4),
+        DOWN(5),
+        ENABLED(6),
+        DISABLED(7),
+        RESET_GEN(8),
+        RESET_BI(9),
+        RESET_TRI(10);
 
         private static Map<Integer, WhatAuxiliary> mapping;
 
@@ -26,6 +33,20 @@ public class Auxiliary extends BaseOpenMessage {
 
         private WhatAuxiliary(int value) {
             this.value = value;
+        }
+
+        public static void initMapping(){
+            mapping = new HashMap<Integer,WhatAuxiliary>();
+            for (WhatAuxiliary w:values()){
+                mapping.put(w.value,w);
+            }
+        }
+
+        public static WhatAuxiliary fromValue(int i) {
+            if (mapping == null) {
+                initMapping();
+            }
+            return mapping.get(i);
         }
 
         @Override
@@ -42,7 +63,15 @@ public class Auxiliary extends BaseOpenMessage {
 
     @Override
     protected void parseWhere() throws FrameException {
-
+        if (whereStr == null) {
+            throw new FrameException("Frame has no WHERE part: " + whereStr);
+        } else {
+            if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
+                where = new WhereZigBee(whereStr);
+            } else {
+                where = new WhereLightAutom(whereStr);
+            }
+        }
     }
 
     @Override
@@ -52,11 +81,25 @@ public class Auxiliary extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return null;
+       return WhatAuxiliary.fromValue(i);
     }
 
     @Override
     public OpenDeviceType detectDeviceType() throws FrameException {
-        return null;
+        if (isCommand()) { // ignore status/dimension frames for detecting device type
+            OpenDeviceType type = null;
+            What w = getWhat();
+            if (w != null) {
+                if (w == WhatAuxiliary.DOWN || w == WhatAuxiliary.ON || w == WhatAuxiliary.
+                        OFF || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
+                        || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN ||
+                        w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
+                    type = OpenDeviceType.SCS_ON_OFF_SWITCH;
+                }
+            }
+            return type;
+        } else {
+            return null;
+        }
     }
 }
