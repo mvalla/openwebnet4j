@@ -29,6 +29,7 @@ TODO.md
 test.properties
 src/test/resources/
 src/test/java/org/openwebnet4j/test/integration/
-idea/
+.idea/
+*.iml
 
 
