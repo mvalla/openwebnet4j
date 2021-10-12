@@ -17,8 +17,6 @@ package org.openwebnet4j.communication;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class contains helper methods for authenticating to a BUS OpenWebNet gateway using a numeric
@@ -31,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Auth {
 
-    private final Logger logger = LoggerFactory.getLogger(Auth.class);
+    // private final Logger logger = LoggerFactory.getLogger(Auth.class);
 
     /**
      * Convert [0-9] digits string to hex string
@@ -43,14 +41,11 @@ public class Auth {
         String out = "";
         char[] chars = digits.toCharArray();
         for (int i = 0; i < digits.length(); i = i + 4) {
-            out =
-                    out
-                            + Integer.toHexString(
-                                    Character.getNumericValue(chars[i]) * 10
-                                            + Character.getNumericValue(chars[i + 1]))
-                            + Integer.toHexString(
-                                    Character.getNumericValue(chars[i + 2]) * 10
-                                            + Character.getNumericValue(chars[i + 3]));
+            out = out
+                    + Integer.toHexString(
+                            Character.getNumericValue(chars[i]) * 10 + Character.getNumericValue(chars[i + 1]))
+                    + Integer.toHexString(
+                            Character.getNumericValue(chars[i + 2]) * 10 + Character.getNumericValue(chars[i + 3]));
         }
         return out;
     }

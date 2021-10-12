@@ -151,10 +151,11 @@ public class EnergyManagement extends BaseOpenMessage {
      * @return message
      */
     public static EnergyManagement setActivePowerNotificationsTime(String where, int time) {
-        if (time < 0 || time > 255) {
-            time = 0;
+        int t = time;
+        if (t < 0 || t > 255) {
+            t = 0;
         }
         return new EnergyManagement(format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where,
-                DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, time));
+                DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, t));
     }
 }

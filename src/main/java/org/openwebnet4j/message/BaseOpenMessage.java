@@ -42,7 +42,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     protected static final String FORMAT_STATUS = "*#%d*%s##";
 
-    private String whoStr = null; // WHO part of the frame
+    // private String whoStr = null; // WHO part of the frame
     private String whatStr = null; // WHAT part of the frame
     protected String whereStr = null; // WHERE part of the frame
     private String dimStr = null; // DIM part of the frame
