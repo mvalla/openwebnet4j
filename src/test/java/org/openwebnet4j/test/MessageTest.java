@@ -267,7 +267,18 @@ public class MessageTest {
             assertNull(cenMsg.getDim());
             assertEquals(WhatCEN.BUTTON_01, cenMsg.getWhat());
             assertEquals(1, cenMsg.getButtonNumber());
-            assertEquals(CENPressure.EXT_PRESSURE, cenMsg.getButtonPressure());
+            assertEquals(CENPressure.EXTENDED_PRESSURE, cenMsg.getButtonPressure());
+            System.out.println(cenMsg.toStringVerbose());
+            cenMsg = (CENScenario) BaseOpenMessage.parse("*15*02*22##");
+            assertNotNull(cenMsg);
+            assertEquals(Who.CEN_SCENARIO_SCHEDULER, cenMsg.getWho());
+            assertTrue(cenMsg.isCommand());
+            assertFalse(cenMsg.isCommandTranslation());
+            assertEquals("22", cenMsg.getWhere().value());
+            assertNull(cenMsg.getDim());
+            assertEquals(WhatCEN.BUTTON_02, cenMsg.getWhat());
+            assertEquals(2, cenMsg.getButtonNumber());
+            assertEquals(CENPressure.START_PRESSURE, cenMsg.getButtonPressure());
             System.out.println(cenMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();
@@ -287,7 +298,7 @@ public class MessageTest {
             assertNull(cenPlusMsg.getDim());
             assertEquals(WhatCENPlus.START_EXT_PRESSURE, cenPlusMsg.getWhat());
             assertEquals(2, cenPlusMsg.getButtonNumber());
-            assertEquals(CENPlusPressure.START_EXT_PRESSURE, cenPlusMsg.getButtonPressure());
+            assertEquals(CENPlusPressure.START_EXTENDED_PRESSURE, cenPlusMsg.getButtonPressure());
             System.out.println(cenPlusMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();

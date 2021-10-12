@@ -18,6 +18,7 @@ import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.CENPlusScenario;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.OpenMessage;
@@ -148,6 +149,20 @@ public class BUSGateway extends OpenGateway {
                     if (type != null) {
                         Where w = tdMsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, tdMsg));
+                    }
+                }
+            }
+            // DISCOVER DRY CONTACT / IR SENSOR - request: *#25*30##
+            // response <<<< *25*WHAT#0*WHERE##
+            logger.debug("##BUS## ----- DRY CONTACT / IR sensor discover");
+            res = sendInternal(CENPlusScenario.requestStatus("30")); // TODO use WhereScenario
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof CENPlusScenario) {
+                    CENPlusScenario cenMsg = ((CENPlusScenario) msg);
+                    OpenDeviceType type = cenMsg.detectDeviceType();
+                    if (type != null) {
+                        Where w = cenMsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, cenMsg));
                     }
                 }
             }

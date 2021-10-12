@@ -92,11 +92,17 @@ public class CENScenario extends CEN {
 
     }
 
-    public enum CENPressure {
-        PRESSURE(0),
+    public enum CENPressure implements Pressure {
+        /**
+         * This is START_PRESSURE TODO
+         */
+        START_PRESSURE(0),
+        /**
+         * TODO javadoc
+         */
         RELEASE_SHORT_PRESSURE(1),
-        RELEASE_EXT_PRESSURE(2),
-        EXT_PRESSURE(3);
+        RELEASE_EXTENDED_PRESSURE(2),
+        EXTENDED_PRESSURE(3);
 
         private static Map<Integer, CENPressure> mapping;
 
@@ -149,8 +155,8 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualStartPressure(String where, int buttonNumber) {
-        return new CENScenario(format(FORMAT_REQUEST_WHAT_STR, WHO, whoFromButton(buttonNumber), where));
+    public static CENScenario virtualStartPressure(String where, int buttonNumber) throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_WHAT_STR, WHO, whatFromButton(buttonNumber), where));
     }
 
     /**
@@ -160,8 +166,9 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualReleaseShortPressure(String where, int buttonNumber) {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whoFromButton(buttonNumber),
+    public static CENScenario virtualReleaseShortPressure(String where, int buttonNumber)
+            throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
                 CENPressure.RELEASE_SHORT_PRESSURE.value, where));
     }
 
@@ -172,9 +179,9 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualExtendedPressure(String where, int buttonNumber) {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whoFromButton(buttonNumber),
-                CENPressure.EXT_PRESSURE.value, where));
+    public static CENScenario virtualExtendedPressure(String where, int buttonNumber) throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
+                CENPressure.EXTENDED_PRESSURE.value, where));
     }
 
     /**
@@ -184,9 +191,10 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualReleaseExtendedPressure(String where, int buttonNumber) {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whoFromButton(buttonNumber),
-                CENPressure.RELEASE_EXT_PRESSURE.value, where));
+    public static CENScenario virtualReleaseExtendedPressure(String where, int buttonNumber)
+            throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
+                CENPressure.RELEASE_EXTENDED_PRESSURE.value, where));
     }
 
     @Override
@@ -194,15 +202,10 @@ public class CENScenario extends CEN {
         return getWhat().value();
     }
 
-    /**
-     * Get button {@link CENPressure}
-     *
-     * @return button {@link CENPressure}, or null if a {@link CENPressure} cannot be recognised
-     * @throws FrameException in case of frame error
-     */
-    public CENPressure getButtonPressure() throws FrameException {
-        if (getCommandParams() == null) {
-            return CENPressure.PRESSURE;
+    @Override
+    public Pressure getButtonPressure() throws FrameException {
+        if (getCommandParams().length == 0) {
+            return CENPressure.START_PRESSURE;
         } else {
             return CENPressure.fromValue(getCommandParams()[0]);
         }
@@ -225,8 +228,12 @@ public class CENScenario extends CEN {
         return OpenDeviceType.SCENARIO_CONTROL;
     }
 
-    private static String whoFromButton(int button) {
-        return (button < 10 ? "0" : "") + button;
+    private static String whatFromButton(int button) throws IllegalArgumentException {
+        if (button < 0 || button > 31) {
+            throw new IllegalArgumentException("button number must be between 0 and 31");
+        } else {
+            return (button < 10 ? "0" : "") + button;
+        }
     }
 
 }

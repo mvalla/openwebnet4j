@@ -21,6 +21,10 @@ package org.openwebnet4j.message;
  */
 public abstract class CEN extends BaseOpenMessage {
 
+    public interface Pressure {
+
+    }
+
     public CEN(String value) {
         super(value);
     }
@@ -32,9 +36,17 @@ public abstract class CEN extends BaseOpenMessage {
     /**
      * Get button number from CEN/CEN+ message [0-31]
      *
-     * @return button number or null
+     * @return button number or null if no button number can be found in frame
      * @throws FrameException in case of frame error
      */
     public abstract Integer getButtonNumber() throws FrameException;
+
+    /**
+     * Get button pressure type.
+     *
+     * @return button pressure type or null if no pressure can be found in frame
+     * @throws FrameException in case of frame error
+     */
+    public abstract Pressure getButtonPressure() throws FrameException;
 
 }

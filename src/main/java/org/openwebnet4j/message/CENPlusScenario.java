@@ -67,32 +67,32 @@ public class CENPlusScenario extends CEN {
 
     }
 
-    public enum CENPlusPressure {
-        SHORT_PRESSURE(21),
-        START_EXT_PRESSURE(22),
-        EXT_PRESSURE(23),
-        RELEASE_EXT_PRESSURE(24);
+    public enum CENPlusPressure implements Pressure {
+        SHORT_PRESSURE(WhatCENPlus.SHORT_PRESSURE),
+        START_EXTENDED_PRESSURE(WhatCENPlus.START_EXT_PRESSURE),
+        EXTENDED_PRESSURE(WhatCENPlus.EXT_PRESSURE),
+        RELEASE_EXTENDED_PRESSURE(WhatCENPlus.RELEASE_EXT_PRESSURE);
 
-        private static Map<Integer, CENPlusPressure> mapping;
+        private static Map<WhatCENPlus, CENPlusPressure> mapping;
 
-        private final int value;
+        private final WhatCENPlus value;
 
-        private CENPlusPressure(Integer value) {
-            this.value = value;
+        private CENPlusPressure(WhatCENPlus pr) {
+            this.value = pr;
         }
 
         private static void initMapping() {
-            mapping = new HashMap<Integer, CENPlusPressure>();
-            for (CENPlusPressure w : values()) {
-                mapping.put(w.value, w);
+            mapping = new HashMap<WhatCENPlus, CENPlusPressure>();
+            for (CENPlusPressure pr : values()) {
+                mapping.put(pr.value, pr);
             }
         }
 
-        public static CENPlusPressure fromValue(int i) {
+        public static CENPlusPressure fromValue(WhatCENPlus w) {
             if (mapping == null) {
                 initMapping();
             }
-            return mapping.get(i);
+            return mapping.get(w);
         }
     }
 
@@ -209,16 +209,12 @@ public class CENPlusScenario extends CEN {
         }
     }
 
-    /**
-     * Get button pressure type.
-     *
-     * @return button pressure type or null
-     */
-    public CENPlusPressure getButtonPressure() {
+    @Override
+    public Pressure getButtonPressure() {
         if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
             return null;
         }
-        return CENPlusPressure.fromValue(getWhat().value());
+        return CENPlusPressure.fromValue((WhatCENPlus) getWhat());
     }
 
     /**
@@ -239,7 +235,7 @@ public class CENPlusScenario extends CEN {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            // TODO define e specific WhereCENPlus class to be returned here, according to specs WHO 15/25 page 15
+            // TODO FIXME define e specific WhereCENPlus class to be returned here, according to specs WHO 15/25 page 15
             where = new WhereLightAutom(whereStr);
         }
     }
