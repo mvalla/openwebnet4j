@@ -15,6 +15,7 @@ Supported frames:
 * `WHO=2` Automation
 * `WHO=4` Thermoregulation
 * `WHO=13` Gateway Management
+* `WHO=15 & 25` CEN/CEN+ scenarios
 * `WHO=18` Energy Management
 
 Supported Open Web Net gateways:
@@ -30,7 +31,7 @@ Supported Open Web Net gateways:
 - Add other `WHOs`
 	- [x] Energy
 	- [x] Thermo (standalone mode)
-    - [ ] CEN/CEN+
+    - [x] CEN/CEN+
 	- [ ] Thermo (systems with 4 and 99 Central Units)
 	- [ ] AUX
 - [ ] add sendHighPriority with priority queue

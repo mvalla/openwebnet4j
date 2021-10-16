@@ -127,6 +127,7 @@ public class CENPlusScenario extends CEN {
      * Verify OpenWebNet message if Dry Contact/IR is ON (WHAT=31).
      *
      * @return true if Dry Contact/IR is ON
+	 * @throws FrameException in case of invalid frame
      */
     public boolean isOn() throws FrameException {
         if (getWhat() == null) {
@@ -140,6 +141,7 @@ public class CENPlusScenario extends CEN {
      * Verify OpenWebNet message if Dry Contact/IR is OFF (WHAT=32).
      *
      * @return true if Dry Contact/IR is OFF
+	 * @throws FrameException in case of invalid frame
      */
     public boolean isOff() throws FrameException {
         if (getWhat() == null) {

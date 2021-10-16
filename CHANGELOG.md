@@ -1,9 +1,6 @@
 # Changelog
 
-## [0.6.0-SNAPSHOT] - 2021-??-??
-
-### Changed
-- todo
+## [0.6.0] - 2021-10-16
 
 ### Added
 - Support for CEN and CEN+ (WHO=15/25)
