@@ -94,7 +94,7 @@ public class Auxiliary extends BaseOpenMessage {
                         OFF || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
                         || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN ||
                         w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
-                    type = OpenDeviceType.SCS_ON_OFF_SWITCH;
+                    type = OpenDeviceType.SCS_AUXILIARY_TOGGLE_CONTROL;
                 }
             }
             return type;
