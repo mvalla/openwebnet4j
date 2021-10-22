@@ -5,7 +5,7 @@
 
 	<groupId>io.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.5.3</version>
+	<version>0.6.0</version>
 	<packaging>jar</packaging>
 
 	<name>openwebnet4j OpenWebNet Java library</name>
@@ -60,7 +60,6 @@
 		<dependency>
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
-			<!-- <version>3.15.0</version> -->
 			<version>5.2.1</version>
 		</dependency>
 

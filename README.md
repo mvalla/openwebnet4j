@@ -15,6 +15,7 @@ Supported frames:
 * `WHO=2` Automation
 * `WHO=4` Thermoregulation
 * `WHO=13` Gateway Management
+* `WHO=15 & 25` CEN/CEN+ scenarios
 * `WHO=18` Energy Management
 
 Supported Open Web Net gateways:
@@ -29,9 +30,9 @@ Supported Open Web Net gateways:
 - [x] ZigBee: check isOldFirmware and related gw bugfixes
 - Add other `WHOs`
 	- [x] Energy
-	- [x] Thermo
-	- [ ] Thermo (advanced)
-	- [ ] CEN/CEN+
+	- [x] Thermo (standalone mode)
+    - [x] CEN/CEN+
+	- [ ] Thermo (systems with 4 and 99 Central Units)
 	- [ ] AUX
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
@@ -46,7 +47,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.5.2</version>
+      <version>0.6.0</version>
     </dependency>
 ```
 
