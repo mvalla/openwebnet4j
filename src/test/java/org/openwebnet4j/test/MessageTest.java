@@ -18,25 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openwebnet4j.message.Automation;
-import org.openwebnet4j.message.BaseOpenMessage;
-import org.openwebnet4j.message.CENPlusScenario;
+import org.openwebnet4j.message.*;
 import org.openwebnet4j.message.CENPlusScenario.CENPlusPressure;
 import org.openwebnet4j.message.CENPlusScenario.WhatCENPlus;
-import org.openwebnet4j.message.CENScenario;
 import org.openwebnet4j.message.CENScenario.CENPressure;
 import org.openwebnet4j.message.CENScenario.WhatCEN;
-import org.openwebnet4j.message.EnergyManagement;
-import org.openwebnet4j.message.FrameException;
-import org.openwebnet4j.message.GatewayMgmt;
-import org.openwebnet4j.message.Lighting;
-import org.openwebnet4j.message.MalformedFrameException;
-import org.openwebnet4j.message.OpenMessage;
-import org.openwebnet4j.message.Thermoregulation;
-import org.openwebnet4j.message.UnsupportedFrameException;
-import org.openwebnet4j.message.WhereThermo;
-import org.openwebnet4j.message.WhereZigBee;
-import org.openwebnet4j.message.Who;
 
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
@@ -44,6 +30,7 @@ import org.openwebnet4j.message.Who;
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy Management contribution
  * @author G. Cocchi - Thermoregulation contribution
+ * @author G. Fabiani - Auxiliary contribution
  */
 public class MessageTest {
 
@@ -123,6 +110,23 @@ public class MessageTest {
             assertEquals("0", automMsg.getDimValues()[3]);
             System.out.println(automMsg.toStringVerbose());
         } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testAuxiliary(){
+        Auxiliary auxiliaryMsg;
+        try {
+            auxiliaryMsg=(Auxiliary) BaseOpenMessage.parse("*9*1*1##");
+            assertNotNull(auxiliaryMsg);
+            assertEquals(Who.AUX,auxiliaryMsg.getWho());
+            assertEquals("1",auxiliaryMsg.getWhere().value());
+            assertEquals(Auxiliary.WhatAuxiliary.ON,auxiliaryMsg.getWhat());
+            assertTrue(auxiliaryMsg.isCommand());
+            assertFalse(auxiliaryMsg.isCommandTranslation());
+            System.out.println(auxiliaryMsg.toStringVerbose());
+        } catch (FrameException e){
             Assertions.fail();
         }
     }
