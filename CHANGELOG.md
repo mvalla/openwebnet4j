@@ -1,9 +1,16 @@
 # Changelog
 
+## [0.7.0] - 2021-10-??
+
+### Added
+- Support for AUX (WHO=9)
+
+
 ## [0.6.0] - 2021-10-16
 
 ### Added
 - Support for CEN and CEN+ (WHO=15/25)
+
 
 ## [0.5.3] - 2021-06-14
 
