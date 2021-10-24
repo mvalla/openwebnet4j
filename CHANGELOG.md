@@ -4,6 +4,7 @@
 
 ### Added
 - Support for AUX (WHO=9)
+- Support for Burglar Alarm (WHO=5)
 
 
 ## [0.6.0] - 2021-10-16

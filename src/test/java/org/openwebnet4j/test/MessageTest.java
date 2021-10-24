@@ -18,11 +18,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openwebnet4j.message.*;
+import org.openwebnet4j.message.Alarm;
+import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.Auxiliary;
+import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.CENPlusScenario;
 import org.openwebnet4j.message.CENPlusScenario.CENPlusPressure;
 import org.openwebnet4j.message.CENPlusScenario.WhatCENPlus;
+import org.openwebnet4j.message.CENScenario;
 import org.openwebnet4j.message.CENScenario.CENPressure;
 import org.openwebnet4j.message.CENScenario.WhatCEN;
+import org.openwebnet4j.message.EnergyManagement;
+import org.openwebnet4j.message.FrameException;
+import org.openwebnet4j.message.GatewayMgmt;
+import org.openwebnet4j.message.Lighting;
+import org.openwebnet4j.message.MalformedFrameException;
+import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
+import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereThermo;
+import org.openwebnet4j.message.WhereZigBee;
+import org.openwebnet4j.message.Who;
 
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
@@ -115,18 +131,18 @@ public class MessageTest {
     }
 
     @Test
-    public void testAuxiliary(){
+    public void testAuxiliary() {
         Auxiliary auxiliaryMsg;
         try {
-            auxiliaryMsg=(Auxiliary) BaseOpenMessage.parse("*9*1*1##");
+            auxiliaryMsg = (Auxiliary) BaseOpenMessage.parse("*9*1*1##");
             assertNotNull(auxiliaryMsg);
-            assertEquals(Who.AUX,auxiliaryMsg.getWho());
-            assertEquals("1",auxiliaryMsg.getWhere().value());
-            assertEquals(Auxiliary.WhatAuxiliary.ON,auxiliaryMsg.getWhat());
+            assertEquals(Who.AUX, auxiliaryMsg.getWho());
+            assertEquals("1", auxiliaryMsg.getWhere().value());
+            assertEquals(Auxiliary.WhatAuxiliary.ON, auxiliaryMsg.getWhat());
             assertTrue(auxiliaryMsg.isCommand());
             assertFalse(auxiliaryMsg.isCommandTranslation());
             System.out.println(auxiliaryMsg.toStringVerbose());
-        } catch (FrameException e){
+        } catch (FrameException e) {
             Assertions.fail();
         }
     }
@@ -366,11 +382,7 @@ public class MessageTest {
         } catch (FrameException e) {
             assertTrue(e instanceof UnsupportedFrameException);
         }
-        try {
-            msg = BaseOpenMessage.parse("*#5*0##");
-        } catch (FrameException e) {
-            assertTrue(e instanceof UnsupportedFrameException);
-        }
+
         assertNull(msg);
     }
 
@@ -452,6 +464,31 @@ public class MessageTest {
             assertEquals("51", energyMsg.getWhere().value());
             assertEquals(EnergyManagement.DimEnergyMgmt.ACTIVE_POWER, energyMsg.getDim());
             assertNotNull(energyMsg.getDimValues());
+        } catch (FrameException e) {
+            System.out.println(e.getMessage());
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testAlarm() {
+        Alarm alarmMsg;
+        try {
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*#5##");
+            assertNotNull(alarmMsg);
+            assertEquals(Who.BURGLAR_ALARM, alarmMsg.getWho());
+            assertFalse(alarmMsg.isCommand());
+            assertNull(alarmMsg.getWhere());
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*5*1*##");
+            assertNotNull(alarmMsg);
+            assertTrue(alarmMsg.isCommand());
+            assertNull(alarmMsg.getWhere());
+            assertEquals(Alarm.WhatAlarm.SYSTEM_ACTIVE, alarmMsg.getWhat());
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*5*11*#2##");
+            assertNotNull(alarmMsg);
+            assertTrue(alarmMsg.isCommand());
+            assertEquals("#2", alarmMsg.getWhere().value());
+            assertEquals(Alarm.WhatAlarm.ZONE_ENGAGED, alarmMsg.getWhat());
         } catch (FrameException e) {
             System.out.println(e.getMessage());
             Assertions.fail();

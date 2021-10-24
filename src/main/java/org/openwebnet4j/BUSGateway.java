@@ -17,6 +17,7 @@ package org.openwebnet4j;
 import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
+import org.openwebnet4j.message.Alarm;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.CENPlusScenario;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
@@ -154,7 +155,7 @@ public class BUSGateway extends OpenGateway {
             }
             // DISCOVER DRY CONTACT / IR SENSOR - request: *#25*30##
             // response <<<< *25*WHAT#0*WHERE##
-            logger.debug("##BUS## ----- DRY CONTACT / IR sensor discover");
+            logger.debug("##BUS## ----- DRY CONTACT / IR sensor discovery");
             res = sendInternal(CENPlusScenario.requestStatus("30")); // TODO use WhereScenario
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof CENPlusScenario) {
@@ -163,6 +164,23 @@ public class BUSGateway extends OpenGateway {
                     if (type != null) {
                         Where w = cenMsg.getWhere();
                         notifyListeners((listener) -> listener.onNewDevice(w, type, cenMsg));
+                    }
+                }
+            }
+            // DISCOVER ALARM - request: *#5##
+            logger.debug("##BUS## ----- ALARM discovery");
+            res = sendInternal(Alarm.requestSystemStatus());
+            boolean foundAlarmCentralUnit = false; // to notify central unit only once
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (!foundAlarmCentralUnit) {
+                    if (msg instanceof Alarm) {
+                        Alarm alarmMsg = ((Alarm) msg);
+                        OpenDeviceType type = alarmMsg.detectDeviceType();
+                        if (type != null) {
+                            Where w = alarmMsg.getWhere();
+                            notifyListeners((listener) -> listener.onNewDevice(w, type, alarmMsg));
+                            foundAlarmCentralUnit = true;
+                        }
                     }
                 }
             }
