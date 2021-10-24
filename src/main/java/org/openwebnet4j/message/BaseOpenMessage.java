@@ -41,6 +41,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     protected static final String FORMAT_REQUEST_PARAM_STR = "*%d*%s#%d*%s##";
 
     protected static final String FORMAT_STATUS = "*#%d*%s##";
+    protected static final String FORMAT_STATUS_NO_WHERE = "*#%d##";
 
     // private String whoStr = null; // WHO part of the frame
     private String whatStr = null; // WHAT part of the frame
@@ -131,24 +132,24 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private static String[] getPartsStrings(String frame) throws MalformedFrameException {
         // remove trailing "##" and get frame parts separated by '*'
         String[] parts = frame.substring(0, frame.length() - 2).split("\\*");
-        if (parts.length == 0) {
+        if (parts.length < 2) {
             throw new MalformedFrameException("Invalid frame");
-        }
-        if (parts.length < 3) { // every OWN frame must have at least 2 '*'
-            throw new MalformedFrameException(
-                    "Cmd/Dim frames must have at least 2 non-empty sections separated by '*'");
         }
         return parts;
     }
 
-    private void parseParts(String[] parts) {
+    private void parseParts(String[] parts) throws MalformedFrameException {
         if (isCommand()) {
-            whatStr = parts[2]; // second part is WHAT
+            if (parts.length > 2) {
+                whatStr = parts[2]; // second part is WHAT
+            } else {
+                throw new MalformedFrameException("Cmd frames must contain a What part");
+            }
             if (parts.length > 3) {
                 whereStr = parts[3]; // third part is WHERE (optional)
             }
         } else {
-            if (!(parts[2].equals(""))) {
+            if (parts.length > 2 && !(parts[2].equals(""))) {
                 whereStr = parts[2]; // second part is WHERE
             }
             if (parts.length >= 4) {
@@ -285,7 +286,6 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case CEN_PLUS_SCENARIO_SCHEDULER:
                 baseopenmsg = new CENPlusScenario(frame);
                 break;
-            // DIAGNOSTIC
             case ENERGY_MANAGEMENT_DIAGNOSTIC:
                 baseopenmsg = new EnergyManagementDiagnostic(frame);
                 break;
@@ -293,7 +293,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 baseopenmsg = new ThermoregulationDiagnostic(frame);
                 break;
             case AUX:
-                baseopenmsg=new Auxiliary(frame);
+                baseopenmsg = new Auxiliary(frame);
+                break;
+            case BURGLAR_ALARM:
+                baseopenmsg = new Alarm(frame);
+                break;
             default:
                 break;
         }
