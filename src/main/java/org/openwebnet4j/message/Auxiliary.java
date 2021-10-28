@@ -84,6 +84,12 @@ public class Auxiliary extends BaseOpenMessage {
         return new Auxiliary(format(FORMAT_REQUEST, WHO,WhatAuxiliary.OFF.value,where));
     }
 
+    /**
+     * OpenWebNet message request auxiliary  status <code>*#9*WHERE##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
     public static Auxiliary requestStatus(String where){
         return new Auxiliary(format(FORMAT_STATUS,WHO,where));
     }
