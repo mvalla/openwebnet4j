@@ -5,6 +5,10 @@ import org.openwebnet4j.OpenDeviceType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.String.*;
+import static org.openwebnet4j.message.Who.AUX;
+import static org.openwebnet4j.message.Who.LIGHTING;
+
 /**
  * OpenWebNet Auxiliary messages (WHO=9)
  *
@@ -54,12 +58,61 @@ public class Auxiliary extends BaseOpenMessage {
             return value;
         }
     }
+    private static final int WHO = AUX.value();
 
     protected Auxiliary(String value) {
         super(value);
         this.who = Who.AUX;
     }
+    /**
+     * OpenWebNet message request to turn auxiliary ON <code>*9*1*WHERE##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Auxiliary requestTurnOn (String where){
+        return new Auxiliary(format(FORMAT_REQUEST, WHO, WhatAuxiliary.ON.value,where));
+    }
 
+    /**
+     * OpenWebNet message request to turn auxiliary ON <code>*9*0*WHERE##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Auxiliary requestTurnOff (String where){
+        return new Auxiliary(format(FORMAT_REQUEST, WHO,WhatAuxiliary.OFF.value,where));
+    }
+
+    public static Auxiliary requestStatus(String where){
+        return new Auxiliary(format(FORMAT_STATUS,WHO,where));
+    }
+
+    /**
+     * Verify OpenWebNet message if auxiliary  is ON (WHAT=1).
+     *
+     * @return true if auxiliary is ON
+     */
+    public boolean isOn() {
+        if (getWhat() == null) {
+            return false;
+        } else {
+            return getWhat().equals(Auxiliary.WhatAuxiliary.ON);
+        }
+    }
+
+    /**
+     * Verify OpenWebNet message if auxiliary is OFF (WHAT=0).
+     *
+     * @return true if auxiliary is OFF
+     */
+    public boolean isOff() {
+        if (getWhat() == null) {
+            return false;
+        } else {
+            return getWhat().equals(Auxiliary.WhatAuxiliary.OFF);
+        }
+    }
 
     @Override
     protected void parseWhere() throws FrameException {
@@ -69,7 +122,7 @@ public class Auxiliary extends BaseOpenMessage {
             if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
                 where = new WhereZigBee(whereStr);
             } else {
-                where = new WhereLightAutom(whereStr);
+                where = new WhereAuxiliary(whereStr);
             }
         }
     }

@@ -132,6 +132,18 @@ public class MessageTest {
     }
 
     @Test
+    public void testAuxiliaryMessage() {
+        Auxiliary auxiliaryMsgON;
+        auxiliaryMsgON = Auxiliary.requestTurnOn("1");
+        assertNotNull(auxiliaryMsgON);
+        assertEquals(Who.AUX,auxiliaryMsgON.getWho());
+        assertEquals("1",auxiliaryMsgON.getWhere().value());
+        assertEquals(Auxiliary.WhatAuxiliary.ON,auxiliaryMsgON.getWhat());
+        assertTrue(auxiliaryMsgON.isCommand());
+        assertTrue(auxiliaryMsgON.isOn());
+        System.out.println(auxiliaryMsgON.toStringVerbose());
+    }
+    @Test
     public void testThermoregulation() {
         Thermoregulation thermoMsg;
         try {
