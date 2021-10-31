@@ -36,6 +36,7 @@ import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereAlarm;
 import org.openwebnet4j.message.WhereThermo;
 import org.openwebnet4j.message.WhereZigBee;
 import org.openwebnet4j.message.Who;
@@ -487,7 +488,9 @@ public class MessageTest {
             alarmMsg = (Alarm) BaseOpenMessage.parse("*5*11*#2##");
             assertNotNull(alarmMsg);
             assertTrue(alarmMsg.isCommand());
+            assertNotNull(alarmMsg.getWhere());
             assertEquals("#2", alarmMsg.getWhere().value());
+            assertEquals(2, ((WhereAlarm) alarmMsg.getWhere()).getZone());
             assertEquals(Alarm.WhatAlarm.ZONE_ENGAGED, alarmMsg.getWhat());
         } catch (FrameException e) {
             System.out.println(e.getMessage());

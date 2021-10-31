@@ -21,24 +21,24 @@ public class Alarm extends BaseOpenMessage {
         SYSTEM_ACTIVE(1),
         SYSTEM_INACTIVE(2),
         DELAY_END(3),
-        BATTERY_FAULT(4),
-        BATTERY_OK(5),
-        NETWORK_NOT_OK(6),
-        NETWORK_OK(7),
+        SYSTEM_BATTERY_FAULT(4),
+        SYSTEM_BATTERY_OK(5),
+        SYSTEM_NETWORK_ERROR(6),
+        SYSTEM_NETWORK_OK(7),
         SYSTEM_ENGAGED(8),
-        SYSTEM_NOT_ENGAGED(9),
-        BATTERY_UNLOADED(10),
+        SYSTEM_DISENGAGED(9),
+        SYSTEM_BATTERY_UNLOADED(10),
         ZONE_ENGAGED(11),
-        ZONE_TECHNICAL_ALARM(12),
-        ZONE_RESET_TECHNICAL_ALARM(13),
+        ZONE_ALARM_TECHNICAL(12),
+        ZONE_ALARM_TECHNICAL_RESET(13),
         NO_CONNECTION_TO_DEVICE(14),
-        ZONE_INTRUSION_ALARM(15),
-        ZONE_TAMPERING_ALARM(16),
-        ZONE_ANTI_PANIC_ALARM(17),
-        ZONE_NOT_ENGAGED(18),
+        ZONE_ALARM_INTRUSION(15),
+        ZONE_ALARM_TAMPERING(16),
+        ZONE_ALARM_ANTI_PANIC(17),
+        ZONE_DISENGAGED(18),
         START_PROGRAMMING(26),
         STOP_PROGRAMMING(27),
-        ZONE_SILENT_ALARM(31);
+        ZONE_ALARM_SILENT(31);
 
         private static Map<Integer, WhatAlarm> mapping;
 
@@ -76,12 +76,11 @@ public class Alarm extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to request alarm system status <code>*#5##</code>.
+     * OpenWebNet message to request alarm system status <code>*#5*0##</code>.
      *
      * @return message
      */
     public static Alarm requestSystemStatus() {
-        // return new Alarm(format(FORMAT_STATUS_NO_WHERE, WHO)); TODO
         return new Alarm(format(FORMAT_STATUS, WHO, "0"));
 
     }
@@ -106,7 +105,12 @@ public class Alarm extends BaseOpenMessage {
     @Override
     public OpenDeviceType detectDeviceType() {
         if (isCommand()) { // ignore status/dimension frames for detecting device type
-            return OpenDeviceType.SCS_ALARM_CENTRAL_UNIT;
+            WhereAlarm w = (WhereAlarm) getWhere();
+            if (w == null) {
+                return OpenDeviceType.SCS_ALARM_CENTRAL_UNIT;
+            } else {
+                return OpenDeviceType.SCS_ALARM_ZONE;
+            }
         } else {
             return null;
         }

@@ -167,22 +167,27 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-            // DISCOVER ALARM - request: *#5##
+            // DISCOVER ALARM - request: *#5*0##
             logger.debug("##BUS## ----- ALARM discovery");
             res = sendInternal(Alarm.requestSystemStatus());
             boolean foundAlarmCentralUnit = false; // to notify central unit only once
             for (OpenMessage msg : res.getResponseMessages()) {
-                if (!foundAlarmCentralUnit) {
-                    if (msg instanceof Alarm) {
-                        Alarm alarmMsg = ((Alarm) msg);
-                        OpenDeviceType type = alarmMsg.detectDeviceType();
-                        if (type != null) {
+                if (msg instanceof Alarm) {
+                    Alarm alarmMsg = ((Alarm) msg);
+                    OpenDeviceType type = alarmMsg.detectDeviceType();
+                    if (type != null) {
+                        if (type == OpenDeviceType.SCS_ALARM_CENTRAL_UNIT) {
+                            if (!foundAlarmCentralUnit) {
+                                foundAlarmCentralUnit = true;
+                                notifyListeners((listener) -> listener.onNewDevice(null, type, alarmMsg));
+                            }
+                        } else if (type == OpenDeviceType.SCS_ALARM_ZONE) {
                             Where w = alarmMsg.getWhere();
                             notifyListeners((listener) -> listener.onNewDevice(w, type, alarmMsg));
-                            foundAlarmCentralUnit = true;
                         }
                     }
                 }
+
             }
 
         } catch (OWNException e) {
