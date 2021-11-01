@@ -75,7 +75,7 @@ public class Auxiliary extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message request to turn auxiliary ON <code>*9*0*WHERE##</code>.
+     * OpenWebNet message request to turn auxiliary OFF <code>*9*0*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
