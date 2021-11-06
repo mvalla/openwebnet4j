@@ -85,6 +85,17 @@ public class Alarm extends BaseOpenMessage {
 
     }
 
+    /**
+     * OpenWebNet message to request alarm zone status <code>*#5*#Z##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Alarm requestZoneStatus(String where) {
+        return new Alarm(format(FORMAT_STATUS, WHO, where));
+
+    }
+
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr != null) {

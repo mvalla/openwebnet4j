@@ -12,8 +12,10 @@ package org.openwebnet4j.message;
  *
  * Zone 0 is for inputs and the 3 internal sirens
  * Zone C (zone 12) is a special zone comprising: power feeder, external sirens, mechanical key, communicator
+ * </p>
  *
  * @author M. Valla - Initial contribution
+ *
  */
 
 public class WhereAlarm extends Where {
