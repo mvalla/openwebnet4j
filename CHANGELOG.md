@@ -1,10 +1,15 @@
 # Changelog
 
+## [0.8.0] - 2021-11-????
+
+### Added
+- Support for Burglar Alarm (WHO=5)
+
+
 ## [0.7.0] - 2021-11-12
 
 ### Added
 - Support for AUX (WHO=9)
-- Support for Burglar Alarm (WHO=5)
 
 
 ## [0.6.0] - 2021-10-16
