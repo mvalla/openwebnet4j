@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.7.0] - 2021-10-??
+## [0.7.0] - 2021-11-12
 
 ### Added
 - Support for AUX (WHO=9)

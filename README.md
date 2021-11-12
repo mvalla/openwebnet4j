@@ -17,7 +17,7 @@ Supported frames:
 * `WHO=13` Gateway Management
 * `WHO=15 & 25` CEN/CEN+ scenarios
 * `WHO=18` Energy Management
-* `WHO=9`  Auxiliary support 
+* `WHO=9`  Auxiliary 
 
 Supported Open Web Net gateways:
 - *IP gateways* or scenario programmers, such as: BTicino F453 / F454 / F455, MyHOMEServer1,  MyHOME_Screen10, MH201 / MH202 / MH200N
@@ -34,7 +34,7 @@ Supported Open Web Net gateways:
 	- [x] Thermo (standalone mode)
     - [x] CEN/CEN+
 	- [ ] Thermo (systems with 4 and 99 Central Units)
-	- [X] AUX
+	- [x] AUX
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
 
@@ -48,7 +48,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.6.0</version>
+      <version>0.7.0</version>
     </dependency>
 ```
 
