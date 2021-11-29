@@ -308,12 +308,12 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param where WHERE string
      * @param newSetPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param function HEATING/COOLING/GENERIC
+     * @param isStandAlone distinguish if a central unit is used (false) or not (true)
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
-    public static Thermoregulation requestWriteSetpointTemperature(
-            String where, double newSetPointTemperature, Thermoregulation.Function function)
-            throws MalformedFrameException {
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            Thermoregulation.Function function, boolean isStandAlone) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
             throw new MalformedFrameException(
                     "Set Point Temperature should be between 5° and 40° Celsius.");
@@ -321,12 +321,11 @@ public class Thermoregulation extends BaseOpenMessage {
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(
                 format(
-                        FORMAT_DIMENSION_WRITING_2V,
-                        WHO,
-                        where,
+                        FORMAT_DIMENSION_WRITING_2V, 
+                        WHO, 
+                        isStandAlone ? where : "#" + where, 
                         DimThermo.TEMP_SETPOINT.value(),
-                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
-                        function.value()));
+                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), function.value()));
     }
 
     /**
@@ -397,21 +396,22 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param where WHERE string
      * @param newOperationMode Operation mode
      * @param currentFunction current zone function (HEATING/COOLING/GENERIC)
-     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set
-     *     when switching to function=MANUAL
+     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set when switching to
+     *            function=MANUAL
+     * @param isStandAlone distinguish if a central unit is used (false) or not (true)
      * @return message
      */
     public static Thermoregulation requestWriteMode(
-            String where,
+            String where, 
             Thermoregulation.OperationMode newOperationMode,
-            Thermoregulation.Function currentFunction,
-            double setPointTemperature) {
+            Thermoregulation.Function currentFunction, 
+            double setPointTemperature, 
+            boolean isStandAlone) {
 
         switch (newOperationMode) {
             case MANUAL:
                 try {
-                    return requestWriteSetpointTemperature(
-                            where, setPointTemperature, currentFunction);
+                    return requestWriteSetpointTemperature(where, setPointTemperature, currentFunction, isStandAlone);
                 } catch (MalformedFrameException ex) {
                     return null;
                 }
