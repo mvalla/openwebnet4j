@@ -1,13 +1,12 @@
 package org.openwebnet4j.message;
 
-import org.openwebnet4j.OpenDeviceType;
+import static java.lang.String.format;
+import static org.openwebnet4j.message.Who.AUX;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.String.*;
-import static org.openwebnet4j.message.Who.AUX;
-import static org.openwebnet4j.message.Who.LIGHTING;
+import org.openwebnet4j.OpenDeviceType;
 
 /**
  * OpenWebNet Auxiliary messages (WHO=9)
@@ -39,10 +38,10 @@ public class Auxiliary extends BaseOpenMessage {
             this.value = value;
         }
 
-        public static void initMapping(){
-            mapping = new HashMap<Integer,WhatAuxiliary>();
-            for (WhatAuxiliary w:values()){
-                mapping.put(w.value,w);
+        public static void initMapping() {
+            mapping = new HashMap<Integer, WhatAuxiliary>();
+            for (WhatAuxiliary w : values()) {
+                mapping.put(w.value, w);
             }
         }
 
@@ -58,20 +57,22 @@ public class Auxiliary extends BaseOpenMessage {
             return value;
         }
     }
+
     private static final int WHO = AUX.value();
 
     protected Auxiliary(String value) {
         super(value);
         this.who = Who.AUX;
     }
+
     /**
      * OpenWebNet message request to turn auxiliary ON <code>*9*1*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Auxiliary requestTurnOn (String where){
-        return new Auxiliary(format(FORMAT_REQUEST, WHO, WhatAuxiliary.ON.value,where));
+    public static Auxiliary requestTurnOn(String where) {
+        return new Auxiliary(format(FORMAT_REQUEST, WHO, WhatAuxiliary.ON.value, where));
     }
 
     /**
@@ -80,22 +81,22 @@ public class Auxiliary extends BaseOpenMessage {
      * @param where WHERE string
      * @return message
      */
-    public static Auxiliary requestTurnOff (String where){
-        return new Auxiliary(format(FORMAT_REQUEST, WHO,WhatAuxiliary.OFF.value,where));
+    public static Auxiliary requestTurnOff(String where) {
+        return new Auxiliary(format(FORMAT_REQUEST, WHO, WhatAuxiliary.OFF.value, where));
     }
 
     /**
-     * OpenWebNet message request auxiliary  status <code>*#9*WHERE##</code>.
+     * OpenWebNet message request auxiliary status <code>*#9*WHERE##</code>.
      *
      * @param where WHERE string
      * @return message
      */
-    public static Auxiliary requestStatus(String where){
-        return new Auxiliary(format(FORMAT_STATUS,WHO,where));
+    public static Auxiliary requestStatus(String where) {
+        return new Auxiliary(format(FORMAT_STATUS, WHO, where));
     }
 
     /**
-     * Verify OpenWebNet message if auxiliary  is ON (WHAT=1).
+     * Verify OpenWebNet message if auxiliary is ON (WHAT=1).
      *
      * @return true if auxiliary is ON
      */
@@ -140,7 +141,7 @@ public class Auxiliary extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-       return WhatAuxiliary.fromValue(i);
+        return WhatAuxiliary.fromValue(i);
     }
 
     @Override
@@ -149,10 +150,10 @@ public class Auxiliary extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WhatAuxiliary.DOWN || w == WhatAuxiliary.ON || w == WhatAuxiliary.
-                        OFF || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
-                        || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN ||
-                        w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
+                if (w == WhatAuxiliary.DOWN || w == WhatAuxiliary.ON || w == WhatAuxiliary.OFF
+                        || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
+                        || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN
+                        || w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
                     type = OpenDeviceType.SCS_AUXILIARY_TOGGLE_CONTROL;
                 }
             }
