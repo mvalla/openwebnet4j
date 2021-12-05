@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.8.0] - 2021-11-????
+## [0.8.0-SNAPSHOT] - 2021-11-????
 
 ### Added
 - Support for Burglar Alarm (WHO=5)

@@ -18,6 +18,7 @@ Supported frames:
 * `WHO=15 & 25` CEN/CEN+ scenarios
 * `WHO=18` Energy Management
 * `WHO=9`  Auxiliary 
+* `WHO=5`  Alarm 
 
 Supported Open Web Net gateways:
 - *IP gateways* or scenario programmers, such as: BTicino F453 / F454 / F455, MyHOMEServer1,  MyHOME_Screen10, MH201 / MH202 / MH200N
@@ -48,7 +49,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.7.0</version>
+      <version>0.8.0</version>
     </dependency>
 ```
 
