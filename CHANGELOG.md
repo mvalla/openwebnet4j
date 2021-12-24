@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.7.1-SNAPSHOT] - 2021-??-??
+
+### Added
+- Support for AUX discovery
+
+
 ## [0.7.0] - 2021-11-12
 
 ### Added
