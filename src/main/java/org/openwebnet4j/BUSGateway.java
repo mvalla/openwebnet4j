@@ -17,16 +17,7 @@ package org.openwebnet4j;
 import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
-import org.openwebnet4j.message.Automation;
-import org.openwebnet4j.message.CENPlusScenario;
-import org.openwebnet4j.message.EnergyManagementDiagnostic;
-import org.openwebnet4j.message.Lighting;
-import org.openwebnet4j.message.OpenMessage;
-import org.openwebnet4j.message.ThermoregulationDiagnostic;
-import org.openwebnet4j.message.Where;
-import org.openwebnet4j.message.WhereEnergyManagement;
-import org.openwebnet4j.message.WhereLightAutom;
-import org.openwebnet4j.message.WhereThermo;
+import org.openwebnet4j.message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author Andrea Conte - Energy manager contribution
+ * @author G.Fabiani - Auxiliary support
  */
 public class BUSGateway extends OpenGateway {
 
@@ -80,7 +72,6 @@ public class BUSGateway extends OpenGateway {
 
     /**
      * Returns the gateway password.
-     *
      * @return password
      */
     public String getPassword() {
@@ -166,6 +157,20 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
+            //DISCOVER AUX  request:*#9*0##
+            // response <<<< *9*WHAT*0
+            res = sendInternal(Auxiliary.requestStatus(WhereAuxiliary.GENERAL.value()));
+            for (OpenMessage msg : res.getResponseMessages()) {
+                if (msg instanceof Auxiliary) {
+                    Auxiliary auxMsg = (Auxiliary) msg;
+                    OpenDeviceType type = auxMsg.detectDeviceType();
+                    if (type != null){
+                        Where w=auxMsg.getWhere();
+                        notifyListeners((listener)-> listener.onNewDevice(w, type, auxMsg));
+                    }
+                }
+            }
+
 
         } catch (OWNException e) {
             logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
