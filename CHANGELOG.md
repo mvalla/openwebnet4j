@@ -2,6 +2,9 @@
 
 ## [0.7.1-SNAPSHOT] - 2021-??-??
 
+### Changed
+- [zigbee] improved error handling
+
 ### Added
 - Support for AUX discovery
 

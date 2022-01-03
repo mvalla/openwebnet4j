@@ -15,6 +15,7 @@
 package org.openwebnet4j;
 
 import java.nio.ByteBuffer;
+
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.communication.USBConnector;
@@ -59,7 +60,7 @@ public class USBGateway extends OpenGateway {
     }
 
     @Override
-    protected void discoverDevicesInternal() {
+    protected void discoverDevicesInternal() throws OWNException {
         Response res;
         logger.debug("##USB## ----- ### STARTING A NEW DISCOVERY...");
         receivedProducts = 0;
@@ -67,15 +68,13 @@ public class USBGateway extends OpenGateway {
         try {
             res = send(GatewayMgmt.requestScanNetwork());
             if (!res.isSuccess()) {
-                logger.debug(
-                        "##USB## ----- # Cannot discover devices, requestScanNetwork() returned: "
-                                + res);
-                isDiscovering = false;
+                throw new OWNException("Error while discovering devices on USB gateway. RequestScanNetwork returned: "
+                        + res.getFinalResponse());
             }
         } catch (OWNException e) {
-            logger.error("##USB## ----- # OWNException while discovering devices: {}", e);
-            e.printStackTrace();
+            logger.error("##USB## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
+            throw e;
         }
     }
 
@@ -99,14 +98,9 @@ public class USBGateway extends OpenGateway {
                 for (int p = 0; p < discoveredProducts; p++) {
                     handleDiscoveryResponse(sendInternal(GatewayMgmt.requestProductInfo(p)));
                     receivedProducts++;
-                    logger.debug(
-                            "##USB## ----- # DISCOVERED {} / {} products",
-                            receivedProducts,
-                            discoveredProducts);
+                    logger.debug("##USB## ----- # DISCOVERED {} / {} products", receivedProducts, discoveredProducts);
                 }
-                logger.debug(
-                        "##USB## ----- ### DISCOVERY COMPLETED - DISCOVERED {} / {} products",
-                        receivedProducts,
+                logger.debug("##USB## ----- ### DISCOVERY COMPLETED - DISCOVERED {} / {} products", receivedProducts,
                         discoveredProducts);
                 notifyListeners((listener) -> listener.onDiscoveryCompleted());
             } catch (Exception e) {

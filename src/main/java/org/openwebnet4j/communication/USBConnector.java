@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NRSerialPort;
 import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
@@ -218,32 +219,46 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         NRSerialPort connectPort = new NRSerialPort(portN, SERIAL_SPEED);
         logger.debug("##USB-conn## NRSerialPort created");
 
-        if (connectPort.connect()) {
-            try {
-                connectPort.getSerialPortInstance().setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8,
-                        SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-            } catch (UnsupportedCommOperationException ue) {
-                logger.error("##USB-conn## Failed setting params for port {}", ident.getName());
-                throw new OWNException("Failed setting params for port: " + portN, ue);
+        try {
+            if (!connectPort.connect()) {
+                logger.info("Failed to connect to serial port {}", ident.getName());
+                throw new OWNException("Failed to connect to serial port " + ident.getName()
+                        + " (NRSerialPort.connect() returned false)");
             }
-            SerialPort sp = connectPort.getSerialPortInstance();
-            // try {
-            // sp.enableReceiveThreshold(1); // makes read() blocking until at least 1 char is
-            // received
-            // sp.disableReceiveTimeout(); // disable any read() timeout
-            // sp.enableReceiveTimeout(SERIAL_RECEIVE_TIMEOUT);
-            logger.debug("##USB-conn## isReceiveThresholdEnabled={} v={}", sp.isReceiveThresholdEnabled(),
-                    sp.getReceiveThreshold());
-            logger.debug("##USB-conn## isReceiveTimeoutEnabled={} v={}", sp.isReceiveTimeoutEnabled(),
-                    sp.getReceiveTimeout());
-            logger.info("##USB-conn## === CONNECTED TO SERIAL PORT {} ===",
-                    connectPort.getSerialPortInstance().getName());
-            return connectPort;
-        } else {
-            logger.info("Failed to connect to serial port {}", ident.getName());
-            throw new OWNException(
-                    "Failed to connect to serial port " + ident.getName() + " (NRSerialPort connect() returned false)");
+            connectPort.getSerialPortInstance().setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8,
+                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+        } catch (UnsupportedCommOperationException ue) {
+            logger.error("##USB-conn## Failed setting params for port {}", ident.getName());
+            throw new OWNException("Failed setting params for port: " + portN, ue);
+        } catch (OWNException oe) {
+            throw oe;
+        } catch (Exception e) {
+            // PortInUseException could be thrown but is not declared, so we check here
+            if (e instanceof PortInUseException) {
+                logger.debug("##USB-conn## Serial port {} is already in use (PortInUseException)", ident.getName());
+                throw new OWNException(
+                        "Failed to connect to serial port " + portN + ". Port is already in use (PortInUseException).",
+                        e);
+            } else {
+                logger.debug("##USB-conn## Exception while connecting serial port: {}", e.getMessage());
+                throw new OWNException("Failed to connect to serial port " + portN, e);
+            }
         }
+        SerialPort sp = connectPort.getSerialPortInstance();
+
+        // try {
+        // sp.enableReceiveThreshold(1); // makes read() blocking until at least 1 char is
+        // received
+        // sp.disableReceiveTimeout(); // disable any read() timeout
+        // sp.enableReceiveTimeout(SERIAL_RECEIVE_TIMEOUT);
+        logger.debug("##USB-conn## isReceiveThresholdEnabled={} v={}", sp.isReceiveThresholdEnabled(),
+                sp.getReceiveThreshold());
+        logger.debug("##USB-conn## isReceiveTimeoutEnabled={} v={}", sp.isReceiveTimeoutEnabled(),
+                sp.getReceiveTimeout());
+        logger.debug("##USB-conn## FlowControl: {}", sp.getFlowControlMode());
+
+        logger.info("##USB-conn## === CONNECTED TO SERIAL PORT {} ===", connectPort.getSerialPortInstance().getName());
+        return connectPort;
     }
 
     private void disconnectSerialPort() {
