@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,7 +17,18 @@ package org.openwebnet4j;
 import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
-import org.openwebnet4j.message.*;
+import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.Auxiliary;
+import org.openwebnet4j.message.CENPlusScenario;
+import org.openwebnet4j.message.EnergyManagementDiagnostic;
+import org.openwebnet4j.message.Lighting;
+import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.ThermoregulationDiagnostic;
+import org.openwebnet4j.message.Where;
+import org.openwebnet4j.message.WhereAuxiliary;
+import org.openwebnet4j.message.WhereEnergyManagement;
+import org.openwebnet4j.message.WhereLightAutom;
+import org.openwebnet4j.message.WhereThermo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +83,7 @@ public class BUSGateway extends OpenGateway {
 
     /**
      * Returns the gateway password.
+     *
      * @return password
      */
     public String getPassword() {
@@ -118,7 +130,10 @@ public class BUSGateway extends OpenGateway {
             // DISCOVER ENERGY MANAGEMENT - request diagnostic for all energy devices: *#1018*0*7##
             // response <<<< *#1018*WHERE*7*BITS##
             logger.debug("##BUS## ----- ENERGY MANAGEMENT discovery -----");
-            res = sendInternal(EnergyManagementDiagnostic.requestDiagnostic(WhereEnergyManagement.GENERAL.value()));
+            res =
+                    sendInternal(
+                            EnergyManagementDiagnostic.requestDiagnostic(
+                                    WhereEnergyManagement.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof EnergyManagementDiagnostic) {
                     EnergyManagementDiagnostic edmsg = ((EnergyManagementDiagnostic) msg);
@@ -129,10 +144,14 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-            // DISCOVER THERMOREGULATION - request diagnostic for all thermoregulation devices: *#1004*0*7##
+            // DISCOVER THERMOREGULATION - request diagnostic for all thermoregulation devices:
+            // *#1004*0*7##
             // response <<<< *#1004*WHERE*7*BITS##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
-            res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.ALL_MASTER_PROBES.value()));
+            res =
+                    sendInternal(
+                            ThermoregulationDiagnostic.requestDiagnostic(
+                                    WhereThermo.ALL_MASTER_PROBES.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof ThermoregulationDiagnostic) {
                     ThermoregulationDiagnostic tdMsg = ((ThermoregulationDiagnostic) msg);
@@ -157,23 +176,23 @@ public class BUSGateway extends OpenGateway {
                     }
                 }
             }
-            //DISCOVER AUX  request:*#9*0##
+            // DISCOVER AUX request:*#9*0##
             // response <<<< *9*WHAT*0
             res = sendInternal(Auxiliary.requestStatus(WhereAuxiliary.GENERAL.value()));
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof Auxiliary) {
                     Auxiliary auxMsg = (Auxiliary) msg;
                     OpenDeviceType type = auxMsg.detectDeviceType();
-                    if (type != null){
-                        Where w=auxMsg.getWhere();
-                        notifyListeners((listener)-> listener.onNewDevice(w, type, auxMsg));
+                    if (type != null) {
+                        Where w = auxMsg.getWhere();
+                        notifyListeners((listener) -> listener.onNewDevice(w, type, auxMsg));
                     }
                 }
             }
 
-
         } catch (OWNException e) {
-            logger.error("##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
+            logger.error(
+                    "##BUS## ----- # OWNException while discovering devices: {}", e.getMessage());
             isDiscovering = false;
             throw e;
         }
@@ -192,7 +211,8 @@ public class BUSGateway extends OpenGateway {
     @Override
     public boolean isCmdConnectionReady() {
         long now = System.currentTimeMillis();
-        if (isConnected && connector.isCmdConnected()
+        if (isConnected
+                && connector.isCmdConnected()
                 && (now - connector.getLastCmdFrameSentTs() < CONNECTION_TIMEOUT_MS)) {
             return true;
         } else {

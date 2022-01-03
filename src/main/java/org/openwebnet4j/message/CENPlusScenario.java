@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,6 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -64,7 +63,6 @@ public class CENPlusScenario extends CEN {
         public Integer value() {
             return value;
         }
-
     }
 
     public enum CENPlusPressure implements Pressure {
@@ -116,7 +114,6 @@ public class CENPlusScenario extends CEN {
     /**
      * OpenWebNet message to request status <code>*#25*WHERE##</code>.
      *
-     *
      * @param where String
      * @return message
      */
@@ -161,7 +158,12 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualShortPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.SHORT_PRESSURE.value, buttonNumber, where));
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        WhatCENPlus.SHORT_PRESSURE.value,
+                        buttonNumber,
+                        where));
     }
 
     /**
@@ -173,7 +175,12 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualStartExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.START_EXT_PRESSURE.value, buttonNumber, where));
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        WhatCENPlus.START_EXT_PRESSURE.value,
+                        buttonNumber,
+                        where));
     }
 
     /**
@@ -185,11 +192,17 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.EXT_PRESSURE.value, buttonNumber, where));
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        WhatCENPlus.EXT_PRESSURE.value,
+                        buttonNumber,
+                        where));
     }
 
     /**
-     * OpenWebNet message request for Virtual Release after Extended Pressure <b>*25*24#BUTTON*WHERE##</b>.
+     * OpenWebNet message request for Virtual Release after Extended Pressure
+     * <b>*25*24#BUTTON*WHERE##</b>.
      *
      * @param where WHERE
      * @param buttonNumber button number
@@ -197,12 +210,18 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualReleaseExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.RELEASE_EXT_PRESSURE.value, buttonNumber, where));
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        WhatCENPlus.RELEASE_EXT_PRESSURE.value,
+                        buttonNumber,
+                        where));
     }
 
     @Override
     public Integer getButtonNumber() throws FrameException {
-        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION
+                || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
             return null;
         }
         if (getCommandParams() != null) {
@@ -214,7 +233,8 @@ public class CENPlusScenario extends CEN {
 
     @Override
     public Pressure getButtonPressure() {
-        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION
+                || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
             return null;
         }
         return CENPlusPressure.fromValue((WhatCENPlus) getWhat());
@@ -226,7 +246,8 @@ public class CENPlusScenario extends CEN {
      * @return boolean
      */
     public boolean isDryContactIR() {
-        if (getWhat() != WhatCENPlus.OFF_IR_NO_DETECTION && getWhat() != WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() != WhatCENPlus.OFF_IR_NO_DETECTION
+                && getWhat() != WhatCENPlus.ON_IR_DETECTION) {
             return false;
         } else {
             return true;
@@ -238,7 +259,8 @@ public class CENPlusScenario extends CEN {
         if (whereStr == null) {
             throw new FrameException("Frame has no WHERE part: " + whereStr);
         } else {
-            // TODO FIXME define e specific WhereCENPlus class to be returned here, according to specs WHO 15/25 page 15
+            // TODO FIXME define e specific WhereCENPlus class to be returned here, according to
+            // specs WHO 15/25 page 15
             where = new WhereLightAutom(whereStr);
         }
     }
@@ -253,6 +275,5 @@ public class CENPlusScenario extends CEN {
         } else {
             return OpenDeviceType.MULTIFUNCTION_SCENARIO_CONTROL;
         }
-
     }
 }

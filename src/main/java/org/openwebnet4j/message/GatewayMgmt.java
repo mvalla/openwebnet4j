@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -139,7 +139,8 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestKeepConnect() {
-        return new GatewayMgmt(format(FORMAT_REQUEST, WHO, WhatGatewayMgmt.KEEP_CONNECT.value(), ""));
+        return new GatewayMgmt(
+                format(FORMAT_REQUEST, WHO, WhatGatewayMgmt.KEEP_CONNECT.value(), ""));
     }
 
     /**
@@ -148,7 +149,8 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestMACAddress() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MAC_ADDRESS.value()));
+        return new GatewayMgmt(
+                format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MAC_ADDRESS.value()));
     }
 
     /**
@@ -175,7 +177,8 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return GatewayMgmt message
      */
     public static GatewayMgmt requestModel() {
-        return new GatewayMgmt(format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MODEL.value()));
+        return new GatewayMgmt(
+                format(FORMAT_DIMENSION_REQUEST, WHO, "", DimGatewayMgmt.MODEL.value()));
     }
 
     /**

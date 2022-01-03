@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -41,11 +41,14 @@ public class Auth {
         String out = "";
         char[] chars = digits.toCharArray();
         for (int i = 0; i < digits.length(); i = i + 4) {
-            out = out
-                    + Integer.toHexString(
-                            Character.getNumericValue(chars[i]) * 10 + Character.getNumericValue(chars[i + 1]))
-                    + Integer.toHexString(
-                            Character.getNumericValue(chars[i + 2]) * 10 + Character.getNumericValue(chars[i + 3]));
+            out =
+                    out
+                            + Integer.toHexString(
+                                    Character.getNumericValue(chars[i]) * 10
+                                            + Character.getNumericValue(chars[i + 1]))
+                            + Integer.toHexString(
+                                    Character.getNumericValue(chars[i + 2]) * 10
+                                            + Character.getNumericValue(chars[i + 3]));
         }
         return out;
     }

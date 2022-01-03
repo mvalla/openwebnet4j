@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,7 +19,6 @@ import static org.openwebnet4j.message.Who.LIGHTING;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -154,7 +153,7 @@ public class Lighting extends BaseOpenMessage {
      *
      * @param where WHERE string
      * @param level What level (0=Off, 1=On, 2-10=level, 30=Up one level, 31=Down one level,
-     *            32=Toggle). See {@link WhatLighting}
+     *     32=Toggle). See {@link WhatLighting}
      * @return message
      */
     public static Lighting requestDimTo(String where, What level) {
@@ -281,7 +280,9 @@ public class Lighting extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WhatLighting.OFF || w == WhatLighting.ON || w == WhatLighting.MOVEMENT_DETECTED
+                if (w == WhatLighting.OFF
+                        || w == WhatLighting.ON
+                        || w == WhatLighting.MOVEMENT_DETECTED
                         || w == WhatLighting.END_MOVEMENT_DETECTED) {
                     type = OpenDeviceType.SCS_ON_OFF_SWITCH;
                 } else if (w.value() >= 2 && w.value() <= 10) {

@@ -1,9 +1,10 @@
 # Changelog
 
-## [0.7.1-SNAPSHOT] - 2021-??-??
+## [0.7.1-SNAPSHOT] - 2022-??-??
 
 ### Changed
 - [zigbee] improved error handling
+- code cleanup, re-enabled spotless check
 
 ### Added
 - Support for AUX discovery
@@ -52,7 +53,7 @@
 
 ### Added
 - Initial support for Thermoregulation (WHO=4) with WereThermo, Thermoregulation and ThermoregulationDigagnostic classes
-  NOTE for this release only Thermostats in standalone installations have been tested
+NOTE for this release only Thermostats in standalone installations have been tested
 
 ### Changed
 - project description

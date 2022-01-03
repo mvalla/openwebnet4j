@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,15 +17,15 @@ package org.openwebnet4j.message;
 /**
  * WHERE for Energy Management frames
  *
- * <p>
- * Where Table:
- * <p>
- * 1N N=[1-127] Stop &amp; Go
+ * <p>Where Table:
  *
- * 5N N= [1-255] Energy Management Central Unit, Pulse Counter, Power
- * Meter: BTicino reference: F520, F523, 3522; Legrand reference: 03555,03557, 03554
+ * <p>1N N=[1-127] Stop &amp; Go
  *
- * 7N#0 N= [1-255] Energy Management Actuators: BTicino reference: F522, F523; Legrand reference: 03558, 03559
+ * <p>5N N= [1-255] Energy Management Central Unit, Pulse Counter, Power Meter: BTicino reference:
+ * F520, F523, 3522; Legrand reference: 03555,03557, 03554
+ *
+ * <p>7N#0 N= [1-255] Energy Management Actuators: BTicino reference: F522, F523; Legrand reference:
+ * 03558, 03559
  *
  * @author Andrea Conte - Initial contribution
  */
@@ -79,7 +79,10 @@ public class WhereEnergyManagement extends Where {
             }
         } catch (Exception e) {
             throw new IllegalArgumentException(
-                    "WHERE address '" + w + "' is invalid: generic exception caught! " + e.getMessage());
+                    "WHERE address '"
+                            + w
+                            + "' is invalid: generic exception caught! "
+                            + e.getMessage());
         }
     }
 }

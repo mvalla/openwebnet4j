@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ */
 package org.openwebnet4j.message;
 
 import static java.lang.String.format;
@@ -5,7 +19,6 @@ import static org.openwebnet4j.message.Who.AUX;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -14,7 +27,6 @@ import org.openwebnet4j.OpenDeviceType;
  * @author M. Valla - Initial contribution
  * @author G.Fabiani - Added auxiliary message support
  */
-
 public class Auxiliary extends BaseOpenMessage {
 
     public enum WhatAuxiliary implements What {
@@ -150,10 +162,17 @@ public class Auxiliary extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WhatAuxiliary.DOWN || w == WhatAuxiliary.ON || w == WhatAuxiliary.OFF
-                        || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
-                        || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN
-                        || w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
+                if (w == WhatAuxiliary.DOWN
+                        || w == WhatAuxiliary.ON
+                        || w == WhatAuxiliary.OFF
+                        || w == WhatAuxiliary.TOGGLE
+                        || w == WhatAuxiliary.DISABLED
+                        || w == WhatAuxiliary.ENABLED
+                        || w == WhatAuxiliary.STOP
+                        || w == WhatAuxiliary.UP
+                        || w == WhatAuxiliary.RESET_GEN
+                        || w == WhatAuxiliary.RESET_BI
+                        || w == WhatAuxiliary.RESET_TRI) {
                     type = OpenDeviceType.SCS_AUXILIARY_TOGGLE_CONTROL;
                 }
             }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -15,7 +15,6 @@
 package org.openwebnet4j.message;
 
 import java.util.Arrays;
-
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,28 +76,30 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach": other parts (WHERE,
-     * WHAT, DIM, parameters, etc.) are not parsed until requested.
+     * Parses the frame and returns a new OpenMessage object. This parser uses a "lazy approach":
+     * other parts (WHERE, WHAT, DIM, parameters, etc.) are not parsed until requested.
      *
      * @param frame the frame String to parse
-     *
      * @return a new {@link OpenMessage} object representing the OpenWebNet frame
-     *
-     * @throws MalformedFrameException in case the provided frame String is not a valid OpenWebNet frame
-     * @throws UnsupportedFrameException in case the provided frame String is not a supported OpenWebNet frame
-     *
+     * @throws MalformedFrameException in case the provided frame String is not a valid OpenWebNet
+     *     frame
+     * @throws UnsupportedFrameException in case the provided frame String is not a supported
+     *     OpenWebNet frame
      */
-    public static OpenMessage parse(String frame) throws MalformedFrameException, UnsupportedFrameException {
+    public static OpenMessage parse(String frame)
+            throws MalformedFrameException, UnsupportedFrameException {
         boolean isCmd = true;
         if (frame == null) {
             throw new MalformedFrameException("Frame is null");
         }
-        if (OpenMessage.FRAME_ACK.equals(frame) || OpenMessage.FRAME_NACK.equals(frame)
+        if (OpenMessage.FRAME_ACK.equals(frame)
+                || OpenMessage.FRAME_NACK.equals(frame)
                 || OpenMessage.FRAME_BUSY_NACK.equals(frame)) {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException(
+                    "Frame does not end with terminator " + OpenMessage.FRAME_END);
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
@@ -112,7 +113,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
         for (char c : frame.toCharArray()) {
             if (!Character.isDigit(c)) {
                 if (c != '#' && c != '*') {
-                    throw new MalformedFrameException("Frame can only contain '#', '*' or digits [0-9]");
+                    throw new MalformedFrameException(
+                            "Frame can only contain '#', '*' or digits [0-9]");
                 }
             }
         }
@@ -285,7 +287,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
             case CEN_PLUS_SCENARIO_SCHEDULER:
                 baseopenmsg = new CENPlusScenario(frame);
                 break;
-            // DIAGNOSTIC
+                // DIAGNOSTIC
             case ENERGY_MANAGEMENT_DIAGNOSTIC:
                 baseopenmsg = new EnergyManagementDiagnostic(frame);
                 break;
@@ -293,7 +295,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 baseopenmsg = new ThermoregulationDiagnostic(frame);
                 break;
             case AUX:
-                baseopenmsg=new Auxiliary(frame);
+                baseopenmsg = new Auxiliary(frame);
             default:
                 break;
         }
@@ -319,7 +321,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
         if (parts != null) {
             int partsIndex = 0;
             try {
-                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION) && parts.length > 1) {
+                if ((Integer.parseInt(parts[partsIndex]) == What.WHAT_COMMAND_TRANSLATION)
+                        && parts.length > 1) {
                     // commandTranslation: 1000#WHAT
                     isCommandTranslation = true;
                     partsIndex++; // skip first 1000 value

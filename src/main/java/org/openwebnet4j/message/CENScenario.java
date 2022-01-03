@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,6 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -89,17 +88,12 @@ public class CENScenario extends CEN {
         public Integer value() {
             return value;
         }
-
     }
 
     public enum CENPressure implements Pressure {
-        /**
-         * This is START_PRESSURE TODO
-         */
+        /** This is START_PRESSURE TODO */
         START_PRESSURE(0),
-        /**
-         * TODO javadoc
-         */
+        /** TODO javadoc */
         RELEASE_SHORT_PRESSURE(1),
         RELEASE_EXTENDED_PRESSURE(2),
         EXTENDED_PRESSURE(3);
@@ -155,12 +149,15 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualStartPressure(String where, int buttonNumber) throws IllegalArgumentException {
-        return new CENScenario(format(FORMAT_REQUEST_WHAT_STR, WHO, whatFromButton(buttonNumber), where));
+    public static CENScenario virtualStartPressure(String where, int buttonNumber)
+            throws IllegalArgumentException {
+        return new CENScenario(
+                format(FORMAT_REQUEST_WHAT_STR, WHO, whatFromButton(buttonNumber), where));
     }
 
     /**
-     * OpenWebNet message request for Virtual Release after Short Pressure <b>*15*BUTTON#1*WHERE##</b>.
+     * OpenWebNet message request for Virtual Release after Short Pressure
+     * <b>*15*BUTTON#1*WHERE##</b>.
      *
      * @param where WHERE
      * @param buttonNumber button number
@@ -168,8 +165,13 @@ public class CENScenario extends CEN {
      */
     public static CENScenario virtualReleaseShortPressure(String where, int buttonNumber)
             throws IllegalArgumentException {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
-                CENPressure.RELEASE_SHORT_PRESSURE.value, where));
+        return new CENScenario(
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        whatFromButton(buttonNumber),
+                        CENPressure.RELEASE_SHORT_PRESSURE.value,
+                        where));
     }
 
     /**
@@ -179,13 +181,20 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualExtendedPressure(String where, int buttonNumber) throws IllegalArgumentException {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
-                CENPressure.EXTENDED_PRESSURE.value, where));
+    public static CENScenario virtualExtendedPressure(String where, int buttonNumber)
+            throws IllegalArgumentException {
+        return new CENScenario(
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        whatFromButton(buttonNumber),
+                        CENPressure.EXTENDED_PRESSURE.value,
+                        where));
     }
 
     /**
-     * OpenWebNet message request for Virtual Release after Extended Pressure <b>*15*BUTTON#2*WHERE##</b>.
+     * OpenWebNet message request for Virtual Release after Extended Pressure
+     * <b>*15*BUTTON#2*WHERE##</b>.
      *
      * @param where WHERE
      * @param buttonNumber button number
@@ -193,8 +202,13 @@ public class CENScenario extends CEN {
      */
     public static CENScenario virtualReleaseExtendedPressure(String where, int buttonNumber)
             throws IllegalArgumentException {
-        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
-                CENPressure.RELEASE_EXTENDED_PRESSURE.value, where));
+        return new CENScenario(
+                format(
+                        FORMAT_REQUEST_PARAM_STR,
+                        WHO,
+                        whatFromButton(buttonNumber),
+                        CENPressure.RELEASE_EXTENDED_PRESSURE.value,
+                        where));
     }
 
     @Override
@@ -235,5 +249,4 @@ public class CENScenario extends CEN {
             return (button < 10 ? "0" : "") + button;
         }
     }
-
 }

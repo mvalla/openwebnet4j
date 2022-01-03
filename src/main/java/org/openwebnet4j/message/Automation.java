@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,7 +18,6 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -198,9 +197,13 @@ public class Automation extends BaseOpenMessage {
      */
     public static Automation convertUpDown(Automation autMsg) throws FrameException {
         if (autMsg.isUp()) {
-            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
+            return (Automation)
+                    BaseOpenMessage.parse(
+                            autMsg.getFrameValue().replaceFirst("\\*2\\*1", "\\*2\\*2"));
         } else if (autMsg.isDown()) {
-            return (Automation) BaseOpenMessage.parse(autMsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
+            return (Automation)
+                    BaseOpenMessage.parse(
+                            autMsg.getFrameValue().replaceFirst("\\*2\\*2", "\\*2\\*1"));
         } else {
             return autMsg;
         }

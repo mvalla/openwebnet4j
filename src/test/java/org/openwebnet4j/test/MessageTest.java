@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -18,11 +18,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openwebnet4j.message.*;
+import org.openwebnet4j.message.Automation;
+import org.openwebnet4j.message.Auxiliary;
+import org.openwebnet4j.message.BaseOpenMessage;
+import org.openwebnet4j.message.CENPlusScenario;
 import org.openwebnet4j.message.CENPlusScenario.CENPlusPressure;
 import org.openwebnet4j.message.CENPlusScenario.WhatCENPlus;
+import org.openwebnet4j.message.CENScenario;
 import org.openwebnet4j.message.CENScenario.CENPressure;
 import org.openwebnet4j.message.CENScenario.WhatCEN;
+import org.openwebnet4j.message.EnergyManagement;
+import org.openwebnet4j.message.FrameException;
+import org.openwebnet4j.message.GatewayMgmt;
+import org.openwebnet4j.message.Lighting;
+import org.openwebnet4j.message.MalformedFrameException;
+import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Thermoregulation;
+import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereThermo;
+import org.openwebnet4j.message.WhereZigBee;
+import org.openwebnet4j.message.Who;
 
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
@@ -115,18 +130,18 @@ public class MessageTest {
     }
 
     @Test
-    public void testAuxiliary(){
+    public void testAuxiliary() {
         Auxiliary auxiliaryMsg;
         try {
-            auxiliaryMsg=(Auxiliary) BaseOpenMessage.parse("*9*1*1##");
+            auxiliaryMsg = (Auxiliary) BaseOpenMessage.parse("*9*1*1##");
             assertNotNull(auxiliaryMsg);
-            assertEquals(Who.AUX,auxiliaryMsg.getWho());
-            assertEquals("1",auxiliaryMsg.getWhere().value());
-            assertEquals(Auxiliary.WhatAuxiliary.ON,auxiliaryMsg.getWhat());
+            assertEquals(Who.AUX, auxiliaryMsg.getWho());
+            assertEquals("1", auxiliaryMsg.getWhere().value());
+            assertEquals(Auxiliary.WhatAuxiliary.ON, auxiliaryMsg.getWhat());
             assertTrue(auxiliaryMsg.isCommand());
             assertFalse(auxiliaryMsg.isCommandTranslation());
             System.out.println(auxiliaryMsg.toStringVerbose());
-        } catch (FrameException e){
+        } catch (FrameException e) {
             Assertions.fail();
         }
     }
@@ -136,13 +151,14 @@ public class MessageTest {
         Auxiliary auxiliaryMsgON;
         auxiliaryMsgON = Auxiliary.requestTurnOn("1");
         assertNotNull(auxiliaryMsgON);
-        assertEquals(Who.AUX,auxiliaryMsgON.getWho());
-        assertEquals("1",auxiliaryMsgON.getWhere().value());
-        assertEquals(Auxiliary.WhatAuxiliary.ON,auxiliaryMsgON.getWhat());
+        assertEquals(Who.AUX, auxiliaryMsgON.getWho());
+        assertEquals("1", auxiliaryMsgON.getWhere().value());
+        assertEquals(Auxiliary.WhatAuxiliary.ON, auxiliaryMsgON.getWhat());
         assertTrue(auxiliaryMsgON.isCommand());
         assertTrue(auxiliaryMsgON.isOn());
         System.out.println(auxiliaryMsgON.toStringVerbose());
     }
+
     @Test
     public void testThermoregulation() {
         Thermoregulation thermoMsg;
@@ -157,7 +173,8 @@ public class MessageTest {
             assertEquals("1048", thermoMsg.getDimValues()[0]);
             // temperature encoding tests
             assertEquals(-4.8, Thermoregulation.parseTemperature(thermoMsg));
-            System.out.println("Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
+            System.out.println(
+                    "Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
             assertEquals("1214", Thermoregulation.encodeTemperature(-21.4));
             System.out.println(thermoMsg.toStringVerbose());
         } catch (FrameException e) {
@@ -260,14 +277,15 @@ public class MessageTest {
                 // if we can parse this where, this test fails
                 Assertions.fail("IllegalArgumentException not detected: " + wt);
             } catch (Exception e) {
-                System.out.println("correctly got IllegalArgumentException for WhereThermo 1#12: " + e.getMessage());
+                System.out.println(
+                        "correctly got IllegalArgumentException for WhereThermo 1#12: "
+                                + e.getMessage());
                 assertTrue(e instanceof IllegalArgumentException);
             }
 
         } catch (FrameException e) {
             Assertions.fail();
         }
-
     }
 
     @Test
@@ -340,14 +358,15 @@ public class MessageTest {
 
     @Test
     public void testMalformedCmdAndDimFrames() {
-        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
+        String[] wrongFrames = {"*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##"};
         for (String frame : wrongFrames) {
             try {
                 BaseOpenMessage.parse(frame);
                 // if we can parse this message, this test fails
                 Assertions.fail("MalformedFrameException not detected: " + frame);
             } catch (FrameException e) {
-                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                System.out.println(
+                        "correctly got FrameException for frame: " + frame + ": " + e.getMessage());
                 assertTrue(e instanceof MalformedFrameException);
             }
         }
