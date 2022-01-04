@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author G. Cocchi - Contribution for new lib
- * @author A. Conte - Added fancoil speed support
+ * @author A. Conte - Added standalone and central unit
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -53,14 +53,84 @@ public class Thermoregulation extends BaseOpenMessage {
         MANUAL_HEATING(110, Function.HEATING, OperationMode.MANUAL),
         MANUAL_CONDITIONING(210, Function.COOLING, OperationMode.MANUAL),
         MANUAL_GENERIC(310, Function.GENERIC, OperationMode.MANUAL),
-        // programming (zone is following the program of the central unit)
-        PROGRAM_HEATING(111),
-        PROGRAM_CONDITIONING(211),
-        PROGRAM_GENERIC(311),
-        // holiday (zone is following the holiday program set on the central unit)
-        HOLIDAY_HEATING(115),
-        HOLIDAY_CONDITIONING(215),
-        HOLIDAY_GENERIC(315);
+
+        // // programming (zone is following the program of the central unit)
+        // PROGRAM_HEATING(111, Function.HEATING, OperationMode.PROGRAM),
+        // PROGRAM_CONDITIONING(211, Function.COOLING, OperationMode.PROGRAM),
+        // PROGRAM_GENERIC(311, Function.GENERIC, OperationMode.PROGRAM),
+        // // holiday (zone is following the holiday program set on the central unit)
+        // HOLIDAY_HEATING(115, Function.HEATING, OperationMode.HOLIDAY),
+        // HOLIDAY_CONDITIONING(215, Function.COOLING, OperationMode.HOLIDAY),
+        // HOLIDAY_GENERIC(315, Function.GENERIC, OperationMode.HOLIDAY),
+
+        // weekly program (zone is following the program of the central unit)
+        WEEKLY1_HEATING(1101, Function.HEATING, OperationMode.WEEKLY_1),
+        WEEKLY1_CONDITIONING(2101, Function.COOLING, OperationMode.WEEKLY_1),
+        WEEKLY1_GENERIC(3101, Function.GENERIC, OperationMode.WEEKLY_1),
+        WEEKLY2_HEATING(1102, Function.HEATING, OperationMode.WEEKLY_2),
+        WEEKLY2_CONDITIONING(2102, Function.COOLING, OperationMode.WEEKLY_2),
+        WEEKLY2_GENERIC(3102, Function.GENERIC, OperationMode.WEEKLY_2),
+        WEEKLY3_HEATING(1103, Function.HEATING, OperationMode.WEEKLY_3),
+        WEEKLY3_CONDITIONING(2103, Function.COOLING, OperationMode.WEEKLY_3),
+        WEEKLY3_GENERIC(3103, Function.GENERIC, OperationMode.WEEKLY_3),
+
+        // scenarios (zone is set by the central unit)
+        SCENARIO1_HEATING(1201, Function.HEATING, OperationMode.SCENARIO_1),
+        SCENARIO1_CONDITIONING(2201, Function.COOLING, OperationMode.SCENARIO_1),
+        SCENARIO1_GENERIC(3201, Function.GENERIC, OperationMode.SCENARIO_1),
+        SCENARIO2_HEATING(1202, Function.HEATING, OperationMode.SCENARIO_2),
+        SCENARIO2_CONDITIONING(2202, Function.COOLING, OperationMode.SCENARIO_2),
+        SCENARIO2_GENERIC(3202, Function.GENERIC, OperationMode.SCENARIO_2),
+        SCENARIO3_HEATING(1203, Function.HEATING, OperationMode.SCENARIO_3),
+        SCENARIO3_CONDITIONING(2203, Function.COOLING, OperationMode.SCENARIO_3),
+        SCENARIO3_GENERIC(3203, Function.GENERIC, OperationMode.SCENARIO_3),
+        SCENARIO4_HEATING(1204, Function.HEATING, OperationMode.SCENARIO_4),
+        SCENARIO4_CONDITIONING(2204, Function.COOLING, OperationMode.SCENARIO_4),
+        SCENARIO4_GENERIC(3204, Function.GENERIC, OperationMode.SCENARIO_4),
+        SCENARIO5_HEATING(1205, Function.HEATING, OperationMode.SCENARIO_5),
+        SCENARIO5_CONDITIONING(2205, Function.COOLING, OperationMode.SCENARIO_5),
+        SCENARIO5_GENERIC(3205, Function.GENERIC, OperationMode.SCENARIO_5),
+        SCENARIO6_HEATING(1206, Function.HEATING, OperationMode.SCENARIO_6),
+        SCENARIO6_CONDITIONING(2206, Function.COOLING, OperationMode.SCENARIO_6),
+        SCENARIO6_GENERIC(3206, Function.GENERIC, OperationMode.SCENARIO_6),
+        SCENARIO7_HEATING(1207, Function.HEATING, OperationMode.SCENARIO_7),
+        SCENARIO7_CONDITIONING(2207, Function.COOLING, OperationMode.SCENARIO_7),
+        SCENARIO7_GENERIC(3207, Function.GENERIC, OperationMode.SCENARIO_7),
+        SCENARIO8_HEATING(1208, Function.HEATING, OperationMode.SCENARIO_8),
+        SCENARIO8_CONDITIONING(2208, Function.COOLING, OperationMode.SCENARIO_8),
+        SCENARIO8_GENERIC(3208, Function.GENERIC, OperationMode.SCENARIO_8),
+        SCENARIO9_HEATING(1209, Function.HEATING, OperationMode.SCENARIO_9),
+        SCENARIO9_CONDITIONING(2209, Function.COOLING, OperationMode.SCENARIO_9),
+        SCENARIO9_GENERIC(3209, Function.GENERIC, OperationMode.SCENARIO_9),
+        SCENARIO10_HEATING(1210, Function.HEATING, OperationMode.SCENARIO_10),
+        SCENARIO10_CONDITIONING(2210, Function.COOLING, OperationMode.SCENARIO_10),
+        SCENARIO10_GENERIC(3210, Function.GENERIC, OperationMode.SCENARIO_10),
+        SCENARIO11_HEATING(1211, Function.HEATING, OperationMode.SCENARIO_11),
+        SCENARIO11_CONDITIONING(2211, Function.COOLING, OperationMode.SCENARIO_11),
+        SCENARIO11_GENERIC(3211, Function.GENERIC, OperationMode.SCENARIO_11),
+        SCENARIO12_HEATING(1212, Function.HEATING, OperationMode.SCENARIO_12),
+        SCENARIO12_CONDITIONING(2212, Function.COOLING, OperationMode.SCENARIO_12),
+        SCENARIO12_GENERIC(3212, Function.GENERIC, OperationMode.SCENARIO_12),
+        SCENARIO13_HEATING(1213, Function.HEATING, OperationMode.SCENARIO_13),
+        SCENARIO13_CONDITIONING(2213, Function.COOLING, OperationMode.SCENARIO_13),
+        SCENARIO13_GENERIC(3213, Function.GENERIC, OperationMode.SCENARIO_13),
+        SCENARIO14_HEATING(1214, Function.HEATING, OperationMode.SCENARIO_14),
+        SCENARIO14_CONDITIONING(2214, Function.COOLING, OperationMode.SCENARIO_14),
+        SCENARIO14_GENERIC(3214, Function.GENERIC, OperationMode.SCENARIO_14),
+        SCENARIO15_HEATING(1215, Function.HEATING, OperationMode.SCENARIO_15),
+        SCENARIO15_CONDITIONING(2215, Function.COOLING, OperationMode.SCENARIO_15),
+        SCENARIO15_GENERIC(3215, Function.GENERIC, OperationMode.SCENARIO_15),
+        SCENARIO16_HEATING(1216, Function.HEATING, OperationMode.SCENARIO_16),
+        SCENARIO16_CONDITIONING(2216, Function.COOLING, OperationMode.SCENARIO_16),
+        SCENARIO16_GENERIC(3216, Function.GENERIC, OperationMode.SCENARIO_16),
+
+        // central unit only
+        REMOTE_CONTROL_DISABLED(20),
+        REMOTE_CONTROL_ENABLED(21),
+        AT_LEAST_ONE_PROBE_OFF(22),
+        AT_LEAST_ONE_PROBE_ANTIFREEZE(23),
+        AT_LEAST_ONE_PROBE_MANUAL(24),
+        BATTERY_KO(31);
 
         private static Map<Integer, WhatThermo> mapping;
 
@@ -168,7 +238,28 @@ public class Thermoregulation extends BaseOpenMessage {
     public enum OperationMode {
         MANUAL(1),
         PROTECTION(2),
-        OFF(3);
+        OFF(3),
+
+        WEEKLY_1(4),
+        WEEKLY_2(5),
+        WEEKLY_3(6),
+
+        SCENARIO_1(7),
+        SCENARIO_2(8),
+        SCENARIO_3(9),
+        SCENARIO_4(10),
+        SCENARIO_5(11),
+        SCENARIO_6(12),
+        SCENARIO_7(13),
+        SCENARIO_8(14),
+        SCENARIO_9(15),
+        SCENARIO_10(16),
+        SCENARIO_11(17),
+        SCENARIO_12(18),
+        SCENARIO_13(19),
+        SCENARIO_14(20),
+        SCENARIO_15(21),
+        SCENARIO_16(22);
 
         private final Integer value;
 
@@ -308,24 +399,26 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param where WHERE string
      * @param newSetPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step)
      * @param function HEATING/COOLING/GENERIC
-     * @param isStandAlone distinguish if a central unit is used (false) or not (true)
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
-    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
-            Thermoregulation.Function function, boolean isStandAlone) throws MalformedFrameException {
+    public static Thermoregulation requestWriteSetpointTemperature(
+            String where, double newSetPointTemperature, Thermoregulation.Function function)
+            throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
             throw new MalformedFrameException(
                     "Set Point Temperature should be between 5° and 40° Celsius.");
         }
+
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(
                 format(
-                        FORMAT_DIMENSION_WRITING_2V, 
-                        WHO, 
-                        isStandAlone ? where : "#" + where, 
+                        FORMAT_DIMENSION_WRITING_2V,
+                        WHO,
+                        where,
                         DimThermo.TEMP_SETPOINT.value(),
-                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), function.value()));
+                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
+                        function.value()));
     }
 
     /**
@@ -396,22 +489,21 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param where WHERE string
      * @param newOperationMode Operation mode
      * @param currentFunction current zone function (HEATING/COOLING/GENERIC)
-     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set when switching to
-     *            function=MANUAL
-     * @param isStandAlone distinguish if a central unit is used (false) or not (true)
+     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set
+     *     when switching to function=MANUAL
      * @return message
      */
     public static Thermoregulation requestWriteMode(
-            String where, 
+            String where,
             Thermoregulation.OperationMode newOperationMode,
-            Thermoregulation.Function currentFunction, 
-            double setPointTemperature, 
-            boolean isStandAlone) {
+            Thermoregulation.Function currentFunction,
+            double setPointTemperature) {
 
         switch (newOperationMode) {
             case MANUAL:
                 try {
-                    return requestWriteSetpointTemperature(where, setPointTemperature, currentFunction, isStandAlone);
+                    return requestWriteSetpointTemperature(
+                            where, setPointTemperature, currentFunction);
                 } catch (MalformedFrameException ex) {
                     return null;
                 }
@@ -455,13 +547,470 @@ public class Thermoregulation extends BaseOpenMessage {
                         return new Thermoregulation(
                                 format(FORMAT_REQUEST, WHO, WhatThermo.OFF_GENERIC.value(), where));
                 }
+            case WEEKLY_1:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY1_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY1_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY1_GENERIC.value(),
+                                        where));
+                }
+            case WEEKLY_2:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY2_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY2_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY2_GENERIC.value(),
+                                        where));
+                }
+            case WEEKLY_3:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY3_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY3_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.WEEKLY3_GENERIC.value(),
+                                        where));
+                }
+
+            case SCENARIO_1:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO1_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO1_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO1_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_2:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO2_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO2_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO2_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_3:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO3_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO3_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO3_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_4:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO4_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO4_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO4_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_5:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO5_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO5_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO5_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_6:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO6_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO6_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO6_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_7:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO7_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO7_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO7_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_8:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO8_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO8_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO8_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_9:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO9_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO9_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO9_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_10:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO10_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO10_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO10_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_11:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO11_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO11_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO11_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_12:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO12_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO12_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO12_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_13:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO13_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO13_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO13_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_14:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO14_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO14_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO14_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_15:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO15_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO15_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO15_GENERIC.value(),
+                                        where));
+                }
+            case SCENARIO_16:
+                switch (currentFunction) {
+                    case HEATING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO16_HEATING.value(),
+                                        where));
+                    case COOLING:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO16_CONDITIONING.value(),
+                                        where));
+                    case GENERIC:
+                        return new Thermoregulation(
+                                format(
+                                        FORMAT_REQUEST,
+                                        WHO,
+                                        WhatThermo.SCENARIO16_GENERIC.value(),
+                                        where));
+                }
         }
         return null;
     }
 
     /**
-     * OpenWebNet message to request the set point temperature with local offset and operation mode
-     * <code>*#4*where*12##</code>.
+     * OpenWebNet message to request the set point temperature with operation mode <code>
+     * *#4*where*12##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -473,6 +1022,17 @@ public class Thermoregulation extends BaseOpenMessage {
                         WHO,
                         where,
                         DimThermo.COMPLETE_PROBE_STATUS.value()));
+    }
+
+    /**
+     * OpenWebNet message to request the local offset (knob) <code>*#4*where*13##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestLocalMode(String where) {
+        return new Thermoregulation(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.OFFSET.value()));
     }
 
     /**
@@ -498,18 +1058,6 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestWriteSetMode(
             String where, Thermoregulation.WhatThermo newMode) throws MalformedFrameException {
         return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
-    }
-
-    /**
-     * OpenWebNet message to turn off the zone <code>*4*303*where##
-     * </code>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static Thermoregulation requestTurnOff(String where) {
-        return new Thermoregulation(
-                format(FORMAT_REQUEST, WHO, WhatThermo.OFF_GENERIC.value, where));
     }
 
     /**
@@ -556,6 +1104,15 @@ public class Thermoregulation extends BaseOpenMessage {
                 format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.ACTUATOR_STATUS.value()));
     }
 
+    /**
+     * OpenWebNet message to request the central unit operation mode <code>*#4*#0##</code>.
+     *
+     * @return message
+     */
+    public static Thermoregulation requestCUOperationMode() {
+        return new Thermoregulation(format(FORMAT_STATUS, WHO, "#0"));
+    }
+
     @Override
     protected void parseWhere() throws FrameException {
         if (whereStr == null) {
@@ -573,6 +1130,26 @@ public class Thermoregulation extends BaseOpenMessage {
     public int getActuator() {
         WhereThermo wt = (WhereThermo) where;
         return wt.getActuator();
+    }
+
+    /**
+     * Returns if the thing is defined as stand-alone
+     *
+     * @return boolean
+     */
+    public boolean isStandalone() {
+        WhereThermo wt = (WhereThermo) where;
+        return wt.isStandalone();
+    }
+
+    /**
+     * Returns if the thing is a central unit
+     *
+     * @return boolean
+     */
+    public boolean isCentralUnit() {
+        WhereThermo wt = (WhereThermo) where;
+        return wt.isCentralUnit();
     }
 
     /**
@@ -754,6 +1331,27 @@ public class Thermoregulation extends BaseOpenMessage {
         } else {
             throw new NumberFormatException(
                     "Could not parse actuator status from: " + msg.getFrameValue());
+        }
+    }
+
+    /**
+     * Parse local offset (knob) from Thermoregulation message (dimension: 13)
+     *
+     * @param msg Thermoregulation message
+     * @return parsed local offset (knob) as {@link LocalOffset}
+     * @throws NumberFormatException in case of invalid status
+     * @throws FrameException in case of error in message
+     */
+    public static LocalOffset parseLocalOffset(Thermoregulation msg)
+            throws NumberFormatException, FrameException {
+        String[] values = msg.getDimValues();
+        logger.debug("====parseLocalOffset {} --> : <{}>", msg.getFrameValue(), values[0]);
+
+        if (msg.getDim() == DimThermo.OFFSET) {
+            return LocalOffset.fromValue(values[0]);
+        } else {
+            throw new NumberFormatException(
+                    "Could not parse local offset (knob) from: " + msg.getFrameValue());
         }
     }
 
