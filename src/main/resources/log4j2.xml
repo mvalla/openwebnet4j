@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%-20.20t] [%-30.30c:%-5L] - %m%ex{10}%n" />
+        </Console>
+    </Appenders>
+    <Loggers>  
+        <!--  <Logger name="org.openwebnet4j.communication" level="WARN" />   -->
+    
+        <Root level="DEBUG">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
