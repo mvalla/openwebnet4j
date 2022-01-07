@@ -10,7 +10,7 @@
 
 ### Changed
 - [zigbee] improved error handling
-- code cleanup, re-enabled spotless check
+- code cleanup
 - moved to Log4j 2 binding for SLF4J
 
 

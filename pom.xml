@@ -206,11 +206,11 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>2.18.0</version>
                 <executions>
-                    <execution>
+                   <!-- <execution>
                         <goals>
                             <goal>check</goal>
                         </goals>
-                    </execution>
+                    </execution> -->
                 </executions>
                 <configuration>
                     <!-- optional: limit format enforcement to just the files changed by this feature branch -->
