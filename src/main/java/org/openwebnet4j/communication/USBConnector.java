@@ -66,9 +66,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private NRSerialPort serialPort; // the serial port, once connected
 
     private Response currentResponse;
-    private final Object cmdSentSynchObj =
-            new Object(); // Synch object to synchronise sending a frame and processing
-    // its answer
+    private final Object requestSentSynchObj =
+            new Object(); // Synch object to synchronise sending a request frame and
+    // processing its answer
 
     public USBConnector(String portName) {
         super();
@@ -338,7 +338,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         // TODO add timeout?
         OpenMessage msg = BaseOpenMessage.parse(frame);
         OpenMessage fixedMsg = fixInvertedUpDownBug(msg);
-        synchronized (cmdSentSynchObj) {
+        synchronized (requestSentSynchObj) {
             currentResponse =
                     new Response(fixedMsg); // FIXME check if we have to store original or modified
             // message
@@ -372,18 +372,19 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             logger.warn("##USB-conn## INVALID FRAME: {}, skipping it", newFrame);
             return;
         }
-        synchronized (cmdSentSynchObj) {
+        synchronized (requestSentSynchObj) {
             // fix up/down bug for older gateways
             msg = fixInvertedUpDownBug(msg);
-            if (currentResponse == null) { // no command is currently waiting
+            if (currentResponse == null) { // no request is currently waiting
                 if (msg.isACK() || msg.isNACK()) {
                     logger.warn(
-                            "##USB-conn## Recevied ACK/NACK without a command waiting, skipping it");
+                            "##USB-conn## Recevied ACK/NACK without a request waiting, skipping it");
                 } else {
                     eventLogger.info("USB-MON <<<<<<<< {}", msg.getFrameValue());
                     notifyListener(msg);
                 }
-            } else { // some command is currently waiting
+            } else { // some request is currently waiting
+                logger.debug("##USB-conn## a request is waiting");
                 if (msg.isCommand()) {
                     // perform fixes to compensate bugs of older gateways
                     fixDimensionResponseBug();
@@ -405,15 +406,17 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     }
 
     /*
-     * Add final ACK to older USB gateways that do not return an ACK after dimension response
+     * Add final ACK to response for older USB gateways that do not return an ACK after dimension response.
+     * See OpenWebNet Zigbee docs page 35 / page 17 of older version
      */
     private void fixDimensionResponseBug() {
         if (isOldFirmware
                 && !currentResponse.getRequest().isCommand()
-                && currentResponse.getRequest() instanceof Lighting) {
+                && (currentResponse.getRequest() instanceof Lighting
+                        || currentResponse.getRequest() instanceof Automation)) {
             logger.debug("##USB-conn## BUGFIX for older USB gateways: adding final ACK");
             currentResponse.addResponse(AckOpenMessage.ACK);
-            msgLogger.debug("USB-CMD   <<==   {}", AckOpenMessage.ACK);
+            msgLogger.debug("USB-CMD   <<==   {}   (added)", AckOpenMessage.ACK);
         }
     }
 

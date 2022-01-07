@@ -2,12 +2,16 @@
 
 ## [0.7.1-SNAPSHOT] - 2022-??-??
 
-### Changed
-- [zigbee] improved error handling
-- code cleanup, re-enabled spotless check
+### Fixed
+- [zigbee] Fixes #27: shutter status request blocking USB processing in older gateways
 
 ### Added
 - Support for AUX discovery
+
+### Changed
+- [zigbee] improved error handling
+- code cleanup, re-enabled spotless check
+- moved to Log4j 2 binding for SLF4J
 
 
 ## [0.7.0] - 2021-11-12

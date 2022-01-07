@@ -124,7 +124,7 @@ public class FrameChannel {
                     throw new IOException(
                             "Error in readFrames(): no delimiter found on stream: " + longFrame);
                 }
-                logger.debug("-FC-{} <------- {}", name, readFrames.toString());
+                logger.info("-FC-{} <------- {}", name, readFrames.toString());
                 return readFrames.remove();
             } else {
                 logger.debug("-FC-{} |<--     NO DATA (size={})", name, size);
