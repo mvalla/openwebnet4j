@@ -2,10 +2,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.openwebnet4j</groupId>
-    <artifactId>openwebnet4j</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+	<groupId>io.github.openwebnet4j</groupId>
+	<artifactId>openwebnet4j</artifactId>
+	<version>0.7.1</version>
+	<packaging>jar</packaging>
 
     <name>openwebnet4j OpenWebNet Java library</name>
     <description>openwebnet4j is a Java library for the Open Web Net protocol</description>

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author M. Valla - Initial contribution
  * @author G. Cocchi - Contribution for new lib
- * @author A. Conte - Added fancoil speed support
+ * @author A. Conte - Completed Thermoregulation support
  */
 public class Thermoregulation extends BaseOpenMessage {
 
@@ -40,33 +40,31 @@ public class Thermoregulation extends BaseOpenMessage {
         CONDITIONING(0),
         HEATING(1),
         GENERIC(3),
-        // protection
-        PROTECTION_HEATING(102, Function.HEATING, OperationMode.PROTECTION), // antifreeze
-        PROTECTION_CONDITIONING(
-                202, Function.COOLING, OperationMode.PROTECTION), // thermal-protection
-        PROTECTION_GENERIC(302, Function.GENERIC, OperationMode.PROTECTION),
-        // off
-        OFF_HEATING(103, Function.HEATING, OperationMode.OFF),
-        OFF_CONDITIONING(203, Function.COOLING, OperationMode.OFF),
-        OFF_GENERIC(303, Function.GENERIC, OperationMode.OFF),
-        // manual
-        MANUAL_HEATING(110, Function.HEATING, OperationMode.MANUAL),
-        MANUAL_CONDITIONING(210, Function.COOLING, OperationMode.MANUAL),
-        MANUAL_GENERIC(310, Function.GENERIC, OperationMode.MANUAL),
-        // programming (zone is following the program of the central unit)
-        PROGRAM_HEATING(111),
-        PROGRAM_CONDITIONING(211),
-        PROGRAM_GENERIC(311),
-        // holiday (zone is following the holiday program set on the central unit)
-        HOLIDAY_HEATING(115),
-        HOLIDAY_CONDITIONING(215),
-        HOLIDAY_GENERIC(315);
+
+        // central unit only
+        REMOTE_CONTROL_DISABLED(20),
+        REMOTE_CONTROL_ENABLED(21),
+        AT_LEAST_ONE_PROBE_OFF(22),
+        AT_LEAST_ONE_PROBE_ANTIFREEZE(23),
+        AT_LEAST_ONE_PROBE_MANUAL(24),
+        BATTERY_KO(31),
+
+        // these values do not exist in the WHAT table (Thermoregulation documentation pag. 5), for
+        // this reason they are greater than 9000
+        PROTECTION(9001),
+        OFF(9002),
+        MANUAL(9003),
+        WEEKLY(9004),
+        SCENARIO(9005),
+
+        // to do
+        HOLIDAY(9006);
 
         private static Map<Integer, WhatThermo> mapping;
 
-        private final int value;
-        private final Function function;
-        private final OperationMode mode;
+        private int value;
+        private Function function;
+        private OperationMode mode;
 
         private WhatThermo(int value) {
             this.value = value;
@@ -75,10 +73,23 @@ public class Thermoregulation extends BaseOpenMessage {
             this.mode = OperationMode.MANUAL;
         }
 
-        private WhatThermo(int value, Function function, OperationMode mode) {
-            this.value = value;
-            this.function = function;
-            this.mode = mode;
+        public void setModeAndFuntion(OperationMode newMode, Function newFunction) {
+            this.mode = newMode;
+            this.function = newFunction;
+        }
+
+        public void setValue(int i) {
+            this.value = i;
+        }
+
+        /** Returns the Mode for this WHAT */
+        public OperationMode getMode() {
+            return this.mode;
+        }
+
+        /** Returns the Function for this WHAT */
+        public Function getFunction() {
+            return this.function;
         }
 
         private static void initMapping() {
@@ -88,24 +99,60 @@ public class Thermoregulation extends BaseOpenMessage {
             }
         }
 
+        /**
+         * Returns the Mode and the Function for a specific WHAT
+         *
+         * @param i e.g. 3215
+         * @return WhatThermo with mode and function (e.g. Function=Generic(3) and
+         *     OperationMode=Scenario_15(215))
+         */
         public static WhatThermo fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
-            return mapping.get(i);
+
+            // WHAT less than 32 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
+            if (i < 32)
+                // these are defined in the Enum
+                return mapping.get(i);
+            else {
+                // instead here arrives WHAT like 105, 3215... which represent a combination
+                // of mode and function: the first digit is the Function, the rest of the 
+                // string is the OperationMode.
+                String what = String.valueOf(i);
+
+                WhatThermo result = WhatThermo.GENERIC;
+                result.setModeAndFuntion(
+                        OperationMode.fromValue(what.substring(1)),
+                        Function.fromValue(Integer.parseInt(what.substring(0, 1))));
+
+                return result;
+            }
+        }
+
+        /**
+         * Returns a What composing Mode and Function
+         *
+         * @param mode (e.g. WEEKLY_2)
+         * @param function (e.g. COOLING)
+         * @return WHAT (e.g. 2102)
+         */
+        static String fromModeAndFunction(OperationMode mode, Function function) {
+            String what = function.value().toString();
+
+            if (mode != OperationMode.MANUAL) what += mode.value();
+
+            return what;
+        }
+
+        public static Boolean isComplex(String what) {
+            return what.equalsIgnoreCase(WhatThermo.WEEKLY.toString())
+                    || what.equalsIgnoreCase(WhatThermo.SCENARIO.toString());
         }
 
         @Override
         public Integer value() {
             return value;
-        }
-
-        public Function function() {
-            return function;
-        }
-
-        public OperationMode mode() {
-            return mode;
         }
     }
 
@@ -166,25 +213,53 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     public enum OperationMode {
-        MANUAL(1),
-        PROTECTION(2),
-        OFF(3);
+        // these values are the suffix for WHAT
+        // e.g. x210 means SCENARIO 10 (210) in 'x' function (where 'x' can be Heating=1, Cooling=2,
+        // Generic=3)
 
-        private final Integer value;
+        PROTECTION("02"),
+        OFF("03"),
 
-        private OperationMode(Integer value) {
+        MANUAL("10"),
+        PROGRAM("11"),
+        HOLIDAY("15"),
+
+        WEEKLY_1("101"),
+        WEEKLY_2("102"),
+        WEEKLY_3("103"),
+
+        SCENARIO_1("201"),
+        SCENARIO_2("202"),
+        SCENARIO_3("203"),
+        SCENARIO_4("204"),
+        SCENARIO_5("205"),
+        SCENARIO_6("206"),
+        SCENARIO_7("207"),
+        SCENARIO_8("208"),
+        SCENARIO_9("209"),
+        SCENARIO_10("210"),
+        SCENARIO_11("211"),
+        SCENARIO_12("212"),
+        SCENARIO_13("213"),
+        SCENARIO_14("214"),
+        SCENARIO_15("215"),
+        SCENARIO_16("216");
+
+        private final String value;
+
+        private OperationMode(String value) {
             this.value = value;
         }
 
-        public static OperationMode fromValue(Integer i) {
+        public static OperationMode fromValue(String i) {
             Optional<OperationMode> m =
                     Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
+                            .filter(val -> i.equalsIgnoreCase(val.value))
                             .findFirst();
             return m.orElse(null);
         }
 
-        public Integer value() {
+        public String value() {
             return value;
         }
     }
@@ -318,6 +393,7 @@ public class Thermoregulation extends BaseOpenMessage {
             throw new MalformedFrameException(
                     "Set Point Temperature should be between 5° and 40° Celsius.");
         }
+
         // Round new Set Point Temperature to close 0.5° C value
         return new Thermoregulation(
                 format(
@@ -369,24 +445,12 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestWriteFunction(
             String where, Thermoregulation.Function newFunction) {
 
-        switch (newFunction) {
-            case HEATING:
-                return new Thermoregulation(
-                        format(FORMAT_REQUEST, WHO, WhatThermo.PROTECTION_HEATING.value(), where));
-            case COOLING:
-                return new Thermoregulation(
-                        format(
-                                FORMAT_REQUEST,
-                                WHO,
-                                WhatThermo.PROTECTION_CONDITIONING.value(),
-                                where));
-
-                // this is allow only with central unit
-            case GENERIC:
-                return new Thermoregulation(
-                        format(FORMAT_REQUEST, WHO, WhatThermo.PROTECTION_GENERIC.value(), where));
-        }
-        return null;
+        return new Thermoregulation(
+                format(
+                        FORMAT_REQUEST_WHAT_STR,
+                        WHO,
+                        WhatThermo.fromModeAndFunction(OperationMode.PROTECTION, newFunction),
+                        where));
     }
 
     /**
@@ -407,61 +471,25 @@ public class Thermoregulation extends BaseOpenMessage {
             Thermoregulation.Function currentFunction,
             double setPointTemperature) {
 
-        switch (newOperationMode) {
-            case MANUAL:
-                try {
-                    return requestWriteSetpointTemperature(
-                            where, setPointTemperature, currentFunction);
-                } catch (MalformedFrameException ex) {
-                    return null;
-                }
-            case PROTECTION:
-                switch (currentFunction) {
-                    case HEATING:
-                        return new Thermoregulation(
-                                format(
-                                        FORMAT_REQUEST,
-                                        WHO,
-                                        WhatThermo.PROTECTION_HEATING.value(),
-                                        where));
-                    case COOLING:
-                        return new Thermoregulation(
-                                format(
-                                        FORMAT_REQUEST,
-                                        WHO,
-                                        WhatThermo.PROTECTION_CONDITIONING.value(),
-                                        where));
-                    case GENERIC:
-                        return new Thermoregulation(
-                                format(
-                                        FORMAT_REQUEST,
-                                        WHO,
-                                        WhatThermo.PROTECTION_GENERIC.value(),
-                                        where));
-                }
-            case OFF:
-                switch (currentFunction) {
-                    case HEATING:
-                        return new Thermoregulation(
-                                format(FORMAT_REQUEST, WHO, WhatThermo.OFF_HEATING.value(), where));
-                    case COOLING:
-                        return new Thermoregulation(
-                                format(
-                                        FORMAT_REQUEST,
-                                        WHO,
-                                        WhatThermo.OFF_CONDITIONING.value(),
-                                        where));
-                    case GENERIC:
-                        return new Thermoregulation(
-                                format(FORMAT_REQUEST, WHO, WhatThermo.OFF_GENERIC.value(), where));
-                }
+        if (newOperationMode == OperationMode.MANUAL) {
+            try {
+                return requestWriteSetpointTemperature(where, setPointTemperature, currentFunction);
+            } catch (MalformedFrameException ex) {
+                return null;
+            }
+        } else {
+            return new Thermoregulation(
+                    format(
+                            FORMAT_REQUEST_WHAT_STR,
+                            WHO,
+                            WhatThermo.fromModeAndFunction(newOperationMode, currentFunction),
+                            where));
         }
-        return null;
     }
 
     /**
-     * OpenWebNet message to request the set point temperature with local offset and operation mode
-     * <code>*#4*where*12##</code>.
+     * OpenWebNet message to request the set point temperature with operation mode <code>
+     * *#4*where*12##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -473,6 +501,17 @@ public class Thermoregulation extends BaseOpenMessage {
                         WHO,
                         where,
                         DimThermo.COMPLETE_PROBE_STATUS.value()));
+    }
+
+    /**
+     * OpenWebNet message to request the local offset (knob) <code>*#4*where*13##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static Thermoregulation requestLocalMode(String where) {
+        return new Thermoregulation(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.OFFSET.value()));
     }
 
     /**
@@ -498,18 +537,6 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestWriteSetMode(
             String where, Thermoregulation.WhatThermo newMode) throws MalformedFrameException {
         return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
-    }
-
-    /**
-     * OpenWebNet message to turn off the zone <code>*4*303*where##
-     * </code>.
-     *
-     * @param where WHERE string
-     * @return message
-     */
-    public static Thermoregulation requestTurnOff(String where) {
-        return new Thermoregulation(
-                format(FORMAT_REQUEST, WHO, WhatThermo.OFF_GENERIC.value, where));
     }
 
     /**
@@ -757,6 +784,27 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
+    /**
+     * Parse local offset (knob) from Thermoregulation message (dimension: 13)
+     *
+     * @param msg Thermoregulation message
+     * @return parsed local offset (knob) as {@link LocalOffset}
+     * @throws NumberFormatException in case of invalid status
+     * @throws FrameException in case of error in message
+     */
+    public static LocalOffset parseLocalOffset(Thermoregulation msg)
+            throws NumberFormatException, FrameException {
+        String[] values = msg.getDimValues();
+        logger.debug("====parseLocalOffset {} --> : <{}>", msg.getFrameValue(), values[0]);
+
+        if (msg.getDim() == DimThermo.OFFSET) {
+            return LocalOffset.fromValue(values[0]);
+        } else {
+            throw new NumberFormatException(
+                    "Could not parse local offset (knob) from: " + msg.getFrameValue());
+        }
+    }
+
     /*
      * Parse mode from Thermoregulation msg (*4*what*where##)
      *
@@ -835,6 +883,7 @@ public class Thermoregulation extends BaseOpenMessage {
                 // "all probes/zones", not supported for now
                 return null;
             }
+
             if (w.isProbe()) {
                 return OpenDeviceType.SCS_THERMO_SENSOR;
             } else if (w.isCentralUnit()) {
