@@ -34,6 +34,9 @@ import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
 import org.openwebnet4j.message.Thermoregulation;
+import org.openwebnet4j.message.Thermoregulation.Function;
+import org.openwebnet4j.message.Thermoregulation.OperationMode;
+import org.openwebnet4j.message.Thermoregulation.WhatThermo;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereThermo;
 import org.openwebnet4j.message.WhereZigBee;
@@ -173,8 +176,7 @@ public class MessageTest {
             assertEquals("1048", thermoMsg.getDimValues()[0]);
             // temperature encoding tests
             assertEquals(-4.8, Thermoregulation.parseTemperature(thermoMsg));
-            System.out.println(
-                    "Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
+            System.out.println("Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
             assertEquals("1214", Thermoregulation.encodeTemperature(-21.4));
             System.out.println(thermoMsg.toStringVerbose());
         } catch (FrameException e) {
@@ -277,11 +279,47 @@ public class MessageTest {
                 // if we can parse this where, this test fails
                 Assertions.fail("IllegalArgumentException not detected: " + wt);
             } catch (Exception e) {
-                System.out.println(
-                        "correctly got IllegalArgumentException for WhereThermo 1#12: "
-                                + e.getMessage());
+                System.out.println("correctly got IllegalArgumentException for WhereThermo 1#12: " + e.getMessage());
                 assertTrue(e instanceof IllegalArgumentException);
             }
+
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testWhatThermo() {
+        Thermoregulation thermoMsg;
+        try {
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*2215*#0##");
+            WhatThermo wt = (WhatThermo) thermoMsg.getWhat();
+            // FIXME test fails
+            // assertEquals(2215, wt.value());
+            assertEquals(OperationMode.SCENARIO_15, wt.getMode());
+            assertEquals(Function.COOLING, wt.getFunction());
+
+            // basic functions 0,1
+            wt = WhatThermo.fromValue(0);
+            assertEquals(Function.COOLING, wt.getFunction());
+            wt = WhatThermo.fromValue(1);
+            assertEquals(Function.HEATING, wt.getFunction());
+            // PROTECTION
+            wt = WhatThermo.fromValue(302);
+            assertEquals(Function.GENERIC, wt.getFunction());
+            assertEquals(OperationMode.PROTECTION, wt.getMode());
+            // OFF
+            wt = WhatThermo.fromValue(203);
+            assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(OperationMode.OFF, wt.getMode());
+            // MANUAL
+            wt = WhatThermo.fromValue(110);
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(OperationMode.MANUAL, wt.getMode());
+            // SCENARIO
+            wt = WhatThermo.fromValue(1202);
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(OperationMode.SCENARIO_2, wt.getMode());
 
         } catch (FrameException e) {
             Assertions.fail();
@@ -358,15 +396,14 @@ public class MessageTest {
 
     @Test
     public void testMalformedCmdAndDimFrames() {
-        String[] wrongFrames = {"*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##"};
+        String[] wrongFrames = { "*1*a*123##", "**12", "4##", "*1##", "*1*##", "*1**##" };
         for (String frame : wrongFrames) {
             try {
                 BaseOpenMessage.parse(frame);
                 // if we can parse this message, this test fails
                 Assertions.fail("MalformedFrameException not detected: " + frame);
             } catch (FrameException e) {
-                System.out.println(
-                        "correctly got FrameException for frame: " + frame + ": " + e.getMessage());
+                System.out.println("correctly got FrameException for frame: " + frame + ": " + e.getMessage());
                 assertTrue(e instanceof MalformedFrameException);
             }
         }

@@ -37,18 +37,51 @@ public class Thermoregulation extends BaseOpenMessage {
 
     private static final Logger logger = LoggerFactory.getLogger(Thermoregulation.class);
 
+    // @formatter:off
+    /*
+     * WHAT for Thermoregulation frames
+     *
+     * == Thermo What Table:
+     * (f=Function: 1=HEATING, 2=COOLING, 3=GENERIC)
+     * 0 - CONDITIONING
+     * 1 - HEATING
+     * 3 - GENERIC
+     * f02 - PROTECTION
+     * f03 - OFF
+     * f10 - MANUAL
+     * f11 - PROGRAM
+     * f15 - HOLIDAY
+     * f3ddd - VACATION for ddd [000-999] days
+     * 3000 - VACATION disabled
+     * f1pp - WEEKLY PROGRAM pp [01-03]
+     * f2ss - SCENARIO ss [01-16]
+     * ......
+     * FIXME to be checked / completed!!!!!!!!!!!!!!
+     * ......
+     * 20 - Remote control disabled (central unit)
+     * 21 - Remote control enabled (central unit)
+     * 22 - At least one probe OFF (central unit)
+     * 23 - At least one probe in Anti Freeze (central unit)
+     * 24 - At least one probe in Manual (central unit)
+     * 30 - Failure discovered (central unit)
+     * 31 - Central Unit battery KO
+     * 40 - Release of sensor local adjustment
+     */
+    // @formatter:on
     public enum WhatThermo implements What {
         CONDITIONING(0),
         HEATING(1),
         GENERIC(3),
 
-        // central unit only
+        // for central unit only
         REMOTE_CONTROL_DISABLED(20),
         REMOTE_CONTROL_ENABLED(21),
         AT_LEAST_ONE_PROBE_OFF(22),
         AT_LEAST_ONE_PROBE_ANTIFREEZE(23),
         AT_LEAST_ONE_PROBE_MANUAL(24),
+        FAILURE_DISCOVERED(30),
         BATTERY_KO(31),
+        RELEASE_SENSOR_LOCAL_ADJUST(40),
 
         // these values do not exist in the WHAT table (Thermoregulation documentation pag. 5), for
         // this reason they are greater than 9000
@@ -109,33 +142,37 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         /**
-         * Return the Mode and the Function for a specific WHAT int
+         * Return a WhatThermo with OperationMode and the Function calculated from a WHAT int
          *
          * @param i e.g. 3215
-         * @return WhatThermo with mode and function (e.g. Function=Generic(3) and
+         * @return WhatThermo with OperationMode and Function (e.g. Function=Generic(3) and
          *         OperationMode=Scenario_15(215))
          */
         public static WhatThermo fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
-
+            WhatThermo result = WhatThermo.GENERIC;
             // WHAT less than 32 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
             if (i < 32) {
                 // these are defined in the Enum
-                return mapping.get(i);
+                result = mapping.get(i);
+                // for WHAT=0 and WHAT=1 update Function field accordingly
+                if (result == WhatThermo.HEATING) {
+                    result.setModeAndFuntion(OperationMode.MANUAL, Function.HEATING);
+                }
+                if (result == WhatThermo.CONDITIONING) {
+                    result.setModeAndFuntion(OperationMode.MANUAL, Function.COOLING);
+                }
             } else {
                 // instead here arrives WHAT like 105, 3215... which represent a combination
                 // of mode and function: the first digit is the Function, the rest of the
                 // string is the OperationMode.
                 String what = String.valueOf(i);
-
-                WhatThermo result = WhatThermo.GENERIC;
                 result.setModeAndFuntion(OperationMode.fromValue(what.substring(1)),
                         Function.fromValue(Integer.parseInt(what.substring(0, 1))));
-
-                return result;
             }
+            return result;
         }
 
         /**
