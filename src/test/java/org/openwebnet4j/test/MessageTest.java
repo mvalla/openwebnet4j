@@ -295,7 +295,7 @@ public class MessageTest {
             thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*2215*#0##");
             WhatThermo wt = (WhatThermo) thermoMsg.getWhat();
             // FIXME test fails
-            // assertEquals(2215, wt.value());
+            assertEquals(2215, wt.value());
             assertEquals(OperationMode.SCENARIO_15, wt.getMode());
             assertEquals(Function.COOLING, wt.getFunction());
 

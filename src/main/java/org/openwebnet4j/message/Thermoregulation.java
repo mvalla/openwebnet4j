@@ -56,7 +56,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * f1pp - WEEKLY PROGRAM pp [01-03]
      * f2ss - SCENARIO ss [01-16]
      * ......
-     * FIXME to be checked / completed!!!!!!!!!!!!!!
+     * TODO to be checked / completed!!!!!!!!!!!!!!
      * ......
      * 20 - Remote control disabled (central unit)
      * 21 - Remote control enabled (central unit)
@@ -145,8 +145,8 @@ public class Thermoregulation extends BaseOpenMessage {
          * Return a WhatThermo with OperationMode and the Function calculated from a WHAT int
          *
          * @param i e.g. 3215
-         * @return WhatThermo with OperationMode and Function (e.g. Function=Generic(3) and
-         *         OperationMode=Scenario_15(215))
+         * @return WhatThermo with OperationMode and Function (e.g. Function=GENERIC(3) and
+         *         OperationMode=SCENARIO_15(215))
          */
         public static WhatThermo fromValue(int i) {
             if (mapping == null) {
@@ -169,6 +169,7 @@ public class Thermoregulation extends BaseOpenMessage {
                 // of mode and function: the first digit is the Function, the rest of the
                 // string is the OperationMode.
                 String what = String.valueOf(i);
+                result.value = i;
                 result.setModeAndFuntion(OperationMode.fromValue(what.substring(1)),
                         Function.fromValue(Integer.parseInt(what.substring(0, 1))));
             }
