@@ -1,17 +1,20 @@
 # Changelog
 
-## [0.7.1-SNAPSHOT] - 2022-??-??
+## [0.7.1] - 2022-01-14
 
 ### Fixed
 - [zigbee] Fixes #27: shutter status request blocking USB processing in older gateways
 
 ### Added
 - Support for AUX discovery
+- Thermo: support for LocalOffset
+- Thermo: support for WEEKLY and SCENARIO
 
 ### Changed
 - [zigbee] improved error handling
 - code cleanup
-- moved to Log4j 2 binding for SLF4J
+- moved to Log4j-2 binding for SLF4J
+- Thermo: refactored WhatThermo, isStandAlone param
 
 
 ## [0.7.0] - 2021-11-12
@@ -34,7 +37,7 @@
 - renamed to SCS_THERMO_SENSOR and SCS_THERMO_ZONE
 
 ### Added
-- PROGRAM and HOLIDAY to Thermo WHAT
+- Thermo: support for PROGRAM and HOLIDAY
 
 
 ## [0.5.2] - 2021-05-28

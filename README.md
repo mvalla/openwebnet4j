@@ -33,7 +33,7 @@ Supported Open Web Net gateways:
 	- [x] Energy
 	- [x] Thermo (standalone mode)
     - [x] CEN/CEN+
-	- [ ] Thermo (systems with 4 and 99 Central Units)
+	- [x] Thermo (systems with 4 and 99 Central Units)
 	- [x] AUX
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
@@ -48,7 +48,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.7.0</version>
+      <version>0.7.1</version>
     </dependency>
 ```
 

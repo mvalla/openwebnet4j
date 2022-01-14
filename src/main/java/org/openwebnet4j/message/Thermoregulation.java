@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class Thermoregulation extends BaseOpenMessage {
         WEEKLY(9004),
         SCENARIO(9005),
 
-        // to do
+        // TODO
         HOLIDAY(9006);
 
         private static Map<Integer, WhatThermo> mapping;
@@ -104,7 +105,7 @@ public class Thermoregulation extends BaseOpenMessage {
          *
          * @param i e.g. 3215
          * @return WhatThermo with mode and function (e.g. Function=Generic(3) and
-         *     OperationMode=Scenario_15(215))
+         *         OperationMode=Scenario_15(215))
          */
         public static WhatThermo fromValue(int i) {
             if (mapping == null) {
@@ -112,18 +113,17 @@ public class Thermoregulation extends BaseOpenMessage {
             }
 
             // WHAT less than 32 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
-            if (i < 32)
+            if (i < 32) {
                 // these are defined in the Enum
                 return mapping.get(i);
-            else {
+            } else {
                 // instead here arrives WHAT like 105, 3215... which represent a combination
-                // of mode and function: the first digit is the Function, the rest of the 
+                // of mode and function: the first digit is the Function, the rest of the
                 // string is the OperationMode.
                 String what = String.valueOf(i);
 
                 WhatThermo result = WhatThermo.GENERIC;
-                result.setModeAndFuntion(
-                        OperationMode.fromValue(what.substring(1)),
+                result.setModeAndFuntion(OperationMode.fromValue(what.substring(1)),
                         Function.fromValue(Integer.parseInt(what.substring(0, 1))));
 
                 return result;
@@ -140,7 +140,9 @@ public class Thermoregulation extends BaseOpenMessage {
         static String fromModeAndFunction(OperationMode mode, Function function) {
             String what = function.value().toString();
 
-            if (mode != OperationMode.MANUAL) what += mode.value();
+            if (mode != OperationMode.MANUAL) {
+                what += mode.value();
+            }
 
             return what;
         }
@@ -176,8 +178,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static LocalOffset fromValue(String s) {
-            Optional<LocalOffset> offset =
-                    Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
+            Optional<LocalOffset> offset = Arrays.stream(values()).filter(val -> s.equals(val.value)).findFirst();
             return offset.orElse(null);
         }
 
@@ -200,10 +201,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static FanCoilSpeed fromValue(Integer i) {
-            Optional<FanCoilSpeed> fcs =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<FanCoilSpeed> fcs = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
             return fcs.orElse(null);
         }
 
@@ -252,10 +251,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static OperationMode fromValue(String i) {
-            Optional<OperationMode> m =
-                    Arrays.stream(values())
-                            .filter(val -> i.equalsIgnoreCase(val.value))
-                            .findFirst();
+            Optional<OperationMode> m = Arrays.stream(values()).filter(val -> i.equalsIgnoreCase(val.value))
+                    .findFirst();
             return m.orElse(null);
         }
 
@@ -276,10 +273,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static Function fromValue(Integer i) {
-            Optional<Function> m =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<Function> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
             return m.orElse(null);
         }
 
@@ -310,10 +305,8 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         public static ValveOrActuatorStatus fromValue(Integer i) {
-            Optional<ValveOrActuatorStatus> fcs =
-                    Arrays.stream(values())
-                            .filter(val -> i.intValue() == val.value.intValue())
-                            .findFirst();
+            Optional<ValveOrActuatorStatus> fcs = Arrays.stream(values())
+                    .filter(val -> i.intValue() == val.value.intValue()).findFirst();
             return fcs.orElse(null);
         }
 
@@ -386,23 +379,15 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
-    public static Thermoregulation requestWriteSetpointTemperature(
-            String where, double newSetPointTemperature, Thermoregulation.Function function)
-            throws MalformedFrameException {
+    public static Thermoregulation requestWriteSetpointTemperature(String where, double newSetPointTemperature,
+            Thermoregulation.Function function) throws MalformedFrameException {
         if (newSetPointTemperature < 5 || newSetPointTemperature > 40) {
-            throw new MalformedFrameException(
-                    "Set Point Temperature should be between 5° and 40° Celsius.");
+            throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
 
         // Round new Set Point Temperature to close 0.5° C value
-        return new Thermoregulation(
-                format(
-                        FORMAT_DIMENSION_WRITING_2V,
-                        WHO,
-                        where,
-                        DimThermo.TEMP_SETPOINT.value(),
-                        encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2),
-                        function.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DimThermo.TEMP_SETPOINT.value(),
+                encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), function.value()));
     }
 
     /**
@@ -412,15 +397,10 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param newFanCoilSpeed Speed of the fan coil
      * @return message
      */
-    public static Thermoregulation requestWriteFanCoilSpeed(
-            String where, Thermoregulation.FanCoilSpeed newFanCoilSpeed) {
-        return new Thermoregulation(
-                format(
-                        FORMAT_DIMENSION_WRITING_1V,
-                        WHO,
-                        where,
-                        DimThermo.FAN_COIL_SPEED.value(),
-                        newFanCoilSpeed.value()));
+    public static Thermoregulation requestWriteFanCoilSpeed(String where,
+            Thermoregulation.FanCoilSpeed newFanCoilSpeed) {
+        return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_1V, WHO, where, DimThermo.FAN_COIL_SPEED.value(),
+                newFanCoilSpeed.value()));
     }
 
     /**
@@ -430,8 +410,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestFanCoilSpeed(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.FAN_COIL_SPEED.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.FAN_COIL_SPEED.value()));
     }
 
     /**
@@ -442,15 +421,10 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param newFunction Function (HEATING, COOLING, GENERIC)
      * @return message
      */
-    public static Thermoregulation requestWriteFunction(
-            String where, Thermoregulation.Function newFunction) {
+    public static Thermoregulation requestWriteFunction(String where, Thermoregulation.Function newFunction) {
 
-        return new Thermoregulation(
-                format(
-                        FORMAT_REQUEST_WHAT_STR,
-                        WHO,
-                        WhatThermo.fromModeAndFunction(OperationMode.PROTECTION, newFunction),
-                        where));
+        return new Thermoregulation(format(FORMAT_REQUEST_WHAT_STR, WHO,
+                WhatThermo.fromModeAndFunction(OperationMode.PROTECTION, newFunction), where));
     }
 
     /**
@@ -462,14 +436,11 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param newOperationMode Operation mode
      * @param currentFunction current zone function (HEATING/COOLING/GENERIC)
      * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set
-     *     when switching to function=MANUAL
+     *            when switching to function=MANUAL
      * @return message
      */
-    public static Thermoregulation requestWriteMode(
-            String where,
-            Thermoregulation.OperationMode newOperationMode,
-            Thermoregulation.Function currentFunction,
-            double setPointTemperature) {
+    public static Thermoregulation requestWriteMode(String where, Thermoregulation.OperationMode newOperationMode,
+            Thermoregulation.Function currentFunction, double setPointTemperature) {
 
         if (newOperationMode == OperationMode.MANUAL) {
             try {
@@ -478,12 +449,8 @@ public class Thermoregulation extends BaseOpenMessage {
                 return null;
             }
         } else {
-            return new Thermoregulation(
-                    format(
-                            FORMAT_REQUEST_WHAT_STR,
-                            WHO,
-                            WhatThermo.fromModeAndFunction(newOperationMode, currentFunction),
-                            where));
+            return new Thermoregulation(format(FORMAT_REQUEST_WHAT_STR, WHO,
+                    WhatThermo.fromModeAndFunction(newOperationMode, currentFunction), where));
         }
     }
 
@@ -496,11 +463,7 @@ public class Thermoregulation extends BaseOpenMessage {
      */
     public static Thermoregulation requestMode(String where) {
         return new Thermoregulation(
-                format(
-                        FORMAT_DIMENSION_REQUEST,
-                        WHO,
-                        where,
-                        DimThermo.COMPLETE_PROBE_STATUS.value()));
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.COMPLETE_PROBE_STATUS.value()));
     }
 
     /**
@@ -509,9 +472,8 @@ public class Thermoregulation extends BaseOpenMessage {
      * @param where WHERE string
      * @return message
      */
-    public static Thermoregulation requestLocalMode(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.OFFSET.value()));
+    public static Thermoregulation requestLocalOffset(String where) {
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.OFFSET.value()));
     }
 
     /**
@@ -522,8 +484,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestValvesStatus(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.VALVES_STATUS.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.VALVES_STATUS.value()));
     }
 
     /**
@@ -534,8 +495,8 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
-    public static Thermoregulation requestWriteSetMode(
-            String where, Thermoregulation.WhatThermo newMode) throws MalformedFrameException {
+    public static Thermoregulation requestWriteSetMode(String where, Thermoregulation.WhatThermo newMode)
+            throws MalformedFrameException {
         return new Thermoregulation(format(FORMAT_REQUEST, WHO, newMode.value(), where));
     }
 
@@ -546,8 +507,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestTemperature(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.TEMPERATURE.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.TEMPERATURE.value()));
     }
 
     /**
@@ -558,8 +518,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestSetPointTemperature(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.TEMP_SETPOINT.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.TEMP_SETPOINT.value()));
     }
 
     /**
@@ -579,8 +538,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * @return message
      */
     public static Thermoregulation requestActuatorsStatus(String where) {
-        return new Thermoregulation(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.ACTUATOR_STATUS.value()));
+        return new Thermoregulation(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimThermo.ACTUATOR_STATUS.value()));
     }
 
     @Override
@@ -634,21 +592,18 @@ public class Thermoregulation extends BaseOpenMessage {
      * @throws NumberFormatException if the temperature cannot be parsed
      * @throws FrameException in case of error in message
      */
-    public static double parseTemperature(Thermoregulation msg)
-            throws NumberFormatException, FrameException {
+    public static double parseTemperature(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         // temp is in the first dim value for thermostats (dim=0,12,14), in the second in case of
         // probes (dim=15)
         // TODO check min,max values
-        if (msg.getDim() == DimThermo.TEMPERATURE
-                || msg.getDim() == DimThermo.TEMP_SETPOINT
+        if (msg.getDim() == DimThermo.TEMPERATURE || msg.getDim() == DimThermo.TEMP_SETPOINT
                 || msg.getDim() == DimThermo.COMPLETE_PROBE_STATUS) {
             return decodeTemperature(values[0]);
         } else if (msg.getDim() == DimThermo.PROBE_TEMPERATURE) {
             return decodeTemperature(values[1]);
         } else {
-            throw new NumberFormatException(
-                    "Could not parse temperature from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse temperature from: " + msg.getFrameValue());
         }
     }
 
@@ -714,14 +669,12 @@ public class Thermoregulation extends BaseOpenMessage {
      * @throws NumberFormatException in case of invalid speed
      * @throws FrameException in case of error in message
      */
-    public static FanCoilSpeed parseFanCoilSpeed(Thermoregulation msg)
-            throws NumberFormatException, FrameException {
+    public static FanCoilSpeed parseFanCoilSpeed(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         if (msg.getDim() == DimThermo.FAN_COIL_SPEED) {
             return FanCoilSpeed.fromValue(Integer.parseInt(values[0]));
         } else {
-            throw new NumberFormatException(
-                    "Could not parse fan coil speed from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse fan coil speed from: " + msg.getFrameValue());
         }
     }
 
@@ -737,16 +690,11 @@ public class Thermoregulation extends BaseOpenMessage {
     public static ValveOrActuatorStatus parseValveStatus(Thermoregulation msg, WhatThermo what)
             throws NumberFormatException, FrameException {
         if (what != WhatThermo.CONDITIONING && what != WhatThermo.HEATING) {
-            throw new FrameException(
-                    "Only CONDITIONING and HEATING are allowed as what input parameter.");
+            throw new FrameException("Only CONDITIONING and HEATING are allowed as what input parameter.");
         }
 
         String[] values = msg.getDimValues();
-        logger.debug(
-                "====parseValveStatus {} --> : CV <{}> HV <{}>",
-                msg.getFrameValue(),
-                values[0],
-                values[1]);
+        logger.debug("====parseValveStatus {} --> : CV <{}> HV <{}>", msg.getFrameValue(), values[0], values[1]);
 
         if (msg.getDim() == DimThermo.VALVES_STATUS) {
             if (what == WhatThermo.CONDITIONING) {
@@ -758,8 +706,7 @@ public class Thermoregulation extends BaseOpenMessage {
 
             return null;
         } else {
-            throw new NumberFormatException(
-                    "Could not parse valve status from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse valve status from: " + msg.getFrameValue());
         }
     }
 
@@ -779,8 +726,7 @@ public class Thermoregulation extends BaseOpenMessage {
         if (msg.getDim() == DimThermo.ACTUATOR_STATUS) {
             return ValveOrActuatorStatus.fromValue(Integer.parseInt(values[0]));
         } else {
-            throw new NumberFormatException(
-                    "Could not parse actuator status from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse actuator status from: " + msg.getFrameValue());
         }
     }
 
@@ -792,16 +738,14 @@ public class Thermoregulation extends BaseOpenMessage {
      * @throws NumberFormatException in case of invalid status
      * @throws FrameException in case of error in message
      */
-    public static LocalOffset parseLocalOffset(Thermoregulation msg)
-            throws NumberFormatException, FrameException {
+    public static LocalOffset parseLocalOffset(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         logger.debug("====parseLocalOffset {} --> : <{}>", msg.getFrameValue(), values[0]);
 
         if (msg.getDim() == DimThermo.OFFSET) {
             return LocalOffset.fromValue(values[0]);
         } else {
-            throw new NumberFormatException(
-                    "Could not parse local offset (knob) from: " + msg.getFrameValue());
+            throw new NumberFormatException("Could not parse local offset (knob) from: " + msg.getFrameValue());
         }
     }
 
