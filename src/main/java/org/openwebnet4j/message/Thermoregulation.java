@@ -83,12 +83,20 @@ public class Thermoregulation extends BaseOpenMessage {
             this.value = i;
         }
 
-        /** Returns the Mode for this WHAT */
+        /**
+         * Return the {@link OperationMode} for this WHAT
+         *
+         * @return the {@link OperationMode}
+         */
         public OperationMode getMode() {
             return this.mode;
         }
 
-        /** Returns the Function for this WHAT */
+        /**
+         * Return the Function for this WHAT
+         *
+         * @return the Function
+         */
         public Function getFunction() {
             return this.function;
         }
@@ -101,7 +109,7 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         /**
-         * Returns the Mode and the Function for a specific WHAT
+         * Return the Mode and the Function for a specific WHAT int
          *
          * @param i e.g. 3215
          * @return WhatThermo with mode and function (e.g. Function=Generic(3) and
@@ -131,11 +139,11 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         /**
-         * Returns a What composing Mode and Function
+         * Return a WHAT String composing {@link OperationMode} and {@link Function}
          *
          * @param mode (e.g. WEEKLY_2)
          * @param function (e.g. COOLING)
-         * @return WHAT (e.g. 2102)
+         * @return WHAT String (e.g. 2102)
          */
         static String fromModeAndFunction(OperationMode mode, Function function) {
             String what = function.value().toString();
@@ -374,7 +382,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * </code>.
      *
      * @param where WHERE string
-     * @param newSetPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step)
+     * @param newSetPointTemperature temperature T between 5.0&deg;C and 40.0&deg;C (with 0.5&deg; step)
      * @param function HEATING/COOLING/GENERIC
      * @return message
      * @throws MalformedFrameException in case of error in parameters
@@ -385,7 +393,7 @@ public class Thermoregulation extends BaseOpenMessage {
             throw new MalformedFrameException("Set Point Temperature should be between 5° and 40° Celsius.");
         }
 
-        // Round new Set Point Temperature to close 0.5° C value
+        // Round new Set Point Temperature to close 0.5&deg;C value
         return new Thermoregulation(format(FORMAT_DIMENSION_WRITING_2V, WHO, where, DimThermo.TEMP_SETPOINT.value(),
                 encodeTemperature(Math.rint(newSetPointTemperature * 2) / 2), function.value()));
     }
@@ -418,7 +426,7 @@ public class Thermoregulation extends BaseOpenMessage {
      * *4*102*where##</code> COOLING <code>*4*202*where##</code> GENERIC <code>*4*302*where##</code>
      *
      * @param where WHERE string
-     * @param newFunction Function (HEATING, COOLING, GENERIC)
+     * @param newFunction {@link Function} (HEATING, COOLING, GENERIC)
      * @return message
      */
     public static Thermoregulation requestWriteFunction(String where, Thermoregulation.Function newFunction) {
@@ -428,14 +436,14 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to set the operation mode (MANUAL, PROTECTION, OFF). MANUAL <code>
-     * *#4*where*#14*T*M##</code> (requestWriteSetPointTemperature) PROTECTION <code>*4*302*where##
+     * OpenWebNet message to set the {@link OperationMode} (MANUAL, PROTECTION, OFF). MANUAL
+     * <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature) PROTECTION <code>*4*302*where##
      * </code> (generic protection) OFF <code>*4*303*where##</code> (generic OFF)
      *
      * @param where WHERE string
-     * @param newOperationMode Operation mode
-     * @param currentFunction current zone function (HEATING/COOLING/GENERIC)
-     * @param setPointTemperature temperature T between 5.0° and 40.0° (with 0.5° step) to be set
+     * @param newOperationMode {@link OperationMode}
+     * @param currentFunction current zone {@link Function} (HEATING/COOLING/GENERIC)
+     * @param setPointTemperature temperature T between 5.0&deg;C and 40.0&deg;C (with 0.5&deg; step) to be set
      *            when switching to function=MANUAL
      * @return message
      */
@@ -455,8 +463,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to request the set point temperature with operation mode <code>
-     * *#4*where*12##</code>.
+     * OpenWebNet message to request the set point temperature with operation mode <code>*#4*where*12##</code>.
      *
      * @param where WHERE string
      * @return message
@@ -488,10 +495,10 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to set the zone mode.
+     * OpenWebNet message to set the zone mode ({@link OperationMode}) <code>*4*newMode*where##</code>.
      *
      * @param where WHERE string
-     * @param newMode the new MODE
+     * @param newMode the new {@link OperationMode}
      * @return message
      * @throws MalformedFrameException in case of error in parameters
      */
@@ -551,7 +558,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Returns the actuator from the message WHERE part. WHERE=Z#N --&gt; returns N
+     * Return the actuator from the message WHERE part. WHERE=Z#N --&gt; returns N
      *
      * @return id (int 1-9) of the actuator
      */
@@ -574,9 +581,9 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Extracts the Local Offset value
+     * Extracts the LocalOffset value
      *
-     * @return localOffset
+     * @return LocalOffset
      * @throws FrameException in case of frame error
      */
     public LocalOffset getLocalOffset() throws FrameException {
@@ -608,11 +615,11 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Convert temperature from BTicino format to number For example: 0235 --&gt; +23.5 (°C) and
-     * 1048 --&gt; -4.8 (°C)
+     * Convert temperature from BTicino format to number For example: 0235 --&gt; +23.5 (&deg;C) and
+     * 1048 --&gt; -4.8 (&deg;C)
      *
      * @param temperature the temperature as String
-     * @return the temperature as Double
+     * @return the temperature as double
      */
     public static double decodeTemperature(String temperature) throws NumberFormatException {
         int tempInt;
@@ -636,10 +643,10 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Encodes temperature from float to BTicino format
+     * Encodes temperature from double to BTicino format
      *
      * @param temp temperature
-     * @return String
+     * @return String encoded temperature
      */
     public static String encodeTemperature(double temp) {
         // +23.51 °C --> '0235'; -4.86 °C --> '1049'
