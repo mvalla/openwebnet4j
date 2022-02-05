@@ -67,7 +67,10 @@ public enum OpenDeviceType {
     // energy management (not defined by BTicino)
     SCS_ENERGY_METER(1830),
     // dry contacts and IR interfaces (not defined by BTicino)
-    SCS_DRY_CONTACT_IR(2510);
+    SCS_DRY_CONTACT_IR(2510),
+    // alarm (not defined by BTicino)
+    SCS_ALARM_CENTRAL_UNIT(5100),
+    SCS_ALARM_ZONE(5200);
 
     private final Integer value;
     private static Map<Integer, OpenDeviceType> mapping;

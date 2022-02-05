@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.openwebnet4j.message.Alarm;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.Auxiliary;
 import org.openwebnet4j.message.BaseOpenMessage;
@@ -38,6 +39,7 @@ import org.openwebnet4j.message.Thermoregulation.Function;
 import org.openwebnet4j.message.Thermoregulation.OperationMode;
 import org.openwebnet4j.message.Thermoregulation.WhatThermo;
 import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereAlarm;
 import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
 import org.openwebnet4j.message.WhereZigBee;
@@ -429,11 +431,7 @@ public class MessageTest {
         } catch (FrameException e) {
             assertTrue(e instanceof UnsupportedFrameException);
         }
-        try {
-            msg = BaseOpenMessage.parse("*#5*0##");
-        } catch (FrameException e) {
-            assertTrue(e instanceof UnsupportedFrameException);
-        }
+
         assertNull(msg);
     }
 
@@ -515,6 +513,33 @@ public class MessageTest {
             assertEquals("51", energyMsg.getWhere().value());
             assertEquals(EnergyManagement.DimEnergyMgmt.ACTIVE_POWER, energyMsg.getDim());
             assertNotNull(energyMsg.getDimValues());
+        } catch (FrameException e) {
+            System.out.println(e.getMessage());
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testAlarm() {
+        Alarm alarmMsg;
+        try {
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*#5##");
+            assertNotNull(alarmMsg);
+            assertEquals(Who.BURGLAR_ALARM, alarmMsg.getWho());
+            assertFalse(alarmMsg.isCommand());
+            assertNull(alarmMsg.getWhere());
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*5*1*##");
+            assertNotNull(alarmMsg);
+            assertTrue(alarmMsg.isCommand());
+            assertNull(alarmMsg.getWhere());
+            assertEquals(Alarm.WhatAlarm.SYSTEM_ACTIVE, alarmMsg.getWhat());
+            alarmMsg = (Alarm) BaseOpenMessage.parse("*5*11*#2##");
+            assertNotNull(alarmMsg);
+            assertTrue(alarmMsg.isCommand());
+            assertNotNull(alarmMsg.getWhere());
+            assertEquals("#2", alarmMsg.getWhere().value());
+            assertEquals(2, ((WhereAlarm) alarmMsg.getWhere()).getZone());
+            assertEquals(Alarm.WhatAlarm.ZONE_ENGAGED, alarmMsg.getWhat());
         } catch (FrameException e) {
             System.out.println(e.getMessage());
             Assertions.fail();

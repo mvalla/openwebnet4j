@@ -15,11 +15,13 @@
 package org.openwebnet4j.message;
 
 /**
- * WHERE for CEN scenario frames
+ * WHERE for CEN/CEN+ scenarios and Dry Contact / IR frames
  *
  * @author M. Valla - Initial contribution
  */
 public class WhereCEN extends Where {
+
+    public static final Where GENERAL = new WhereCEN("0");
 
     public WhereCEN(String w) throws NullPointerException {
         // TODO check range for WHERE

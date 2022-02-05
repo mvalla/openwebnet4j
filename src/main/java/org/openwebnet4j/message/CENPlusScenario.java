@@ -21,7 +21,7 @@ import java.util.Map;
 import org.openwebnet4j.OpenDeviceType;
 
 /**
- * OpenWebNet class for CEN+ and DRY CONTACT IR
+ * OpenWebNet class for CEN+ and Dry Contact / IR Interfaces
  *
  * @author M. Valla - Initial contribution
  */

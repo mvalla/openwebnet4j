@@ -19,6 +19,7 @@ import static org.openwebnet4j.message.Who.AUX;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -162,17 +163,10 @@ public class Auxiliary extends BaseOpenMessage {
             OpenDeviceType type = null;
             What w = getWhat();
             if (w != null) {
-                if (w == WhatAuxiliary.DOWN
-                        || w == WhatAuxiliary.ON
-                        || w == WhatAuxiliary.OFF
-                        || w == WhatAuxiliary.TOGGLE
-                        || w == WhatAuxiliary.DISABLED
-                        || w == WhatAuxiliary.ENABLED
-                        || w == WhatAuxiliary.STOP
-                        || w == WhatAuxiliary.UP
-                        || w == WhatAuxiliary.RESET_GEN
-                        || w == WhatAuxiliary.RESET_BI
-                        || w == WhatAuxiliary.RESET_TRI) {
+                if (w == WhatAuxiliary.DOWN || w == WhatAuxiliary.ON || w == WhatAuxiliary.OFF
+                        || w == WhatAuxiliary.TOGGLE || w == WhatAuxiliary.DISABLED || w == WhatAuxiliary.ENABLED
+                        || w == WhatAuxiliary.STOP || w == WhatAuxiliary.UP || w == WhatAuxiliary.RESET_GEN
+                        || w == WhatAuxiliary.RESET_BI || w == WhatAuxiliary.RESET_TRI) {
                     type = OpenDeviceType.SCS_AUXILIARY_TOGGLE_CONTROL;
                 }
             }
