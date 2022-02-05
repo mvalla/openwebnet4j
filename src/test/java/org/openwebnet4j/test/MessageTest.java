@@ -38,6 +38,7 @@ import org.openwebnet4j.message.Thermoregulation.Function;
 import org.openwebnet4j.message.Thermoregulation.OperationMode;
 import org.openwebnet4j.message.Thermoregulation.WhatThermo;
 import org.openwebnet4j.message.UnsupportedFrameException;
+import org.openwebnet4j.message.WhereLightAutom;
 import org.openwebnet4j.message.WhereThermo;
 import org.openwebnet4j.message.WhereZigBee;
 import org.openwebnet4j.message.Who;
@@ -51,6 +52,12 @@ import org.openwebnet4j.message.Who;
  * @author G. Fabiani - Auxiliary contribution
  */
 public class MessageTest {
+
+    @Test
+    public void testWhereLightAutom() {
+        assertThrows(IllegalArgumentException.class, () -> new WhereLightAutom("a"));
+        // TODO add more tests
+    }
 
     @Test
     public void testLightingOn() {
