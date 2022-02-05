@@ -153,22 +153,19 @@ public class MessageTest {
             assertTrue(auxiliaryMsg.isCommand());
             assertFalse(auxiliaryMsg.isCommandTranslation());
             System.out.println(auxiliaryMsg.toStringVerbose());
+
+            auxiliaryMsg = Auxiliary.requestTurnOn("2");
+            assertNotNull(auxiliaryMsg);
+            assertEquals(Who.AUX, auxiliaryMsg.getWho());
+            assertEquals("2", auxiliaryMsg.getWhere().value());
+            assertEquals(Auxiliary.WhatAuxiliary.ON, auxiliaryMsg.getWhat());
+            assertTrue(auxiliaryMsg.isCommand());
+            assertTrue(auxiliaryMsg.isOn());
+            System.out.println(auxiliaryMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();
         }
-    }
 
-    @Test
-    public void testAuxiliaryMessage() {
-        Auxiliary auxiliaryMsgON;
-        auxiliaryMsgON = Auxiliary.requestTurnOn("1");
-        assertNotNull(auxiliaryMsgON);
-        assertEquals(Who.AUX, auxiliaryMsgON.getWho());
-        assertEquals("1", auxiliaryMsgON.getWhere().value());
-        assertEquals(Auxiliary.WhatAuxiliary.ON, auxiliaryMsgON.getWhat());
-        assertTrue(auxiliaryMsgON.isCommand());
-        assertTrue(auxiliaryMsgON.isOn());
-        System.out.println(auxiliaryMsgON.toStringVerbose());
     }
 
     @Test
@@ -303,7 +300,6 @@ public class MessageTest {
         try {
             thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*2215*#0##");
             WhatThermo wt = (WhatThermo) thermoMsg.getWhat();
-            // FIXME test fails
             assertEquals(2215, wt.value());
             assertEquals(OperationMode.SCENARIO_15, wt.getMode());
             assertEquals(Function.COOLING, wt.getFunction());
