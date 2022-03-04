@@ -62,7 +62,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private String[] dimValues = null; // list of dimension values VAL1...VALn in the frame
     // *#WHO*WHERE*DIM...*VAL1*...*VALn##
 
+    @Deprecated
     private int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
+    // *WHO*WHAT#PAR1...#PARn*WHERE##
+
+    private String[] whatParams = null; // list of What parameters PAR1...PARn in the frame
     // *WHO*WHAT#PAR1...#PARn*WHERE##
 
     protected BaseOpenMessage(String frame) {
@@ -331,16 +335,23 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 } else {
                     isCommandTranslation = false;
                 }
-                what = whatFromValue(Integer.parseInt(parts[partsIndex]));
                 commandParams = new int[0];
+                whatParams = new String[0];
+                what = whatFromValue(Integer.parseInt(parts[partsIndex]));
                 if (what == null) {
                     throw new UnsupportedFrameException("Unsupported WHAT=" + whatStr);
                 }
-                if (parts.length > 1) { // copy command parameters into commandParams
+                if (parts.length > 1) { // copy What parameters into whatParams
                     commandParams = new int[parts.length - partsIndex - 1];
                     for (int i = 0; i < commandParams.length; i++) {
                         commandParams[i] = Integer.parseInt(parts[i + partsIndex + 1]);
                     }
+
+                    whatParams = new String[parts.length - partsIndex - 1];
+                    for (int i = 0; i < whatParams.length; i++) {
+                        whatParams[i] = parts[i + partsIndex + 1];
+                    }
+
                 }
             } catch (NumberFormatException e) {
                 throw new MalformedFrameException("Invalid integer format in WHAT=" + whatStr);
@@ -420,14 +431,31 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if
      * no parameters are present
      *
+     * @deprecated Use {@link getWhatParams()} instead.
+     *
      * @return int[] of command parameters, or empty array if no parameters are present
      * @throws FrameException in case of error in frame
      */
+    @Deprecated
     public int[] getCommandParams() throws FrameException {
         if (commandParams == null) {
             getWhat();
         }
         return commandParams;
+    }
+
+    /**
+     * Returns What parameters from a command frame (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if
+     * no parameters are present
+     *
+     * @return String[] of command parameters, or empty array if no parameters are present
+     * @throws FrameException in case of error in frame
+     */
+    public String[] getWhatParams() throws FrameException {
+        if (whatParams == null) {
+            getWhat();
+        }
+        return whatParams;
     }
 
     /**
@@ -494,8 +522,8 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 if (isCommandTranslation()) {
                     verbose += "(translation)";
                 }
-                if (getCommandParams().length > 0) {
-                    verbose += ",cmdParams=" + Arrays.toString(getCommandParams());
+                if (getWhatParams().length > 0) {
+                    verbose += ",whatParams=" + Arrays.toString(getWhatParams());
                 }
                 if (getWhere() != null) {
                     verbose += "," + getWhere();

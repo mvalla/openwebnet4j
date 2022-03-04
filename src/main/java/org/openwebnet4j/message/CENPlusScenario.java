@@ -18,6 +18,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -158,12 +159,7 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualShortPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        WhatCENPlus.SHORT_PRESSURE.value,
-                        buttonNumber,
-                        where));
+                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.SHORT_PRESSURE.value, buttonNumber, where));
     }
 
     /**
@@ -175,12 +171,7 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualStartExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        WhatCENPlus.START_EXT_PRESSURE.value,
-                        buttonNumber,
-                        where));
+                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.START_EXT_PRESSURE.value, buttonNumber, where));
     }
 
     /**
@@ -192,12 +183,7 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        WhatCENPlus.EXT_PRESSURE.value,
-                        buttonNumber,
-                        where));
+                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.EXT_PRESSURE.value, buttonNumber, where));
     }
 
     /**
@@ -210,22 +196,20 @@ public class CENPlusScenario extends CEN {
      */
     public static CENPlusScenario virtualReleaseExtendedPressure(String where, int buttonNumber) {
         return new CENPlusScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        WhatCENPlus.RELEASE_EXT_PRESSURE.value,
-                        buttonNumber,
-                        where));
+                format(FORMAT_REQUEST_PARAM_STR, WHO, WhatCENPlus.RELEASE_EXT_PRESSURE.value, buttonNumber, where));
     }
 
     @Override
     public Integer getButtonNumber() throws FrameException {
-        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION
-                || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
             return null;
         }
-        if (getCommandParams() != null) {
-            return getCommandParams()[0];
+        if (getWhatParams() != null) {
+            try {
+                return Integer.parseInt(getWhatParams()[0]);
+            } catch (NumberFormatException nfe) {
+                throw new FrameException("Frame has wrong WHAT params: " + frameValue);
+            }
         } else {
             return null;
         }
@@ -233,8 +217,7 @@ public class CENPlusScenario extends CEN {
 
     @Override
     public Pressure getButtonPressure() {
-        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION
-                || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() == WhatCENPlus.OFF_IR_NO_DETECTION || getWhat() == WhatCENPlus.ON_IR_DETECTION) {
             return null;
         }
         return CENPlusPressure.fromValue((WhatCENPlus) getWhat());
@@ -246,8 +229,7 @@ public class CENPlusScenario extends CEN {
      * @return boolean
      */
     public boolean isDryContactIR() {
-        if (getWhat() != WhatCENPlus.OFF_IR_NO_DETECTION
-                && getWhat() != WhatCENPlus.ON_IR_DETECTION) {
+        if (getWhat() != WhatCENPlus.OFF_IR_NO_DETECTION && getWhat() != WhatCENPlus.ON_IR_DETECTION) {
             return false;
         } else {
             return true;

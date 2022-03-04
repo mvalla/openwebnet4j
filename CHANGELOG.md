@@ -5,6 +5,10 @@
 ### Added
 - Support for Burglar Alarm (WHO=5)
 - checks to Where base class constructor
+- getWhatParams
+
+### Changed
+- DEPRECATED getCommandParams
 
 
 ## [0.7.1] - 2022-01-14

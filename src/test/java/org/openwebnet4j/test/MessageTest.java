@@ -85,7 +85,7 @@ public class MessageTest {
     public void testLightingCommandTranslationAndParams() {
         Lighting lightMsg;
         try {
-            lightMsg = (Lighting) BaseOpenMessage.parse("*1*1000#1#1#2#3*0311#4#01##");
+            lightMsg = (Lighting) BaseOpenMessage.parse("*1*1000#1#01#2#3*0311#4#01##");
             assertNotNull(lightMsg);
             assertEquals(Who.LIGHTING, lightMsg.getWho());
             assertTrue(lightMsg.isCommand());
@@ -95,11 +95,11 @@ public class MessageTest {
             assertEquals(Lighting.WhatLighting.ON, lightMsg.getWhat());
             assertTrue(lightMsg.isOn());
             assertFalse(lightMsg.isOff());
-            assertNotNull(lightMsg.getCommandParams());
-            assertEquals(3, lightMsg.getCommandParams().length);
-            assertEquals(1, lightMsg.getCommandParams()[0]);
-            assertEquals(2, lightMsg.getCommandParams()[1]);
-            assertEquals(3, lightMsg.getCommandParams()[2]);
+            assertNotNull(lightMsg.getWhatParams());
+            assertEquals(3, lightMsg.getWhatParams().length);
+            assertEquals("01", lightMsg.getWhatParams()[0]);
+            assertEquals("2", lightMsg.getWhatParams()[1]);
+            assertEquals("3", lightMsg.getWhatParams()[2]);
             System.out.println(lightMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();

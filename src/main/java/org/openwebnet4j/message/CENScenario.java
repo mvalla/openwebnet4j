@@ -18,6 +18,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -120,9 +121,6 @@ public class CENScenario extends CEN {
             return mapping.get(i);
         }
 
-        // public Integer value() {
-        // return value;
-        // }
     }
 
     @Override
@@ -149,10 +147,8 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualStartPressure(String where, int buttonNumber)
-            throws IllegalArgumentException {
-        return new CENScenario(
-                format(FORMAT_REQUEST_WHAT_STR, WHO, whatFromButton(buttonNumber), where));
+    public static CENScenario virtualStartPressure(String where, int buttonNumber) throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_WHAT_STR, WHO, whatFromButton(buttonNumber), where));
     }
 
     /**
@@ -165,13 +161,8 @@ public class CENScenario extends CEN {
      */
     public static CENScenario virtualReleaseShortPressure(String where, int buttonNumber)
             throws IllegalArgumentException {
-        return new CENScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        whatFromButton(buttonNumber),
-                        CENPressure.RELEASE_SHORT_PRESSURE.value,
-                        where));
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
+                CENPressure.RELEASE_SHORT_PRESSURE.value, where));
     }
 
     /**
@@ -181,15 +172,9 @@ public class CENScenario extends CEN {
      * @param buttonNumber button number
      * @return message
      */
-    public static CENScenario virtualExtendedPressure(String where, int buttonNumber)
-            throws IllegalArgumentException {
-        return new CENScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        whatFromButton(buttonNumber),
-                        CENPressure.EXTENDED_PRESSURE.value,
-                        where));
+    public static CENScenario virtualExtendedPressure(String where, int buttonNumber) throws IllegalArgumentException {
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
+                CENPressure.EXTENDED_PRESSURE.value, where));
     }
 
     /**
@@ -202,13 +187,8 @@ public class CENScenario extends CEN {
      */
     public static CENScenario virtualReleaseExtendedPressure(String where, int buttonNumber)
             throws IllegalArgumentException {
-        return new CENScenario(
-                format(
-                        FORMAT_REQUEST_PARAM_STR,
-                        WHO,
-                        whatFromButton(buttonNumber),
-                        CENPressure.RELEASE_EXTENDED_PRESSURE.value,
-                        where));
+        return new CENScenario(format(FORMAT_REQUEST_PARAM_STR, WHO, whatFromButton(buttonNumber),
+                CENPressure.RELEASE_EXTENDED_PRESSURE.value, where));
     }
 
     @Override
@@ -218,10 +198,14 @@ public class CENScenario extends CEN {
 
     @Override
     public Pressure getButtonPressure() throws FrameException {
-        if (getCommandParams().length == 0) {
+        if (getWhatParams().length == 0) {
             return CENPressure.START_PRESSURE;
         } else {
-            return CENPressure.fromValue(getCommandParams()[0]);
+            try {
+                return CENPressure.fromValue(Integer.parseInt(getWhatParams()[0]));
+            } catch (NumberFormatException nfe) {
+                throw new FrameException("Frame has wrong WHAT params: " + frameValue);
+            }
         }
     }
 
