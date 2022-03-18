@@ -1,14 +1,14 @@
 # Changelog
 
-## [0.8.0-SNAPSHOT] - 2022-??-??
+## [0.8.0] - 2022-03-18
 
 ### Added
 - Support for Burglar Alarm (WHO=5)
 - checks to Where base class constructor
-- getWhatParams
+- getWhatParams()
 
 ### Changed
-- DEPRECATED getCommandParams
+- DEPRECATED getCommandParams()
 
 
 ## [0.7.1] - 2022-01-14
