@@ -325,7 +325,9 @@ public class MessageTest {
             wt = WhatThermo.fromValue(1202);
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.SCENARIO_2, wt.getMode());
-
+            assertEquals("SCENARIO", wt.getMode().mode());
+            assertEquals(2, wt.getMode().programNumber());
+           
         } catch (FrameException e) {
             Assertions.fail();
         }
