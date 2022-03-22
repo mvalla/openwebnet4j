@@ -257,43 +257,48 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    public enum OperationMode {
-        // these values are the suffix for WHAT
-        // e.g. x210 means SCENARIO 10 (210) in 'x' function (where 'x' can be Heating=1, Cooling=2,
-        // Generic=3)
+    /**
+    * OperationMode enumeration: these values are the suffix for WHAT.
+    * Each item is made by (value, mode) where:
+    *   - "value" is the suffix. E.g. x210 means SCENARIO 10 (210) in 'x' function 
+    *     (where 'x' can be Heating=1, Cooling=2 or Generic=3)
+    *   - "mode" is the corresponding base mode (like MANUAL, OFF, WEEKLY)
+    */
+    public enum OperationMode {        
+        PROTECTION("02", "PROTECTION"),
+        OFF("03", "OFF"),
 
-        PROTECTION("02"),
-        OFF("03"),
+        MANUAL("10", "MANUAL"),
+        PROGRAM("11", "PROGRAM"),
+        HOLIDAY("15", "HOLIDAY"),
 
-        MANUAL("10"),
-        PROGRAM("11"),
-        HOLIDAY("15"),
+        WEEKLY_1("101", "WEEKLY"),
+        WEEKLY_2("102", "WEEKLY"),
+        WEEKLY_3("103", "WEEKLY"),
 
-        WEEKLY_1("101"),
-        WEEKLY_2("102"),
-        WEEKLY_3("103"),
-
-        SCENARIO_1("201"),
-        SCENARIO_2("202"),
-        SCENARIO_3("203"),
-        SCENARIO_4("204"),
-        SCENARIO_5("205"),
-        SCENARIO_6("206"),
-        SCENARIO_7("207"),
-        SCENARIO_8("208"),
-        SCENARIO_9("209"),
-        SCENARIO_10("210"),
-        SCENARIO_11("211"),
-        SCENARIO_12("212"),
-        SCENARIO_13("213"),
-        SCENARIO_14("214"),
-        SCENARIO_15("215"),
-        SCENARIO_16("216");
+        SCENARIO_1("201", "SCENARIO"),
+        SCENARIO_2("202", "SCENARIO"),
+        SCENARIO_3("203", "SCENARIO"),
+        SCENARIO_4("204", "SCENARIO"),
+        SCENARIO_5("205", "SCENARIO"),
+        SCENARIO_6("206", "SCENARIO"),
+        SCENARIO_7("207", "SCENARIO"),
+        SCENARIO_8("208", "SCENARIO"),
+        SCENARIO_9("209", "SCENARIO"),
+        SCENARIO_10("210", "SCENARIO"),
+        SCENARIO_11("211", "SCENARIO"),
+        SCENARIO_12("212", "SCENARIO"),
+        SCENARIO_13("213", "SCENARIO"),
+        SCENARIO_14("214", "SCENARIO"),
+        SCENARIO_15("215", "SCENARIO"),
+        SCENARIO_16("216", "SCENARIO");
 
         private final String value;
+        private final String mode;
 
-        private OperationMode(String value) {
+        private OperationMode(String value, String mode) {
             this.value = value;
+            this.mode = mode;
         }
 
         public static OperationMode fromValue(String i) {
@@ -304,6 +309,44 @@ public class Thermoregulation extends BaseOpenMessage {
 
         public String value() {
             return value;
+        }
+
+        public String mode() {
+            return mode;
+        }
+
+        /**
+        * Return if current {@link OperationMode} is a SCENARIO
+        *
+        * @return Boolean (e.g. 2102 = true, 103 = false)
+        */
+        public Boolean isScenario() {
+            return mode == "SCENARIO";
+        }
+
+        /**
+        * Return if current {@link OperationMode} is a WEEKLY
+        *
+        * @return Boolean (e.g. 3101 = true, 110 = false)
+        */
+        public Boolean isWeekly() {
+            return mode == "WEEKLY";
+        }
+
+        /**
+        * Return the Program Number associated to a WEEKLY or SCENARIO {@link OperationMode} 
+        *
+        * @return Integer (e.g. 2102 = 2, 1216 = 16, 103 = 0)
+        */
+        public Integer programNumber() {
+            if (isWeekly())
+                // "weekly" range is [101, 103] so must substract 100 to get program number in range [1, 3]
+                return Integer.parseInt(value) - 100;
+            else if (isScenario())
+                // "scenario" range is [201, 216] so must substract 200 to get program number in range [1, 3]
+                return Integer.parseInt(value) - 200;
+            else 
+                return 0;
         }
     }
 

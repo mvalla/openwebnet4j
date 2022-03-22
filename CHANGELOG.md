@@ -1,12 +1,9 @@
 # Changelog
 
-## [0.8.1] - 2022-xx-xx
-
-### Added
-- tbd
+## [0.8.1] - 2022-03-23
 
 ### Changed
-- tbd
+- Thermo: extended OperationMode enumeration (added link between "complex" OperationMode and "base" mode)
 
 
 ## [0.8.0] - 2022-03-18
