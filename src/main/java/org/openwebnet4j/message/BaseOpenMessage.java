@@ -270,6 +270,9 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
         BaseOpenMessage baseopenmsg = null;
         switch (who) {
+            case SCENARIO:
+                baseopenmsg = new Scenario(frame);
+                break;
             case GATEWAY_MANAGEMENT:
                 baseopenmsg = new GatewayMgmt(frame);
                 break;

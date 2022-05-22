@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.0] - 2022-05-??
+
+### Added
+- Initial support for SCENARIOS (WHO=0)
+
+
 ## [0.8.1] - 2022-03-24
 
 ### Changed

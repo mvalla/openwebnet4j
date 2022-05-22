@@ -34,6 +34,7 @@ import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.Lighting;
 import org.openwebnet4j.message.MalformedFrameException;
 import org.openwebnet4j.message.OpenMessage;
+import org.openwebnet4j.message.Scenario;
 import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Thermoregulation.Function;
 import org.openwebnet4j.message.Thermoregulation.OperationMode;
@@ -52,6 +53,7 @@ import org.openwebnet4j.message.Who;
  * @author Andrea Conte - Energy Management contribution
  * @author G. Cocchi - Thermoregulation contribution
  * @author G. Fabiani - Auxiliary contribution
+ * @author M. Valla - Alarm and Scenario contribution
  */
 public class MessageTest {
 
@@ -327,7 +329,7 @@ public class MessageTest {
             assertEquals(OperationMode.SCENARIO_2, wt.getMode());
             assertEquals("SCENARIO", wt.getMode().mode());
             assertEquals(2, wt.getMode().programNumber());
-           
+
         } catch (FrameException e) {
             Assertions.fail();
         }
@@ -538,6 +540,39 @@ public class MessageTest {
             assertEquals("#2", alarmMsg.getWhere().value());
             assertEquals(2, ((WhereAlarm) alarmMsg.getWhere()).getZone());
             assertEquals(Alarm.WhatAlarm.ZONE_ENGAGED, alarmMsg.getWhat());
+        } catch (FrameException e) {
+            System.out.println(e.getMessage());
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testScenario() {
+        Scenario scenarioMsg;
+        try {
+            scenarioMsg = (Scenario) BaseOpenMessage.parse("*0*14*95##");
+            assertNotNull(scenarioMsg);
+            assertEquals(Who.SCENARIO, scenarioMsg.getWho());
+            assertTrue(scenarioMsg.isCommand());
+            assertNotNull(scenarioMsg.getWhere());
+            assertEquals("95", scenarioMsg.getWhere().value());
+            assertEquals(Scenario.WhatScenario.SCENARIO_14, scenarioMsg.getWhat());
+
+            scenarioMsg = (Scenario) BaseOpenMessage.parse("*0*2*05##");
+            assertNotNull(scenarioMsg);
+            assertEquals(Who.SCENARIO, scenarioMsg.getWho());
+            assertTrue(scenarioMsg.isCommand());
+            assertNotNull(scenarioMsg.getWhere());
+            assertEquals("05", scenarioMsg.getWhere().value());
+            assertEquals(Scenario.WhatScenario.SCENARIO_02, scenarioMsg.getWhat());
+
+            scenarioMsg = (Scenario) BaseOpenMessage.parse("*0*40#5*06##");
+            assertNotNull(scenarioMsg);
+            assertEquals(Who.SCENARIO, scenarioMsg.getWho());
+            assertTrue(scenarioMsg.isCommand());
+            assertNotNull(scenarioMsg.getWhere());
+            assertEquals("06", scenarioMsg.getWhere().value());
+
         } catch (FrameException e) {
             System.out.println(e.getMessage());
             Assertions.fail();
