@@ -26,7 +26,7 @@ public enum OpenDeviceType {
     /** OpenWebNet Device types. See OWN ZigBee docs pages 50-51 */
     UNKNOWN(0),
     SCENARIO_CONTROL(2),
-    // basic scenario WHO=0 not defined by BTicino)
+    // basic scenario WHO=0 (not defined by BTicino)
     BASIC_SCENARIO(3),
     // lighting
     ZIGBEE_ON_OFF_SWITCH(256),
