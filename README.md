@@ -11,6 +11,7 @@ Supported features:
 
 Supported frames:
 
+* `WHO=0` Scenarios
 * `WHO=1` Lighting
 * `WHO=2` Automation
 * `WHO=4` Thermoregulation
@@ -36,6 +37,7 @@ Supported Open Web Net gateways:
     - [x] CEN/CEN+
 	- [x] Thermo (systems with 4 and 99 Central Units)
 	- [x] AUX
+	- [x] Scenarios WHO=0
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
 
@@ -49,7 +51,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.8.0</version>
+      <version>0.9.0</version>
     </dependency>
 ```
 
