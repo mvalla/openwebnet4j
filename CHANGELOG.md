@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.1] - 2022-11-04
+
+### Fixed
+- WhereAlarm for Alarm system messages with null where (e.g. *5*6*##)
+
+
 ## [0.9.0] - 2022-10-01
 
 ### Added

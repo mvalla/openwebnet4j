@@ -48,7 +48,7 @@ public class WhereAlarm extends Where {
             if (pos >= 0) { // # is present
                 z = Integer.parseInt(whereStr.substring(1));
             } else { // no # present
-                z = Integer.parseInt(whereStr.substring(0, 0));
+                z = Integer.parseInt(whereStr.substring(0, 1));
                 if (whereStr.length() > 1) {
                     s = Integer.parseInt(whereStr.substring(1));
                 }
