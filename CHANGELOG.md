@@ -2,9 +2,12 @@
 
 ## [0.10.0] - 2023-xx-xx
 
+### Added
+- Energy: support for partial totalizer for current month and current day (WHO=18)
+
 ### Changed
 - updated copyright year
-- Energy: support for partial totalizer for current month and current day (WHO=18)
+- updated dependencies: slf4j-api, junit-jupiter-engine, maven-compiler-plugin, maven-javadoc-plugin, maven-jar-plugin, maven-bundle-plugin, maven-surefire-plugin, spotless-maven-plugin, nexus-staging-maven-plugin
 
 
 ## [0.9.1] - 2022-11-04
