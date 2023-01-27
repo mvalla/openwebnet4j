@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.0] - 2023-xx-xx
+
+### Changed
+- updated copyright year
+
+
 ## [0.9.1] - 2022-11-04
 
 ### Fixed

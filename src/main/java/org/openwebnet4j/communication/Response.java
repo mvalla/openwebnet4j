@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,6 +16,7 @@ package org.openwebnet4j.communication;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,9 +121,7 @@ public class Response {
                 e.printStackTrace();
             }
         } else {
-            logger.debug(
-                    "REQ={} has already a final response set (={}) -> no need to wait",
-                    requestMessage.toString(),
+            logger.debug("REQ={} has already a final response set (={}) -> no need to wait", requestMessage.toString(),
                     finalResponse);
         }
     }

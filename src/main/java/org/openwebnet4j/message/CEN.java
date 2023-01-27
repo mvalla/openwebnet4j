@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -21,7 +21,8 @@ package org.openwebnet4j.message;
  */
 public abstract class CEN extends BaseOpenMessage {
 
-    public interface Pressure {}
+    public interface Pressure {
+    }
 
     public CEN(String value) {
         super(value);

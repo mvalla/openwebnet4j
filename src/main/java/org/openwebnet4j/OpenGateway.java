@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,6 +16,7 @@ package org.openwebnet4j;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
+
 import org.openwebnet4j.communication.ConnectorListener;
 import org.openwebnet4j.communication.OWNAuthException;
 import org.openwebnet4j.communication.OWNException;
@@ -38,8 +39,7 @@ public abstract class OpenGateway implements ConnectorListener {
     private final Logger logger = LoggerFactory.getLogger(OpenGateway.class);
 
     protected boolean isConnected = false;
-    protected boolean isDiscovering =
-            false; // if true: we have already started a device discovery session
+    protected boolean isDiscovering = false; // if true: we have already started a device discovery session
 
     protected final ArrayList<GatewayListener> listeners = new ArrayList<GatewayListener>();
     protected OpenConnector connector;
@@ -120,10 +120,8 @@ public abstract class OpenGateway implements ConnectorListener {
                     if (connector.isMonConnected()) {
                         connector.openCmdConn();
                         if (connector.isCmdConnected()) {
-                            handleManagementDimensions(
-                                    sendInternal(GatewayMgmt.requestMACAddress()));
-                            handleManagementDimensions(
-                                    sendInternal(GatewayMgmt.requestFirmwareVersion()));
+                            handleManagementDimensions(sendInternal(GatewayMgmt.requestMACAddress()));
+                            handleManagementDimensions(sendInternal(GatewayMgmt.requestFirmwareVersion()));
                             isConnected = true;
                             notifyListeners((listener) -> listener.onReconnected());
                         }
@@ -214,12 +212,10 @@ public abstract class OpenGateway implements ConnectorListener {
                             firmwareVersion = GatewayMgmt.parseFirmwareVersion(gmsg);
                             logger.info("##GW## FIRMWARE: {}", getFirmwareVersion());
                         } catch (FrameException e) {
-                            logger.warn(
-                                    "##GW## Cannot parse firmware version from message: {}", gmsg);
+                            logger.warn("##GW## Cannot parse firmware version from message: {}", gmsg);
                         }
                     } else {
-                        logger.debug(
-                                "##GW## handleManagementDimensions DIM {} not supported", thisDim);
+                        logger.debug("##GW## handleManagementDimensions DIM {} not supported", thisDim);
                     }
                 }
             }
@@ -266,14 +262,12 @@ public abstract class OpenGateway implements ConnectorListener {
         }
         // TODO use notifierExecutor instead of Thread, like in OpenConnector
         // Execute 'method' on each of the listeners, using a new notifier Thread
-        Thread notifier =
-                new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                listenersCopy.forEach(method);
-                            }
-                        });
+        Thread notifier = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                listenersCopy.forEach(method);
+            }
+        });
         notifier.start();
     }
 

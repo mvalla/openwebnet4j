@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -17,13 +17,16 @@ package org.openwebnet4j.message;
 /**
  * WHERE for Thermoregulation frames
  *
- * <p>== Where Table:
+ * <p>
+ * == Where Table:
  *
- * <p>=== Probes - 0 : all master probes - Z : zone Z [1-99] master probe - 0ZZ : zone ZZ [01-99]
+ * <p>
+ * === Probes - 0 : all master probes - Z : zone Z [1-99] master probe - 0ZZ : zone ZZ [01-99]
  * all probes (master and slave) - pZZ : zone ZZ [01-99] slave probe p[1-8] - p00 : external zone 00
  * slave probe p[1-9]
  *
- * <p>=== Actuators (thermostats) - #0 : central unit - #Z : zone Z [1-99] via central unit - 0#0 :
+ * <p>
+ * === Actuators (thermostats) - #0 : central unit - #Z : zone Z [1-99] via central unit - 0#0 :
  * all zones, all actuators - Z#0 : zone Z [1-99], all actuators - Z#N : zone Z [1-99], actuator N
  * [1-9]
  *
@@ -64,18 +67,15 @@ public class WhereThermo extends Where {
         if (z <= 99 && z >= 0) {
             zone = z;
         } else {
-            throw new IllegalArgumentException(
-                    "WHERE address '" + w + "' is invalid: zone not in range [0-99]");
+            throw new IllegalArgumentException("WHERE address '" + w + "' is invalid: zone not in range [0-99]");
         }
         probe = p;
         if (p < -1 || p > 9) {
-            throw new IllegalArgumentException(
-                    "WHERE address '" + w + "' is invalid: probe not in range [0-9]");
+            throw new IllegalArgumentException("WHERE address '" + w + "' is invalid: probe not in range [0-9]");
         }
         actuator = a;
         if (a < -1 || a > 9) {
-            throw new IllegalArgumentException(
-                    "WHERE address '" + w + "' is invalid: actuator not in range [0-9]");
+            throw new IllegalArgumentException("WHERE address '" + w + "' is invalid: actuator not in range [0-9]");
         }
     }
 

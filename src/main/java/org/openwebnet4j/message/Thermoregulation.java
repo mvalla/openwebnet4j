@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -258,13 +258,13 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-    * OperationMode enumeration: these values are the suffix for WHAT.
-    * Each item is made by (value, mode) where:
-    *   - "value" is the suffix. E.g. x210 means SCENARIO 10 (210) in 'x' function 
-    *     (where 'x' can be Heating=1, Cooling=2 or Generic=3)
-    *   - "mode" is the corresponding base mode (like MANUAL, OFF, WEEKLY)
-    */
-    public enum OperationMode {        
+     * OperationMode enumeration: these values are the suffix for WHAT.
+     * Each item is made by (value, mode) where:
+     * - "value" is the suffix. E.g. x210 means SCENARIO 10 (210) in 'x' function
+     * (where 'x' can be Heating=1, Cooling=2 or Generic=3)
+     * - "mode" is the corresponding base mode (like MANUAL, OFF, WEEKLY)
+     */
+    public enum OperationMode {
         PROTECTION("02", "PROTECTION"),
         OFF("03", "OFF"),
 
@@ -316,37 +316,38 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         /**
-        * Return if current {@link OperationMode} is a SCENARIO
-        *
-        * @return Boolean (e.g. 2102 = true, 103 = false)
-        */
+         * Return if current {@link OperationMode} is a SCENARIO
+         *
+         * @return Boolean (e.g. 2102 = true, 103 = false)
+         */
         public Boolean isScenario() {
             return mode == "SCENARIO";
         }
 
         /**
-        * Return if current {@link OperationMode} is a WEEKLY
-        *
-        * @return Boolean (e.g. 3101 = true, 110 = false)
-        */
+         * Return if current {@link OperationMode} is a WEEKLY
+         *
+         * @return Boolean (e.g. 3101 = true, 110 = false)
+         */
         public Boolean isWeekly() {
             return mode == "WEEKLY";
         }
 
         /**
-        * Return the Program Number associated to a WEEKLY or SCENARIO {@link OperationMode} 
-        *
-        * @return Integer (e.g. 2102 = 2, 1216 = 16, 103 = 0)
-        */
+         * Return the Program Number associated to a WEEKLY or SCENARIO {@link OperationMode}
+         *
+         * @return Integer (e.g. 2102 = 2, 1216 = 16, 103 = 0)
+         */
         public Integer programNumber() {
-            if (isWeekly())
+            if (isWeekly()) {
                 // "weekly" range is [101, 103] so must substract 100 to get program number in range [1, 3]
                 return Integer.parseInt(value) - 100;
-            else if (isScenario())
+            } else if (isScenario()) {
                 // "scenario" range is [201, 216] so must substract 200 to get program number in range [1, 3]
                 return Integer.parseInt(value) - 200;
-            else 
+            } else {
                 return 0;
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.Queue;
+
 import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FrameChannel {
 
-    protected Queue<String> readFrames =
-            new LinkedList<>(); // the list of frames already read from InputStream
+    protected Queue<String> readFrames = new LinkedList<>(); // the list of frames already read from InputStream
 
     private OutputStream out;
     private InputStream in;
@@ -73,7 +73,7 @@ public class FrameChannel {
      * InputStream because end of steam reached, returns null.
      *
      * @return the first frame already in the receiving queue, or the first new frame read from
-     *     InputStream, or null if end of steam reached
+     *         InputStream, or null if end of steam reached
      * @throws IOException in case of problems while reading frames from InputStream
      */
     protected String readFrames() throws IOException {
@@ -91,15 +91,13 @@ public class FrameChannel {
                         String otherFrame = new String(buf, 0, size);
                         logger.trace("-FC-{}   <---   {}", name, otherFrame);
                         longFrame += otherFrame;
-                        if (OpenMessage.FRAME_ACK.equals(otherFrame)
-                                && (size = readUntilDelimiter(in, buf)) > 0) {
+                        if (OpenMessage.FRAME_ACK.equals(otherFrame) && (size = readUntilDelimiter(in, buf)) > 0) {
                             otherFrame = new String(buf, 0, size);
                             logger.trace("-FC-{}   <---   {}", name, otherFrame);
                             longFrame += otherFrame;
                             if (longFrame.regionMatches(0, otherFrame, 0, 12)) {
                                 // frames refer to same ZigBee device: remove first ACK
-                                logger.debug(
-                                        "-FC- BUGFIX!!! Removing ACK from device info response");
+                                logger.debug("-FC- BUGFIX!!! Removing ACK from device info response");
                                 longFrame = longFrame.replace(OpenMessage.FRAME_ACK, "");
                                 // read final ACK
                                 if ((size = readUntilDelimiter(in, buf)) > 0) {
@@ -121,8 +119,7 @@ public class FrameChannel {
                         readFrames.add(singleFrame + OpenMessage.FRAME_END);
                     }
                 } else {
-                    throw new IOException(
-                            "Error in readFrames(): no delimiter found on stream: " + longFrame);
+                    throw new IOException("Error in readFrames(): no delimiter found on stream: " + longFrame);
                 }
                 logger.info("-FC-{} <------- {}", name, readFrames.toString());
                 return readFrames.remove();
@@ -151,8 +148,7 @@ public class FrameChannel {
         do {
             cint = is.read();
             if (cint == -1) {
-                logger.trace(
-                        "-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
+                logger.trace("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
                 return numBytes;
             } else {
                 buffer[numBytes++] = (byte) cint;

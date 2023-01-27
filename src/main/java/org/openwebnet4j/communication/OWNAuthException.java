@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2022 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -24,7 +24,8 @@ public class OWNAuthException extends OWNException {
     private static final long serialVersionUID = 564111573600046L;
 
     /** Constructs a new <code>OWNAuthException</code> without a detail message. */
-    public OWNAuthException() {}
+    public OWNAuthException() {
+    }
 
     /**
      * Constructs a new <code>OWNAuthException</code> with the specified detail message.
