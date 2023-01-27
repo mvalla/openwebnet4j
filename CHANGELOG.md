@@ -4,6 +4,7 @@
 
 ### Changed
 - updated copyright year
+- Energy: support for partial totalizer for current month and current day (WHO=18)
 
 
 ## [0.9.1] - 2022-11-04
