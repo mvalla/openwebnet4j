@@ -62,7 +62,9 @@ public class EnergyManagement extends BaseOpenMessage {
 
     public enum DimEnergyMgmt implements Dim {
         ACTIVE_POWER(113),
-        ACTIVE_POWER_NOTIFICATION_TIME(1200);
+        ACTIVE_POWER_NOTIFICATION_TIME(1200),
+        PARTIAL_TOTALIZER_CURRENT_MONTH(53),
+        PARTIAL_TOTALIZER_CURRENT_DAY(54);
 
         private static Map<Integer, DimEnergyMgmt> mapping;
 
@@ -138,7 +140,8 @@ public class EnergyManagement extends BaseOpenMessage {
      * @return message
      */
     public static EnergyManagement requestActivePower(String where) {
-        return new EnergyManagement(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.ACTIVE_POWER.value()));
+        return new EnergyManagement(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.ACTIVE_POWER.value()));
     }
 
     /**
@@ -155,7 +158,35 @@ public class EnergyManagement extends BaseOpenMessage {
         if (t < 0 || t > 255) {
             t = 0;
         }
-        return new EnergyManagement(format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where,
-                DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, t));
+        return new EnergyManagement(
+                format(
+                        FORMAT_DIMENSION_WRITING_1P_1V,
+                        WHO,
+                        where,
+                        DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(),
+                        1,
+                        t));
+    }
+
+    /**
+     * OpenWebNet message request to get current month partial totalizer <code>*#18*WHERE*53##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static EnergyManagement requestCurrentMonthTotalizer(String where) {
+        return new EnergyManagement(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.PARTIAL_TOTALIZER_CURRENT_MONTH.value()));
+    }
+
+    /**
+     * OpenWebNet message request to get current day partial totalizer <code>*#18*WHERE*54##</code>.
+     *
+     * @param where WHERE string
+     * @return message
+     */
+    public static EnergyManagement requestCurrentDayTotalizer(String where) {
+        return new EnergyManagement(
+                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.PARTIAL_TOTALIZER_CURRENT_DAY.value()));
     }
 }
