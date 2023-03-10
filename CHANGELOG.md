@@ -8,7 +8,7 @@
 ### Changed
 - updated copyright year
 - updated dependencies: slf4j-api, junit-jupiter-engine, maven-compiler-plugin, maven-javadoc-plugin, maven-jar-plugin, maven-bundle-plugin, maven-surefire-plugin, spotless-maven-plugin, nexus-staging-maven-plugin
-
+- updated BUSGateway to discover and notify thermo CU first and then zones
 
 ## [0.9.1] - 2022-11-04
 

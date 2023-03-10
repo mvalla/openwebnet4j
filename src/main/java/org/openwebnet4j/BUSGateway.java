@@ -14,12 +14,16 @@
  */
 package org.openwebnet4j;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openwebnet4j.communication.BUSConnector;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.message.Alarm;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.Auxiliary;
+import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.CENPlusScenario;
 import org.openwebnet4j.message.EnergyManagementDiagnostic;
 import org.openwebnet4j.message.Lighting;
@@ -41,6 +45,18 @@ import org.slf4j.LoggerFactory;
  * @author G.Fabiani - Auxiliary support
  */
 public class BUSGateway extends OpenGateway {
+
+    private class DiscoveryResult {
+        public Where where;
+        public OpenDeviceType type;
+        public BaseOpenMessage message;
+
+        public DiscoveryResult(Where w, OpenDeviceType t, BaseOpenMessage m) {
+            this.where = w;
+            this.type = t;
+            this.message = m;
+        }
+    }
 
     private final Logger logger = LoggerFactory.getLogger(BUSGateway.class);
 
@@ -146,17 +162,50 @@ public class BUSGateway extends OpenGateway {
             // *#1004*0*7##
             // response <<<< *#1004*WHERE*7*BITS##
             logger.debug("##BUS## ----- THERMOREGULATION discovery");
+            List<DiscoveryResult> foundThermoDevices = new ArrayList<>(); // list of found thermo devices other than CU
             res = sendInternal(ThermoregulationDiagnostic.requestDiagnostic(WhereThermo.ALL_MASTER_PROBES.value()));
+            boolean foundCU99 = false;
+            DiscoveryResult cu = null;
             for (OpenMessage msg : res.getResponseMessages()) {
                 if (msg instanceof ThermoregulationDiagnostic) {
                     ThermoregulationDiagnostic tdMsg = ((ThermoregulationDiagnostic) msg);
                     OpenDeviceType type = tdMsg.detectDeviceType();
                     if (type != null) {
                         Where w = tdMsg.getWhere();
-                        notifyListeners((listener) -> listener.onNewDevice(w, type, tdMsg));
+                        if (OpenDeviceType.SCS_THERMO_CENTRAL_UNIT.equals(type)) {
+                            if (!foundCU99) {
+                                cu = new DiscoveryResult(w, type, tdMsg);
+                                if (w.value().charAt(0) == '#') {
+                                    foundCU99 = true;
+                                    logger.debug("##BUS## ----- THERMOREGULATION discovery - FOUND 99-CU where={}", w);
+                                } else {
+                                    logger.debug("##BUS## ----- THERMOREGULATION discovery - FOUND 4/99-CU where={}",
+                                            w);
+                                }
+                            }
+                        } else {
+                            foundThermoDevices.add(new DiscoveryResult(w, type, tdMsg));
+                        }
                     }
                 }
             }
+            final DiscoveryResult foundCU = cu;
+            if (foundCU != null) { // notify found CU...
+                notifyListeners((listener) -> listener.onNewDevice(foundCU.where, foundCU.type, foundCU.message));
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            foundThermoDevices.forEach(fd -> { // ...then notify all found thermo zones and sensors
+                if (!OpenDeviceType.SCS_THERMO_CENTRAL_UNIT.equals(fd.type)) {
+                    notifyListeners((listener) -> listener.onNewDevice(fd.where, fd.type, fd.message));
+                }
+            });
+
             // DISCOVER DRY CONTACT / IR SENSOR - request: *#25*30##
             // response <<<< *25*WHAT#0*WHERE##
             logger.debug("##BUS## ----- DRY CONTACT / IR sensor discovery");

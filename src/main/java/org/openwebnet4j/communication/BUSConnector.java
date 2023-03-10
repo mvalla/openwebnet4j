@@ -201,9 +201,9 @@ public class BUSConnector extends OpenConnector {
             msg = BaseOpenMessage.parse(newFrame);
             notifyListener(msg);
         } catch (UnsupportedFrameException e) {
-            logger.debug("UNSUPPORTED FRAME: {}, skipping it", newFrame);
+            logger.debug("##BUS-conn## UNSUPPORTED FRAME ON MON: {}, skipping it", newFrame);
         } catch (FrameException e) {
-            logger.warn("INVALID FRAME: {}, skipping it", newFrame);
+            logger.warn("##BUS-conn## INVALID FRAME RECEIVED ON MON: {}, skipping it", newFrame);
         }
     }
 

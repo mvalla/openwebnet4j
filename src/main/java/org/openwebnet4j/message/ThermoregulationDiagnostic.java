@@ -72,8 +72,7 @@ public class ThermoregulationDiagnostic extends BaseOpenMessage {
             return null;
         } else {
             if (w.value().startsWith("0")) {
-                // "all probes/zones", not supported for now
-                return null;
+                return OpenDeviceType.SCS_THERMO_CENTRAL_UNIT;
             }
             if (w.isProbe()) {
                 return OpenDeviceType.SCS_THERMO_SENSOR;
