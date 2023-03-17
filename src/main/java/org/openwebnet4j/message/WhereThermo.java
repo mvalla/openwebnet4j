@@ -15,20 +15,31 @@
 package org.openwebnet4j.message;
 
 /**
- * WHERE for Thermoregulation frames
- *
+ * WHERE for Thermoregulation frames.
  * <p>
- * == Where Table:
- *
- * <p>
- * === Probes - 0 : all master probes - Z : zone Z [1-99] master probe - 0ZZ : zone ZZ [01-99]
- * all probes (master and slave) - pZZ : zone ZZ [01-99] slave probe p[1-8] - p00 : external zone 00
- * slave probe p[1-9]
- *
- * <p>
- * === Actuators (thermostats) - #0 : central unit - #Z : zone Z [1-99] via central unit - 0#0 :
- * all zones, all actuators - Z#0 : zone Z [1-99], all actuators - Z#N : zone Z [1-99], actuator N
- * [1-9]
+ * Where Table:
+ * <ul>
+ * <li>Probes
+ * <ul>
+ * <li>0 : all master probes
+ * <li>Z : zone Z [1-99] master probe
+ * <li>0ZZ : zone ZZ [01-99] all probes (master and slave)
+ * <li>pZZ : zone ZZ [01-99] slave probe p[1-8]
+ * <li>p00 : external zone 00 slave probe p[1-9]
+ * </ul>
+ * <li>Central Units
+ * <ul>
+ * <li>#0 : 99-zones central unit
+ * <li>#0#Z : 4-zones central unit configured as zone Z
+ * </ul>
+ * <li>Zones and actuators
+ * <ul>
+ * <li>#Z : zone Z [1-99] via central unit
+ * <li>0#0 : all zones, all actuators
+ * <li>Z#0 : zone Z [1-99], all actuators
+ * <li>Z#N : zone Z [1-99], actuator N[1-9]
+ * </ul>
+ * </ul>
  *
  * @author M. Valla - Initial contribution
  */
@@ -45,9 +56,15 @@ public class WhereThermo extends Where {
         int z, p = -1, a = -1;
         int pos = whereStr.indexOf("#");
         if (pos >= 0) { // # is present
-            if (pos == 0) { // case '#x'
+            if (pos == 0) {
                 standalone = false;
-                z = Integer.parseInt(whereStr.substring(1));
+                int pos2 = whereStr.indexOf("#", 1);
+                if (pos2 < 0) { // case '#x'
+                    z = Integer.parseInt(whereStr.substring(1));
+                } else { // case '#x#y'
+                    z = Integer.parseInt(whereStr.substring(1, pos2));
+                    a = Integer.parseInt(whereStr.substring(pos2 + 1));
+                }
             } else { // case 'x#x'
                 standalone = true;
                 z = Integer.parseInt(whereStr.substring(0, pos));
@@ -108,16 +125,20 @@ public class WhereThermo extends Where {
     }
 
     /**
-     * Returns true if WHERE is a standalone configuration
+     * @deprecated since 0.10.0. No replacement.
+     *             <p>
+     *
+     *             Returns true if WHERE is a standalone configuration
      *
      * @return true if standalone configuration
      */
+    @Deprecated
     public boolean isStandalone() {
         return standalone;
     }
 
     /**
-     * Returns true if WHERE is Central Unit (where=<code>#0</code>)
+     * Returns true if WHERE is Central Unit (where=<code>#0</code> or where=<code>#0#Z</code>)
      *
      * @return true if Central Unit
      */

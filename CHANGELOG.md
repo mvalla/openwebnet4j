@@ -9,6 +9,8 @@
 - updated copyright year
 - updated dependencies: slf4j-api, junit-jupiter-engine, maven-compiler-plugin, maven-javadoc-plugin, maven-jar-plugin, maven-bundle-plugin, maven-surefire-plugin, spotless-maven-plugin, nexus-staging-maven-plugin
 - updated BUSGateway to discover and notify thermo CU first and then zones
+- WhereThermo: deprected WhereThermo.isStandAlone()
+- WereThermo: Added support for 4-zone central unit (where=#0#1) and related test
 
 ## [0.9.1] - 2022-11-04
 
