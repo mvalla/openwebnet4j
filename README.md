@@ -51,7 +51,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.9.0</version>
+      <version>0.10.0</version>
     </dependency>
 ```
 

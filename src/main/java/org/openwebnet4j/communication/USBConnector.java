@@ -160,10 +160,10 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             GatewayMgmt frame = GatewayMgmt.requestKeepConnect();
             cmdChannel.sendFrame(GatewayMgmt.requestKeepConnect().getFrameValue());
 
-            hsLogger.info("(HS) USB HS==>>>> {}", frame.getFrameValue());
+            hsLogger.info("(HS) USB HS==>>>> `{}`", frame.getFrameValue());
             Thread.sleep(50); // we must wait few ms for the answer to be ready
             String resp = cmdChannel.readFrames();
-            hsLogger.info("(HS) USB <<<<==HS {}", resp);
+            hsLogger.info("(HS) USB <<<<==HS `{}`", resp);
             if (!OpenMessage.FRAME_ACK.equals(resp)) {
                 disconnectSerialPort();
                 throw new OWNException("Could not communicate with a Zigbee USB Gateway on serial port: " + portN
@@ -300,7 +300,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             String frameSend = fixedMsg.getFrameValue();
             cmdChannel.sendFrame(frameSend);
             lastCmdFrameSentTs = System.currentTimeMillis();
-            msgLogger.info("USB-CMD ====>>>> {}", frameSend);
+            msgLogger.info("USB-CMD ====>>>> `{}`", frameSend);
         }
         try {
             currentResponse.waitResponse();
@@ -310,21 +310,21 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
         final Response res = currentResponse;
         currentResponse = null;
-        msgLogger.info("USB-CMD <<<<==== {}", res.getResponseMessages());
+        msgLogger.info("USB-CMD <<<<==== `{}`", res.getResponseMessages());
         return res;
     }
 
     @Override
     protected void processFrame(String newFrame) {
-        logger.debug("##USB-conn## processing frame: {}", newFrame);
+        logger.debug("##USB-conn## processing frame: `{}`", newFrame);
         OpenMessage msg;
         try {
             msg = BaseOpenMessage.parse(newFrame);
         } catch (UnsupportedFrameException e) {
-            logger.info("##USB-conn## UNSUPPORTED FRAME: {}, skipping it", newFrame);
+            logger.info("##USB-conn## UNSUPPORTED FRAME: `{}`, skipping it", newFrame);
             return;
         } catch (FrameException e) {
-            logger.warn("##USB-conn## INVALID FRAME: {}, skipping it", newFrame);
+            logger.warn("##USB-conn## INVALID FRAME: `{}`, skipping it", newFrame);
             return;
         }
         synchronized (requestSentSynchObj) {
@@ -334,7 +334,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
                 if (msg.isACK() || msg.isNACK()) {
                     logger.warn("##USB-conn## Recevied ACK/NACK without a request waiting, skipping it");
                 } else {
-                    eventLogger.info("USB-MON <<<<<<<< {}", msg.getFrameValue());
+                    eventLogger.info("USB-MON <<<<<<<< `{}`", msg.getFrameValue());
                     notifyListener(msg);
                 }
             } else { // some request is currently waiting
@@ -342,17 +342,17 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
                 if (msg.isCommand()) {
                     // perform fixes to compensate bugs of older gateways
                     fixDimensionResponseBug();
-                    eventLogger.info("USB-MON <<<<<<<< {}", msg.getFrameValue());
+                    eventLogger.info("USB-MON <<<<<<<< `{}`", msg.getFrameValue());
                     notifyListener(msg);
                 } else { // add them to the response object
                     // TODO handle the BUSY_NACK case
-                    msgLogger.debug("USB-CMD   <<==   {}", newFrame);
+                    msgLogger.debug("USB-CMD   <<==   `{}`", newFrame);
                     currentResponse.addResponse(msg);
                 }
                 if (currentResponse.hasFinalResponse()) {
                     // we received an ACK/NACK, so let's signal response is ready to the waiting
                     // thread
-                    logger.debug("##USB-conn## USB final response: {}", currentResponse);
+                    logger.debug("##USB-conn## USB final response: `{}`", currentResponse);
                     currentResponse.responseReady();
                 }
             }
@@ -369,7 +369,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
                         || currentResponse.getRequest() instanceof Automation)) {
             logger.debug("##USB-conn## BUGFIX for older USB gateways: adding final ACK");
             currentResponse.addResponse(AckOpenMessage.ACK);
-            msgLogger.debug("USB-CMD   <<==   {}   (added)", AckOpenMessage.ACK);
+            msgLogger.debug("USB-CMD   <<==   `{}`   (added)", AckOpenMessage.ACK);
         }
     }
 
@@ -380,12 +380,12 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         if (hasAutomationBug && msg instanceof Automation) {
             try {
                 Automation msgConverted = Automation.convertUpDown((Automation) msg);
-                logger.debug("##USB-conn## older firmware: converting Automation UP / DOWN on message {} --> {}", msg,
-                        msgConverted);
+                logger.debug("##USB-conn## older firmware: converting Automation UP / DOWN on message `{}` --> `{}`",
+                        msg, msgConverted);
                 return msgConverted;
             } catch (FrameException fe) {
                 logger.warn(
-                        "##USB-conn## older firmware: FrameException while converting Automation UP/DOWN on message {}: {}",
+                        "##USB-conn## older firmware: FrameException while converting Automation UP/DOWN on message `{}`: `{}`",
                         msg, fe.getMessage());
             }
         }

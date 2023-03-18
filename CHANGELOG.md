@@ -4,13 +4,15 @@
 
 ### Added
 - Energy: support for partial totalizer for current month and current day (WHO=18)
+- WereThermo: support for 4-zone central unit (where=#0#1) and related test
 
 ### Changed
 - updated copyright year
 - updated dependencies: slf4j-api, junit-jupiter-engine, maven-compiler-plugin, maven-javadoc-plugin, maven-jar-plugin, maven-bundle-plugin, maven-surefire-plugin, spotless-maven-plugin, nexus-staging-maven-plugin
+- DEPRECATED WhereThermo.isStandAlone()
 - updated BUSGateway to discover and notify thermo CU first and then zones
-- WhereThermo: deprected WhereThermo.isStandAlone()
-- WereThermo: Added support for 4-zone central unit (where=#0#1) and related test
+- escaped OWN frames in log messages
+
 
 ## [0.9.1] - 2022-11-04
 

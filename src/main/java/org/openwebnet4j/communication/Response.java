@@ -92,8 +92,8 @@ public class Response {
      */
     protected synchronized void addResponse(OpenMessage msg) {
         responses.add(msg);
-        logger.debug("{}   <<add   {}", requestMessage, msg);
-        logger.debug("now: {}   <<==    {}", requestMessage, getResponseMessages());
+        logger.debug("`{}`   <<add   `{}`", requestMessage, msg);
+        logger.debug("now: `{}`   <<==    `{}`", requestMessage, getResponseMessages());
         if (msg.isACK() || msg.isNACK()) { // ACK/NACK -> the response is final
             finalResponse = msg;
             if (msg.isACK()) {
