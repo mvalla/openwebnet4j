@@ -16,6 +16,9 @@ package org.openwebnet4j.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openwebnet4j.message.Alarm;
@@ -533,6 +536,30 @@ public class MessageTest {
         assertEquals(GatewayMgmt.DimGatewayMgmt.MAC_ADDRESS, gwMsg.getDim());
         assertNull(gwMsg.getWhere());
         assertNull(gwMsg.getWhat());
+
+        // date time decoding tests
+        try {
+            gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**22*09*37*30*102*03*01*05*2019##");
+            assertNotNull(gwMsg);
+            assertEquals(Who.GATEWAY_MANAGEMENT, gwMsg.getWho());
+            assertFalse(gwMsg.isCommand());
+            assertEquals(GatewayMgmt.DimGatewayMgmt.DATETIME, gwMsg.getDim());
+            assertNotNull(gwMsg.getDimValues());
+            assertEquals("09", gwMsg.getDimValues()[0]);
+            assertEquals(ZonedDateTime.parse("2019-05-01T09:37:30-02:00"), GatewayMgmt.parseDateTime(gwMsg));
+            // encode and then parse current date time
+            ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+            System.out.println("Now: " + now);
+            String nowEncoded = GatewayMgmt.toOWNDateTime(now);
+            System.out.println("Now OWN encoded: " + nowEncoded);
+            gwMsg = (GatewayMgmt) BaseOpenMessage.parse("*#13**22*" + nowEncoded + "##");
+            ZonedDateTime nowParsed = GatewayMgmt.parseDateTime(gwMsg);
+            System.out.println("Now parsed: " + nowParsed);
+            assertTrue(nowParsed.isEqual(now));
+            System.out.println(gwMsg.toStringVerbose());
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
     }
 
     @Test
