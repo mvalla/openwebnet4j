@@ -17,15 +17,23 @@ package org.openwebnet4j.message;
 import static java.lang.String.format;
 import static org.openwebnet4j.message.Who.GATEWAY_MANAGEMENT;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.openwebnet4j.OpenDeviceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** OpenWebNet GatewayManagmenet messages */
 
-/** @author M. Valla - Initial contribution */
+/** @author M. Valla - Initial contribution. Date and Time */
 public class GatewayMgmt extends BaseOpenMessage {
+
+    private static final Logger logger = LoggerFactory.getLogger(GatewayMgmt.class);
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH*mm*ss");
+    private static final DateTimeFormatter wDayDateFormatter = DateTimeFormatter.ofPattern("ee*dd*MM*yyyy");
 
     public enum WhatGatewayMgmt implements What {
         // USB Gateway
@@ -79,6 +87,8 @@ public class GatewayMgmt extends BaseOpenMessage {
         MODEL(15),
         FIRMWARE_VERSION(16),
         HARDWARE_VERSION(17),
+        UPTIME(19),
+        DATETIME(22),
         WHO_IMPLEMENTED(26),
         PRODUCT_INFO(66),
         NB_NETW_PROD(67),
@@ -171,6 +181,46 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
+     * Parse date and time in the OWN message and return ZonedDateTime
+     *
+     * @param msg the message to parse
+     * @return ZonedDateTime date time parsed from message
+     * @throws FrameException in case of error while parsing frame
+     */
+    public static ZonedDateTime parseDateTime(GatewayMgmt msg) throws FrameException {
+        // *#13**22*09*37*30*000*03*01*05*2019##
+        // *#13**22* h* m* s* tz* w* d* m* y##
+        String[] values = msg.getDimValues();
+        try {
+            String decodedTZ = (values[3].charAt(0) == '0' ? "+" : "-") + values[3].substring(1) + ":00";
+            // System.out.println("Decoded TZ: " + decodedTZ);
+            String iso = String.format("%s-%s-%sT%s:%s:%s%s", values[7], values[6], values[5], values[0], values[1],
+                    values[2], decodedTZ);
+            return ZonedDateTime.parse(iso);
+        } catch (Exception e) {
+            throw new FrameException("Cannot parse Date and Time message: " + msg.frameValue);
+        }
+    }
+
+    /**
+     * Return a OWN encoded date time from a given ZonedDateTime
+     *
+     * @param zdt the ZonedDateTime to encode
+     * @return String OWN encoded date and time
+     */
+    public static String toOWNDateTime(ZonedDateTime zdt) {
+        String time = zdt.format(timeFormatter);
+        String offset = zdt.getOffset().getId();
+        String ownTZ = (offset.charAt(0) == '+' ? '0' : '1') + offset.substring(1, 3);
+        String date = zdt.format(wDayDateFormatter);
+        if (date.charAt(1) == '7') { // replace Sunday=07 with Sunday=00
+            date = "00" + date.substring(2);
+        }
+        String dateTime = time + '*' + ownTZ + '*' + date;
+        return dateTime;
+    }
+
+    /**
      * OpenWebNet message request for gateway model <code>*#13**15##</code>.
      *
      * @return GatewayMgmt message
@@ -191,7 +241,11 @@ public class GatewayMgmt extends BaseOpenMessage {
     public static String parseFirmwareVersion(GatewayMgmt msg) throws FrameException {
         // fw version is returned in VAL1-VAL3 decimal dimensions of Firmware version response frame
         String[] values = msg.getDimValues();
-        return values[0] + "." + values[1] + "." + values[2];
+        if (values.length == 3) {
+            return values[0] + "." + values[1] + "." + values[2];
+        } else {
+            throw new FrameException("Cannot parse values for message: " + msg.frameValue);
+        }
     }
 
     /**
