@@ -32,8 +32,8 @@ import org.slf4j.LoggerFactory;
 public class GatewayMgmt extends BaseOpenMessage {
 
     private static final Logger logger = LoggerFactory.getLogger(GatewayMgmt.class);
-    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH*mm*ss");
-    private static final DateTimeFormatter wDayDateFormatter = DateTimeFormatter.ofPattern("ee*dd*MM*yyyy");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH*mm*ss");
+    private static final DateTimeFormatter WEEKDAY_DATE_FORMATTER = DateTimeFormatter.ofPattern("ee*dd*MM*yyyy");
 
     public enum WhatGatewayMgmt implements What {
         // USB Gateway
@@ -181,6 +181,17 @@ public class GatewayMgmt extends BaseOpenMessage {
     }
 
     /**
+     * OpenWebNet message request to set DateTime <code>*#13**#22*hh*mm*ss*zzz*ww*dd*MM*yyyy##</code>.
+     *
+     * @param zdt the ZonedDateTime to set
+     * @return GatewayMgmt message
+     */
+    public static GatewayMgmt requestSetDateTime(ZonedDateTime zdt) {
+        return new GatewayMgmt(
+                format(FORMAT_DIMENSION_WRITING_1V, WHO, "", DimGatewayMgmt.DATETIME.value(), toOWNDateTime(zdt)));
+    }
+
+    /**
      * Parse date and time in the OWN message and return ZonedDateTime
      *
      * @param msg the message to parse
@@ -209,10 +220,10 @@ public class GatewayMgmt extends BaseOpenMessage {
      * @return String OWN encoded date and time
      */
     public static String toOWNDateTime(ZonedDateTime zdt) {
-        String time = zdt.format(timeFormatter);
+        String time = zdt.format(TIME_FORMATTER);
         String offset = zdt.getOffset().getId();
         String ownTZ = (offset.charAt(0) == '+' ? '0' : '1') + offset.substring(1, 3);
-        String date = zdt.format(wDayDateFormatter);
+        String date = zdt.format(WEEKDAY_DATE_FORMATTER);
         if (date.charAt(1) == '7') { // replace Sunday=07 with Sunday=00
             date = "00" + date.substring(2);
         }

@@ -217,7 +217,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message DIM (dimension, <code>*#WHO*#DIM*...##</code>) or null id not DIM is present
+     * Returns message DIM (dimension, <code>*#WHO*#DIM*...##</code>) or null if no DIM is present
      *
      * @return message DIM, or null if no DIM is present
      */

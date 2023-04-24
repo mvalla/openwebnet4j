@@ -3,7 +3,7 @@
 ## [0.10.0] - 2023-xx-xx
 
 ### Added
-- GatewayMgmt: support for Dim=22 DateTime and parseDateTime()/toOWNDateTime() static methods and related tests
+- GatewayMgmt: support for Dim=22 DateTime and requestSetDateTime(), parseDateTime(), toOWNDateTime() static methods and tests
 - Energy: support for partial totalizer for current month and current day (WHO=18)
 - WereThermo: support for 4-zone central unit (where=#0#1) and related test
 
