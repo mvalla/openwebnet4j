@@ -351,21 +351,31 @@ public class MessageTest {
             wt = WhatThermo.fromValue(302);
             assertEquals(Function.GENERIC, wt.getFunction());
             assertEquals(OperationMode.PROTECTION, wt.getMode());
+            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // OFF
             wt = WhatThermo.fromValue(203);
             assertEquals(Function.COOLING, wt.getFunction());
             assertEquals(OperationMode.OFF, wt.getMode());
+            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // MANUAL
             wt = WhatThermo.fromValue(110);
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.MANUAL, wt.getMode());
+            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // SCENARIO
             wt = WhatThermo.fromValue(1202);
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.SCENARIO_2, wt.getMode());
             assertEquals("SCENARIO", wt.getMode().mode());
+            assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
             assertEquals(2, wt.getMode().programNumber());
-
+            // WEEKLY
+            wt = WhatThermo.fromValue(2102);
+            assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(OperationMode.WEEKLY_2, wt.getMode());
+            assertEquals("WEEKLY", wt.getMode().mode());
+            assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
+            assertEquals(2, wt.getMode().programNumber());
         } catch (FrameException e) {
             Assertions.fail();
         }

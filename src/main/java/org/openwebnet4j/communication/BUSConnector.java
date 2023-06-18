@@ -188,7 +188,7 @@ public class BUSConnector extends OpenConnector {
                 throw new IOException("Received null frame while reading responses to command");
             }
         }
-        msgLogger.info("BUS-CMD <<<<==== `{}`", res.getResponseMessages());
+        msgLogger.info("BUS-CMD <<<<==== {}", res.getResponseMessages());
 
         return res;
     }

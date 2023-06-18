@@ -518,7 +518,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
 
     @Override
     public String toStringVerbose() {
-        String verbose = "<" + frameValue + ">{" + getWho();
+        String verbose = "`" + frameValue + "`{" + getWho();
         try {
             if (isCommand()) {
                 verbose += "-" + getWhat();

@@ -77,7 +77,7 @@ public abstract class OpenMessage {
 
     @Override
     public String toString() {
-        return "<" + frameValue + ">";
+        return "`" + frameValue + "`";
     }
 
     /**

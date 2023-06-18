@@ -37,6 +37,9 @@ public class Thermoregulation extends BaseOpenMessage {
 
     private static final Logger logger = LoggerFactory.getLogger(Thermoregulation.class);
 
+    private static final String WEEKLY_STRING = "WEEKLY";
+    private static final String SCENARIO_STRING = "SCENARIO";
+
     // @formatter:off
     /*
      * WHAT for Thermoregulation frames
@@ -153,8 +156,8 @@ public class Thermoregulation extends BaseOpenMessage {
                 initMapping();
             }
             WhatThermo result = WhatThermo.GENERIC;
-            // WHAT less than 32 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
-            if (i < 32) {
+            // WHAT less than 40 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
+            if (i <= 40) {
                 // these are defined in the Enum
                 result = mapping.get(i);
                 // for WHAT=0 and WHAT=1 update Function field accordingly
@@ -193,14 +196,28 @@ public class Thermoregulation extends BaseOpenMessage {
             return what;
         }
 
+        /**
+         * Check for complex WHAT string: WEEKLY, SCENARIO
+         *
+         * @param what String representing a WHAT mode
+         * @return true if the WHAT String parameter is a complex WHAT
+         */
         public static Boolean isComplex(String what) {
-            return what.equalsIgnoreCase(WhatThermo.WEEKLY.toString())
-                    || what.equalsIgnoreCase(WhatThermo.SCENARIO.toString());
+            return what.equalsIgnoreCase(WEEKLY_STRING) || what.equalsIgnoreCase(SCENARIO_STRING);
         }
 
         @Override
         public Integer value() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            if (value <= 40) {
+                return name();
+            } else {
+                return function + "-" + mode;
+            }
         }
     }
 
@@ -272,26 +289,26 @@ public class Thermoregulation extends BaseOpenMessage {
         PROGRAM("11", "PROGRAM"),
         HOLIDAY("15", "HOLIDAY"),
 
-        WEEKLY_1("101", "WEEKLY"),
-        WEEKLY_2("102", "WEEKLY"),
-        WEEKLY_3("103", "WEEKLY"),
+        WEEKLY_1("101", WEEKLY_STRING),
+        WEEKLY_2("102", WEEKLY_STRING),
+        WEEKLY_3("103", WEEKLY_STRING),
 
-        SCENARIO_1("201", "SCENARIO"),
-        SCENARIO_2("202", "SCENARIO"),
-        SCENARIO_3("203", "SCENARIO"),
-        SCENARIO_4("204", "SCENARIO"),
-        SCENARIO_5("205", "SCENARIO"),
-        SCENARIO_6("206", "SCENARIO"),
-        SCENARIO_7("207", "SCENARIO"),
-        SCENARIO_8("208", "SCENARIO"),
-        SCENARIO_9("209", "SCENARIO"),
-        SCENARIO_10("210", "SCENARIO"),
-        SCENARIO_11("211", "SCENARIO"),
-        SCENARIO_12("212", "SCENARIO"),
-        SCENARIO_13("213", "SCENARIO"),
-        SCENARIO_14("214", "SCENARIO"),
-        SCENARIO_15("215", "SCENARIO"),
-        SCENARIO_16("216", "SCENARIO");
+        SCENARIO_1("201", SCENARIO_STRING),
+        SCENARIO_2("202", SCENARIO_STRING),
+        SCENARIO_3("203", SCENARIO_STRING),
+        SCENARIO_4("204", SCENARIO_STRING),
+        SCENARIO_5("205", SCENARIO_STRING),
+        SCENARIO_6("206", SCENARIO_STRING),
+        SCENARIO_7("207", SCENARIO_STRING),
+        SCENARIO_8("208", SCENARIO_STRING),
+        SCENARIO_9("209", SCENARIO_STRING),
+        SCENARIO_10("210", SCENARIO_STRING),
+        SCENARIO_11("211", SCENARIO_STRING),
+        SCENARIO_12("212", SCENARIO_STRING),
+        SCENARIO_13("213", SCENARIO_STRING),
+        SCENARIO_14("214", SCENARIO_STRING),
+        SCENARIO_15("215", SCENARIO_STRING),
+        SCENARIO_16("216", SCENARIO_STRING);
 
         private final String value;
         private final String mode;
@@ -321,7 +338,7 @@ public class Thermoregulation extends BaseOpenMessage {
          * @return Boolean (e.g. 2102 = true, 103 = false)
          */
         public Boolean isScenario() {
-            return mode == "SCENARIO";
+            return mode == SCENARIO_STRING;
         }
 
         /**
@@ -330,7 +347,7 @@ public class Thermoregulation extends BaseOpenMessage {
          * @return Boolean (e.g. 3101 = true, 110 = false)
          */
         public Boolean isWeekly() {
-            return mode == "WEEKLY";
+            return mode == WEEKLY_STRING;
         }
 
         /**
