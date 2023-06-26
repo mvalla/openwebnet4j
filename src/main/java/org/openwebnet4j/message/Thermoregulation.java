@@ -105,7 +105,6 @@ public class Thermoregulation extends BaseOpenMessage {
 
         private WhatThermo(int value) {
             this.value = value;
-
             this.function = Function.GENERIC;
             this.mode = OperationMode.MANUAL;
         }
@@ -254,8 +253,8 @@ public class Thermoregulation extends BaseOpenMessage {
         AUTO(0),
         SPEED_1(1),
         SPEED_2(2),
-        SPEED_3(3);
-        // OFF(15); present in documentation but not handled on real bus
+        SPEED_3(3),
+        OFF(15); // present in documentation but not handled on real bus
 
         private final Integer value;
 
@@ -778,10 +777,15 @@ public class Thermoregulation extends BaseOpenMessage {
     public static FanCoilSpeed parseFanCoilSpeed(Thermoregulation msg) throws NumberFormatException, FrameException {
         String[] values = msg.getDimValues();
         if (msg.getDim() == DimThermo.FAN_COIL_SPEED) {
-            return FanCoilSpeed.fromValue(Integer.parseInt(values[0]));
-        } else {
-            throw new NumberFormatException("Could not parse fan coil speed from: " + msg.getFrameValue());
+            FanCoilSpeed result;
+            result = FanCoilSpeed.fromValue(Integer.parseInt(values[0]));
+            if (result != null) {
+                return result;
+            } else {
+                throw new NumberFormatException("Unknwon/unsupported fan coil speed in frame: " + msg.getFrameValue());
+            }
         }
+        throw new FrameException("Could not parse fan coil speed in frame: " + msg.getFrameValue());
     }
 
     /**

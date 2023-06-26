@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.1] - 2023-07-xxxxxx
+
+### Added
+- FanCoilSpeed.OFF(15)
+
+### Changed
+- parseFanCoilSpeed exceptions handling
+
+
 ## [0.10.0] - 2023-06-18
 
 ### Added
