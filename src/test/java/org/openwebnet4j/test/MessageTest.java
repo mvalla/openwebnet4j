@@ -345,28 +345,35 @@ public class MessageTest {
             // basic functions 0,1
             wt = WhatThermo.fromValue(0);
             assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(0, wt.value());
             wt = WhatThermo.fromValue(1);
             assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(1, wt.value());
+
             // PROTECTION
             wt = WhatThermo.fromValue(302);
             assertEquals(Function.GENERIC, wt.getFunction());
             assertEquals(OperationMode.PROTECTION, wt.getMode());
+            assertEquals(302, wt.value());
             assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // OFF
             wt = WhatThermo.fromValue(203);
             assertEquals(Function.COOLING, wt.getFunction());
             assertEquals(OperationMode.OFF, wt.getMode());
+            assertEquals(203, wt.value());
             assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // MANUAL
             wt = WhatThermo.fromValue(110);
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.MANUAL, wt.getMode());
+            assertEquals(110, wt.value());
             assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // SCENARIO
             wt = WhatThermo.fromValue(1202);
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.SCENARIO_2, wt.getMode());
             assertEquals("SCENARIO", wt.getMode().mode());
+            assertEquals(1202, wt.value());
             assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
             assertEquals(2, wt.getMode().programNumber());
             // WEEKLY
@@ -374,6 +381,7 @@ public class MessageTest {
             assertEquals(Function.COOLING, wt.getFunction());
             assertEquals(OperationMode.WEEKLY_2, wt.getMode());
             assertEquals("WEEKLY", wt.getMode().mode());
+            assertEquals(2102, wt.value());
             assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
             assertEquals(2, wt.getMode().programNumber());
         } catch (FrameException e) {
