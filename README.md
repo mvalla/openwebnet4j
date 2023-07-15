@@ -27,17 +27,6 @@ Supported Open Web Net gateways:
 
 ### TODO
 
-- [x] Support numeric passwords (OPEN handshake)
-- [x] Support alphanumeric passwords (HMAC handshake)
-- [x] Support for `WHO=2` Automation (shutters)
-- [x] ZigBee: check isOldFirmware and related gw bugfixes
-- Add other `WHOs`
-	- [x] Energy
-	- [x] Thermo (standalone mode)
-    - [x] CEN/CEN+
-	- [x] Thermo (systems with 4 and 99 Central Units)
-	- [x] AUX
-	- [x] Scenarios WHO=0
 - [ ] add sendHighPriority with priority queue
 - [ ] extend OpenConnector.listener to multiple listeners
 
@@ -51,7 +40,7 @@ This library is available via Maven Central repository by adding the dependency 
     <dependency>
       <groupId>io.github.openwebnet4j</groupId>
       <artifactId>openwebnet4j</artifactId>
-      <version>0.10.0</version>
+      <version>0.10.1</version>
     </dependency>
 ```
 

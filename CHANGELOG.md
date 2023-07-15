@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.10.1] - 2023-07-xxxxxx
+## [0.10.1] - 2023-07-15
 
 ### Added
 - FanCoilSpeed.OFF(15)
