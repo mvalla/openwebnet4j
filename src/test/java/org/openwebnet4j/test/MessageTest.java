@@ -583,6 +583,8 @@ public class MessageTest {
     @Test
     public void testEnergyManagerUnit() {
         EnergyManagement energyMsg;
+        EnergyManagement currentMonthTotalizerMsg;
+        EnergyManagement currentDayTotalizerMsg;
         try {
             energyMsg = (EnergyManagement) BaseOpenMessage.parse("*#18*51*113##");
             assertNotNull(energyMsg);
@@ -591,6 +593,16 @@ public class MessageTest {
             assertEquals("51", energyMsg.getWhere().value());
             assertEquals(EnergyManagement.DimEnergyMgmt.ACTIVE_POWER, energyMsg.getDim());
             assertNotNull(energyMsg.getDimValues());
+
+            currentMonthTotalizerMsg = (EnergyManagement) BaseOpenMessage.parse("*#18*51*53##");
+            assertFalse(currentMonthTotalizerMsg.isCommand());
+            assertEquals(EnergyManagement.DimEnergyMgmt.PARTIAL_TOTALIZER_CURRENT_MONTH,currentMonthTotalizerMsg.getDim());
+            assertNotNull(currentMonthTotalizerMsg.getDimValues());
+
+            currentDayTotalizerMsg = (EnergyManagement) BaseOpenMessage.parse("*#18*51*54##");
+            assertFalse(currentDayTotalizerMsg.isCommand());
+            assertEquals(EnergyManagement.DimEnergyMgmt.PARTIAL_TOTALIZER_CURRENT_DAY,currentDayTotalizerMsg.getDim());
+            assertNotNull(currentDayTotalizerMsg.getDimValues());
         } catch (FrameException e) {
             System.out.println(e.getMessage());
             Assertions.fail();
