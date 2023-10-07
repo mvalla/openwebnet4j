@@ -59,28 +59,3 @@ public abstract class Where {
         }
     }
 }
-
-/*
- *
- * Add to a WHERE address a prefix or postfix according to type.
- *
- * @param String where the where address
- *
- * @param Type the type of address (AREA, GENERAL, POINT_TO_POINT, etc.)
- *
- * @return String WHERE
- *
- * protected static String buildWhereValue(String where, Type type) {
- * switch (type) {
- * case GENERAL:
- * case AREA:
- * case POINT_TO_POINT:
- * return where;
- * case ZIGBEE:
- * return where.concat(WHERE_ZIGBEE_SUFFIX);
- * case GROUP:
- * return WHERE_GROUP_PREFIX.concat(where);
- * }
- * throw new IllegalArgumentException("invalid type");
- * }
- */

@@ -52,7 +52,7 @@ import org.openwebnet4j.message.Who;
 /**
  * Tests for {@link BaseOpenMessage} and subclasses.
  *
- * @author M. Valla - Initial contribution. Alarm and Scenario contributions
+ * @author M. Valla - Initial contribution. Alarm and Scenario contributions. WhereLightAutom tests.
  * @author Andrea Conte - Energy Management contribution
  * @author G. Cocchi - Thermoregulation contribution
  * @author G. Fabiani - Auxiliary contribution
@@ -62,7 +62,174 @@ public class MessageTest {
     @Test
     public void testWhereLightAutom() {
         assertThrows(IllegalArgumentException.class, () -> new WhereLightAutom("a"));
-        // TODO add more tests
+
+        Lighting lightMsg;
+        try {
+            lightMsg = (Lighting) BaseOpenMessage.parse("*#1*#25#4#01##");
+            assertNotNull(lightMsg);
+            assertTrue(lightMsg.getWhere() instanceof WhereLightAutom);
+            WhereLightAutom wl = (WhereLightAutom) (lightMsg.getWhere());
+            assertFalse(wl.isAPL());
+            assertEquals(25, wl.getGroup());
+            assertEquals("#4#01", wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertTrue(wl.isGeneral());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("#25");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(25, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("00");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(0, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("7");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(7, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("100");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(10, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0003");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(0, wl.getArea());
+            assertEquals(3, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0013");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(0, wl.getArea());
+            assertEquals(13, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("13");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(1, wl.getArea());
+            assertEquals(3, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0113");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(1, wl.getArea());
+            assertEquals(13, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("1003");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(10, wl.getArea());
+            assertEquals(3, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("1013");
+            assertFalse(wl.isMultiple());
+            assertTrue(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(10, wl.getArea());
+            assertEquals(13, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertNull(wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0#3");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertTrue(wl.isGeneral());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertEquals("#3", wl.getBUSIfc());
+
+            wl = new WhereLightAutom("#2#3");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(2, wl.getGroup());
+            assertEquals("#3", wl.getBUSIfc());
+
+            wl = new WhereLightAutom("100#3");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertEquals(10, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertEquals("#3", wl.getBUSIfc());
+
+            wl = new WhereLightAutom("0#4#02");
+            assertTrue(wl.isMultiple());
+            assertFalse(wl.isAPL());
+            assertTrue(wl.isGeneral());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(-1, wl.getGroup());
+            assertEquals("#4#02", wl.getBUSIfc());
+
+            try {
+                wl = new WhereLightAutom("10");
+                // if we can parse this where, this test fails
+                Assertions.fail("IllegalArgumentException not detected: " + wl);
+            } catch (Exception e) {
+                System.out.println("correctly got IllegalArgumentException for WhereLightAutom 10: " + e.getMessage());
+                assertTrue(e instanceof IllegalArgumentException);
+            }
+
+            try {
+                wl = new WhereLightAutom("101");
+                // if we can parse this where, this test fails
+                Assertions.fail("IllegalArgumentException not detected: " + wl);
+            } catch (Exception e) {
+                System.out.println("correctly got IllegalArgumentException for WhereLightAutom 101: " + e.getMessage());
+                assertTrue(e instanceof IllegalArgumentException);
+            }
+
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+
     }
 
     @Test
@@ -215,7 +382,6 @@ public class MessageTest {
             assertEquals(1, wt.getActuator());
 
             wt = new WhereThermo("2");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(2, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -223,7 +389,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("002");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(2, wt.getZone());
             assertEquals(0, wt.getProbe());
@@ -231,7 +396,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("500");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(5, wt.getProbe());
@@ -239,7 +403,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("202");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(2, wt.getZone());
             assertEquals(2, wt.getProbe());
@@ -247,7 +410,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("0");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -255,7 +417,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("#0");
-            assertFalse(wt.isStandalone());
             assertTrue(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -263,7 +424,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("#0#1");
-            assertFalse(wt.isStandalone());
             assertTrue(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -271,7 +431,6 @@ public class MessageTest {
             assertEquals(1, wt.getActuator());
 
             wt = new WhereThermo("#0#2");
-            assertFalse(wt.isStandalone());
             assertTrue(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -279,7 +438,6 @@ public class MessageTest {
             assertEquals(2, wt.getActuator());
 
             wt = new WhereThermo("#1");
-            assertFalse(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(1, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -287,7 +445,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("#34");
-            assertFalse(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(34, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -295,7 +452,6 @@ public class MessageTest {
             assertEquals(-1, wt.getActuator());
 
             wt = new WhereThermo("5#8");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(5, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -303,7 +459,6 @@ public class MessageTest {
             assertEquals(8, wt.getActuator());
 
             wt = new WhereThermo("99#0");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(99, wt.getZone());
             assertEquals(-1, wt.getProbe());
@@ -311,7 +466,6 @@ public class MessageTest {
             assertEquals(0, wt.getActuator());
 
             wt = new WhereThermo("0#0");
-            assertTrue(wt.isStandalone());
             assertFalse(wt.isCentralUnit());
             assertEquals(0, wt.getZone());
             assertEquals(-1, wt.getProbe());
