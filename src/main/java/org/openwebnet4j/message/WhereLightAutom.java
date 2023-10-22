@@ -112,7 +112,7 @@ public class WhereLightAutom extends Where {
                                         "WHERE address '" + w + "' is invalid: PL not in range [1-15]");
                             }
                         } else {
-                            lp = -1; // non lp was found
+                            lp = -1; // no lp was found
                         }
                     }
                 } else // 0 -> GEN
@@ -165,6 +165,10 @@ public class WhereLightAutom extends Where {
 
     public boolean isGeneral() {
         return !isAPL && group == -1 && area == -1; // GEN if it's not APL, nor area, nor group
+    }
+
+    public boolean isArea() {
+        return !isAPL && area != -1;
     }
 
     public boolean isMultiple() {

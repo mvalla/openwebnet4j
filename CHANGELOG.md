@@ -3,11 +3,14 @@
 ## [0.11.0-SNAPSHOT] - 2023-xx-xx5
 
 ### Added
-- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+- Area/Group/General parsing and getters for WhereLightAutom and related tests
+- maven-enforcer-plugin
 
 ### Changed
 - updated README
-- added Area/Group/General parsing and getters for WhereLightAutom and related tests
+- updated config for maven-compiler-plugin
+- updated dependencies: junit-jupiter-engine, slf4j-api, org.apache.logging.log4j.log4j-slf4j-impl/log4j-api/log4j-core
+- updated maven plugins: maven-compiler-plugin, maven-gpg-plugin , maven-javadoc-plugin, maven-source-plugin, maven-surefire-plugin, maven-bundle-plugin
 
 
 ## [0.10.1] - 2023-07-15

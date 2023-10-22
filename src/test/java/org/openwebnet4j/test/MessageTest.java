@@ -73,52 +73,57 @@ public class MessageTest {
             assertEquals(25, wl.getGroup());
             assertEquals("#4#01", wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0");
+            wl = new WhereLightAutom("0"); // GEN
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
+            assertFalse(wl.isArea());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("#25");
+            wl = new WhereLightAutom("#25"); // GR 25
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(25, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("00");
+            wl = new WhereLightAutom("00"); // A 0
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertTrue(wl.isArea());
             assertEquals(0, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("7");
+            wl = new WhereLightAutom("7"); // A 7
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertTrue(wl.isArea());
             assertEquals(7, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("100");
+            wl = new WhereLightAutom("100"); // A 10
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertTrue(wl.isArea());
             assertEquals(10, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0003");
+            wl = new WhereLightAutom("0003"); // A 0, PL 3
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -127,7 +132,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0013");
+            wl = new WhereLightAutom("0013"); // A 0, PL 13
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -136,7 +141,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("13");
+            wl = new WhereLightAutom("13"); // A 1, PL 3
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -145,7 +150,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0113");
+            wl = new WhereLightAutom("0113"); // A 1, PL 13
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -154,7 +159,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("1003");
+            wl = new WhereLightAutom("1003"); // A 10, PL 3
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -163,7 +168,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("1013");
+            wl = new WhereLightAutom("1013"); // A 10, PL 13
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -172,7 +177,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertNull(wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0#3");
+            wl = new WhereLightAutom("0#3"); // GEN , local BUS 3
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
@@ -181,7 +186,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertEquals("#3", wl.getBUSIfc());
 
-            wl = new WhereLightAutom("#2#3");
+            wl = new WhereLightAutom("#2#3"); // GR 2, local BUS 3
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -190,7 +195,7 @@ public class MessageTest {
             assertEquals(2, wl.getGroup());
             assertEquals("#3", wl.getBUSIfc());
 
-            wl = new WhereLightAutom("100#3");
+            wl = new WhereLightAutom("100#3"); // A 10, local BUS 3
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
@@ -199,7 +204,7 @@ public class MessageTest {
             assertEquals(-1, wl.getGroup());
             assertEquals("#3", wl.getBUSIfc());
 
-            wl = new WhereLightAutom("0#4#02");
+            wl = new WhereLightAutom("0#4#02"); // GEN , local BUS #4#02
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
