@@ -69,6 +69,12 @@ public class Alarm extends BaseOpenMessage {
             }
         }
 
+        /**
+         * Return enum from value
+         *
+         * @param i the value
+         * @return the corresponding enum
+         */
         public static WhatAlarm fromValue(int i) {
             if (mapping == null) {
                 initMapping();

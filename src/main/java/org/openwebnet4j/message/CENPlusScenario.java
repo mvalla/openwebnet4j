@@ -53,6 +53,12 @@ public class CENPlusScenario extends CEN {
             }
         }
 
+        /**
+         * Return enum from value
+         *
+         * @param i the value
+         * @return the corresponding enum
+         */
         public static WhatCENPlus fromValue(int i) {
             if (mapping == null) {
                 initMapping();
@@ -87,6 +93,12 @@ public class CENPlusScenario extends CEN {
             }
         }
 
+        /**
+         * Return enum from value
+         *
+         * @param w the value
+         * @return the corresponding enum
+         */
         public static CENPlusPressure fromValue(WhatCENPlus w) {
             if (mapping == null) {
                 initMapping();

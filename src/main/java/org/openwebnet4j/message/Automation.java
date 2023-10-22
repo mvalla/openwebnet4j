@@ -85,6 +85,12 @@ public class Automation extends BaseOpenMessage {
             }
         }
 
+        /**
+         * Return enum from value
+         *
+         * @param i the value
+         * @return the corresponding enum
+         */
         public static DimAutomation fromValue(int i) {
             if (mapping == null) {
                 initMapping();
