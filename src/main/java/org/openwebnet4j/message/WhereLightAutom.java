@@ -139,22 +139,28 @@ public class WhereLightAutom extends Where {
     }
 
     /**
-     * Returns true if WHERE is addressing a specific light/automation point (APL combination)
+     * Returns the A (area) part for this WHERE address
      *
-     * @return true if is APL
+     * @return area number or -1 if no area is present
      */
-    public boolean isAPL() {
-        return isAPL;
-    }
-
     public int getArea() {
         return area;
     }
 
+    /**
+     * Returns the PL (light point) part for this WHERE address
+     *
+     * @return PL number or -1 if no PL is present
+     */
     public int getPL() {
         return lightPoint;
     }
 
+    /**
+     * Returns the GR (group) for this WHERE address
+     *
+     * @return GR number or -1 if no GR is present
+     */
     public int getGroup() {
         return group;
     }
@@ -163,19 +169,40 @@ public class WhereLightAutom extends Where {
         return busIfc;
     }
 
-    public boolean isGeneral() {
-        return !isAPL && group == -1 && area == -1; // GEN if it's not APL/A/G
+    /**
+     * Returns true if WHERE is addressing a specific light/automation point (APL combination)
+     *
+     * @return true if is APL
+     */
+    public boolean isAPL() {
+        return isAPL;
     }
 
-    public boolean isArea() {
-        return !isAPL && area != -1;
-    }
-
+    /**
+     * Returns true if the WHERE address is an GR (group) address, false otherwise
+     *
+     * @return true if the WHERE address is an GR (group) address
+     */
     public boolean isGroup() {
         return !isAPL && group != -1;
     }
 
-    public boolean isMultiple() {
-        return !isAPL;
+    /**
+     * Returns true if the WHERE address is an A (area) address, false otherwise
+     *
+     * @return true if the WHERE address is an A (area) address
+     */
+    public boolean isArea() {
+        return !isAPL && area != -1;
     }
+
+    /**
+     * Returns true if the WHERE address is the GEN (general) address, false otherwise
+     *
+     * @return true if the WHERE address is the GEN (general) address
+     */
+    public boolean isGeneral() {
+        return !isAPL && group == -1 && area == -1; // GEN if it's not APL/A/G
+    }
+
 }
