@@ -5,6 +5,7 @@
 ### Added
 - Area/Group/General parsing and getters for WhereLightAutom and related tests
 - maven-enforcer-plugin
+- first @NonNull annotations
 
 ### Changed
 - updated README

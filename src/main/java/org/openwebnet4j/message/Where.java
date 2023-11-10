@@ -14,11 +14,16 @@
  */
 package org.openwebnet4j.message;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Class to wrap WHERE part of frame
  *
  * @author M. Valla - Initial contribution
  */
+
+@NonNullByDefault
 public abstract class Where {
     protected final String whereStr;
 
@@ -51,7 +56,7 @@ public abstract class Where {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof Where) {
             return whereStr.equals(((Where) o).whereStr);
         } else {

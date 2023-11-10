@@ -16,6 +16,7 @@ package org.openwebnet4j.message;
 
 import java.util.Arrays;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -407,6 +408,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @return recognized device type or null if not device can be recognized
      * @throws FrameException in case of error in frame
      */
+    @Nullable
     public abstract OpenDeviceType detectDeviceType() throws FrameException;
 
     /**

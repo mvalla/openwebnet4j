@@ -20,6 +20,8 @@ import static org.openwebnet4j.message.Who.LIGHTING;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openwebnet4j.OpenDeviceType;
 
 /**
@@ -27,6 +29,8 @@ import org.openwebnet4j.OpenDeviceType;
  *
  * @author M. Valla - Initial contribution
  */
+
+@NonNullByDefault
 public class Lighting extends BaseOpenMessage {
 
     public enum WhatLighting implements What {
@@ -50,6 +54,7 @@ public class Lighting extends BaseOpenMessage {
         MOVEMENT_DETECTED(34),
         END_MOVEMENT_DETECTED(39);
 
+        @Nullable
         private static Map<Integer, WhatLighting> mapping;
 
         private final int value;
@@ -86,6 +91,7 @@ public class Lighting extends BaseOpenMessage {
     public enum DimLighting implements Dim {
         DIMMER_LEVEL_100(1);
 
+        @Nullable
         private static Map<Integer, DimLighting> mapping;
 
         private final int value;
@@ -276,6 +282,7 @@ public class Lighting extends BaseOpenMessage {
     }
 
     @Override
+    @Nullable
     public OpenDeviceType detectDeviceType() {
         if (isCommand()) { // ignore status/dimension frames for detecting device type
             OpenDeviceType type = null;
