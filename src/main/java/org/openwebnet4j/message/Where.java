@@ -27,18 +27,14 @@ import org.eclipse.jdt.annotation.Nullable;
 public abstract class Where {
     protected final String whereStr;
 
-    public Where(String w) throws NullPointerException, IllegalArgumentException {
-        if (w != null) {
-            char[] a = w.toCharArray();
-            for (char c : a) {
-                if (!(((c >= '0') && (c <= '9')) || (c == '#'))) {
-                    throw new IllegalArgumentException("WHERE can only contain '#' or digits [0-9]");
-                }
+    public Where(String w) throws IllegalArgumentException {
+        char[] a = w.toCharArray();
+        for (char c : a) {
+            if (!(((c >= '0') && (c <= '9')) || (c == '#'))) {
+                throw new IllegalArgumentException("WHERE can only contain '#' or digits [0-9]");
             }
-            this.whereStr = w;
-        } else {
-            throw new NullPointerException("WHERE value is null");
         }
+        this.whereStr = w;
     }
 
     @Override
