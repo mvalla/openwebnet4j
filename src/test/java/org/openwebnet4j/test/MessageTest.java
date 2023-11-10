@@ -78,6 +78,7 @@ public class MessageTest {
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
             assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -88,6 +89,7 @@ public class MessageTest {
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
             assertFalse(wl.isArea());
+            assertTrue(wl.isGroup());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(25, wl.getGroup());
@@ -98,6 +100,7 @@ public class MessageTest {
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
             assertTrue(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(0, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -108,6 +111,7 @@ public class MessageTest {
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
             assertTrue(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(7, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -118,6 +122,7 @@ public class MessageTest {
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
             assertTrue(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(10, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -127,6 +132,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(0, wl.getArea());
             assertEquals(3, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -136,6 +143,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(0, wl.getArea());
             assertEquals(13, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -145,6 +154,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(1, wl.getArea());
             assertEquals(3, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -154,6 +165,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(1, wl.getArea());
             assertEquals(13, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -163,6 +176,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(10, wl.getArea());
             assertEquals(3, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -172,6 +187,8 @@ public class MessageTest {
             assertFalse(wl.isMultiple());
             assertTrue(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(10, wl.getArea());
             assertEquals(13, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -181,6 +198,8 @@ public class MessageTest {
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -190,6 +209,8 @@ public class MessageTest {
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertTrue(wl.isGroup());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(2, wl.getGroup());
@@ -199,6 +220,8 @@ public class MessageTest {
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertFalse(wl.isGeneral());
+            assertTrue(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(10, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());
@@ -208,6 +231,8 @@ public class MessageTest {
             assertTrue(wl.isMultiple());
             assertFalse(wl.isAPL());
             assertTrue(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertFalse(wl.isGroup());
             assertEquals(-1, wl.getArea());
             assertEquals(-1, wl.getPL());
             assertEquals(-1, wl.getGroup());

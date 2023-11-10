@@ -51,7 +51,7 @@ package org.openwebnet4j.message;
  * Address can end with <code>#3</code> (private BUS) or with <code>#4#INTERFACE</code> (local BUS with INTERFACE
  * [0-1][1-9] )
  *
- * @author M. Valla - Initial contribution. Added Area/Group/General parsing
+ * @author M. Valla - Initial contribution. Added General/Area/Group parsing
  */
 public class WhereLightAutom extends Where {
 
@@ -164,11 +164,15 @@ public class WhereLightAutom extends Where {
     }
 
     public boolean isGeneral() {
-        return !isAPL && group == -1 && area == -1; // GEN if it's not APL, nor area, nor group
+        return !isAPL && group == -1 && area == -1; // GEN if it's not APL/A/G
     }
 
     public boolean isArea() {
         return !isAPL && area != -1;
+    }
+
+    public boolean isGroup() {
+        return !isAPL && group != -1;
     }
 
     public boolean isMultiple() {
