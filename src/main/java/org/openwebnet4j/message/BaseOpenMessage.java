@@ -398,8 +398,10 @@ public abstract class BaseOpenMessage extends OpenMessage {
         }
     }
 
+    @Nullable
     protected abstract Dim dimFromValue(int i);
 
+    @Nullable
     protected abstract What whatFromValue(int i);
 
     /**

@@ -65,16 +65,24 @@ public class Lighting extends BaseOpenMessage {
 
         private static void initMapping() {
             mapping = new HashMap<Integer, WhatLighting>();
+            Map<Integer, WhatLighting> lMapping = mapping;
             for (WhatLighting w : values()) {
-                mapping.put(w.value, w);
+                lMapping.put(w.value, w);
             }
         }
 
+        @Nullable
         public static WhatLighting fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
-            return mapping.get(i);
+            Map<Integer, WhatLighting> lMapping = mapping;
+            if (lMapping != null) {
+                return lMapping.get(i);
+            } else {
+                return null;
+            }
+
         }
 
         @Override
@@ -84,6 +92,7 @@ public class Lighting extends BaseOpenMessage {
     }
 
     @Override
+    @Nullable
     protected What whatFromValue(int i) {
         return WhatLighting.fromValue(i);
     }
@@ -102,16 +111,23 @@ public class Lighting extends BaseOpenMessage {
 
         private static void initMapping() {
             mapping = new HashMap<Integer, DimLighting>();
+            Map<Integer, DimLighting> lMapping = mapping;
             for (DimLighting d : values()) {
-                mapping.put(d.value, d);
+                lMapping.put(d.value, d);
             }
         }
 
+        @Nullable
         public static DimLighting fromValue(int i) {
             if (mapping == null) {
                 initMapping();
             }
-            return mapping.get(i);
+            Map<Integer, DimLighting> lMapping = mapping;
+            if (lMapping != null) {
+                return lMapping.get(i);
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -121,6 +137,7 @@ public class Lighting extends BaseOpenMessage {
     }
 
     @Override
+    @Nullable
     protected Dim dimFromValue(int i) {
         return DimLighting.fromValue(i);
     }
@@ -242,13 +259,16 @@ public class Lighting extends BaseOpenMessage {
      *
      * @param percent 0-100
      * @return What level (2-10) corresponding to percent
+     * @throws IllegalArgumentException if parameter is not 0-100
      */
     public static What percentToWhat(int percent) {
         if (percent >= 0 && percent <= 100) {
-            return WhatLighting.fromValue(percentToWhatLevel(percent));
-        } else {
-            throw new IllegalArgumentException("Percent must be between 0 and 100");
+            WhatLighting wl = WhatLighting.fromValue(percentToWhatLevel(percent));
+            if (wl != null) {
+                return wl;
+            }
         }
+        throw new IllegalArgumentException("Percent must be between 0 and 100");
     }
 
     /* Transforms a percent int (0-100) into a 0,2-10 level (int) */
