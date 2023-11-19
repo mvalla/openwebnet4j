@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.11.0-SNAPSHOT] - 2023-xx-xx5
+## [0.11.0] - 2023-11-19
 
 ### Added
 - Area/Group/General parsing and getters for WhereLightAutom and related tests
