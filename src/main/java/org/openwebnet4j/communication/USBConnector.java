@@ -15,9 +15,18 @@
 package org.openwebnet4j.communication;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.TooManyListenersException;
+import java.util.stream.Collectors;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.openwebnet4j.communication.serial.PortInUseException;
+import org.openwebnet4j.communication.serial.SerialPort;
+import org.openwebnet4j.communication.serial.SerialPortEvent;
+import org.openwebnet4j.communication.serial.SerialPortEventListener;
+import org.openwebnet4j.communication.serial.SerialPortException;
+import org.openwebnet4j.communication.serial.SerialPortIdentifier;
+import org.openwebnet4j.communication.serial.SerialPortManager;
+import org.openwebnet4j.communication.serial.UnsupportedCommOperationException;
 import org.openwebnet4j.message.AckOpenMessage;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
@@ -30,15 +39,6 @@ import org.openwebnet4j.message.UnsupportedFrameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gnu.io.CommPortIdentifier;
-import gnu.io.NRSerialPort;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
-
 /**
  * Class for communicating with a ZigBee USB Gateway using the OpenWebNet protocol
  *
@@ -47,6 +47,7 @@ import gnu.io.UnsupportedCommOperationException;
 public class USBConnector extends OpenConnector implements SerialPortEventListener {
 
     private static final int SERIAL_SPEED = 19200; // UART baud as declared in the OWN specs
+    private static final int SERIAL_PORT_OPEN_TIMEOUT = 1000; // UART baud as declared in the OWN specs
 
     private final Logger logger = LoggerFactory.getLogger(USBConnector.class);
     private final Logger msgLogger = LoggerFactory.getLogger(logger.getName() + ".message");
@@ -63,7 +64,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     // Dimension response bug
 
     private final String portName; // the serial port name we are connecting to
-    private NRSerialPort serialPort; // the serial port, once connected
+    private SerialPort serialPort; // the serial port, once connected
 
     private Response currentResponse;
     private final Object requestSentSynchObj = new Object(); // Synch object to synchronise sending a request frame and
@@ -153,7 +154,13 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private void connectUSBDongle(String portN) throws OWNException {
         if (serialPort == null) {
             serialPort = connectSerialPort(portN);
-            cmdChannel = new FrameChannel(serialPort.getInputStream(), serialPort.getOutputStream(), "USB");
+            try {
+                cmdChannel = new FrameChannel(serialPort.getInputStream(), serialPort.getOutputStream(), "USB");
+            } catch (IOException e) {
+                disconnectSerialPort();
+                throw new OWNException(
+                        "Failed to getInput/OutputStreams for Zigbee USB Gateway on serial port: " + portN, e);
+            }
         }
         try {
             // send requestKeepConnect to see if USB stick is ready to receive commands
@@ -184,7 +191,8 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
     }
 
-    private NRSerialPort connectSerialPort(String portN) throws OWNException {
+    private SerialPort connectSerialPort(String portN) throws OWNException {
+        // FIXME remove
         try {
             // FIXME If I call RXTXVersion.getVersion(), it throws NoClassDefError each time gnu.io
             // is called again
@@ -195,98 +203,88 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             throw new OWNException(
                     "Serial connection requires RXTX libraries to be available, but they could not be found!", e);
         }
-        CommPortIdentifier ident = null;
-        try { // see if serial port exists
-            ident = CommPortIdentifier.getPortIdentifier(portN);
-        } catch (NoSuchPortException e) {
-            logger.info("##USB-conn## Failed to connect to serial port {}: NoSuchPortException", portN);
-            String availPorts = listSerialPorts();
-            logger.info("##USB-conn## Available serial ports are: {}", availPorts);
-            throw new OWNException(
-                    "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts, e);
-        }
-        logger.debug("##USB-conn## CommPortIndetifier: name={} type={} owner={}", ident.getName(), ident.getPortType(),
-                ident.getCurrentOwner());
+        // FIXME remove -- END
 
-        if (ident.getPortType() != CommPortIdentifier.PORT_SERIAL) {
-            logger.error("##USB-conn## Port {} is not a serial port", ident.getName());
-            throw new OWNException("Failed to connect to port " + portN + " (not a serial port).");
+        SerialPortManager portManager;
+        try {
+            portManager = new SerialPortManager();
+        } catch (SerialPortException e) {
+            logger.error(
+                    "##USB-conn## Serial connection requires a SerialPortProvider class, but it could not be found!");
+            throw new OWNException("Serial connection requires a SerialPortProvider class, but it could not be found!",
+                    e);
         }
+
+        SerialPortIdentifier ident = null;
+        // see if serial port exists
+        ident = portManager.getIdentifier(portN);
+        if (ident == null) {
+            logger.warn("##USB-conn## Failed to connect to serial port {}: port cannot be found", portN);
+            String availPorts = listSerialPorts(portManager);
+            logger.warn("##USB-conn## Available serial ports are: {}", availPorts);
+            throw new OWNException(
+                    "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts);
+        }
+        logger.debug("##USB-conn## CommPortIndetifier: name={} owner={}", ident.getName(), ident.getCurrentOwner());
+
+        // if (ident.getPortType() != CommPortIdentifier.PORT_SERIAL) {
+        // logger.error("##USB-conn## Port {} is not a serial port", ident.getName());
+        // throw new OWNException("Failed to connect to port " + portN + " (not a serial port).");
+        // }
         if (ident.isCurrentlyOwned()) {
             logger.debug("##USB-conn## Serial port {} is already in use", ident.getName());
             throw new OWNException("Failed to connect to serial port " + portN + ". Port is already in use.");
         }
-        NRSerialPort connectPort = new NRSerialPort(portN, SERIAL_SPEED);
-        logger.debug("##USB-conn## NRSerialPort created");
 
+        SerialPort sp;
         try {
-            if (!connectPort.connect()) {
-                logger.info("Failed to connect to serial port {}", ident.getName());
-                throw new OWNException("Failed to connect to serial port " + ident.getName()
-                        + " (NRSerialPort.connect() returned false)");
-            }
-            connectPort.getSerialPortInstance().setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8,
-                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            sp = ident.open("openwebnet4j", SERIAL_PORT_OPEN_TIMEOUT);
+            logger.debug("##USB-conn## SerialPort connected");
+            sp.setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            logger.debug("##USB-conn## SerialPort connection params set");
+        } catch (PortInUseException piue) {
+            logger.debug("##USB-conn## Serial port {} is already in use (PortInUseException)", ident.getName());
+            throw new OWNException(
+                    "Failed to connect to serial port " + portN + ". Port is already in use (PortInUseException).",
+                    piue);
         } catch (UnsupportedCommOperationException ue) {
             logger.error("##USB-conn## Failed setting params for port {}", ident.getName());
             throw new OWNException("Failed setting params for port: " + portN, ue);
-        } catch (OWNException oe) {
-            throw oe;
         } catch (Exception e) {
-            // PortInUseException could be thrown but is not declared, so we check here
-            if (e instanceof PortInUseException) {
-                logger.debug("##USB-conn## Serial port {} is already in use (PortInUseException)", ident.getName());
-                throw new OWNException(
-                        "Failed to connect to serial port " + portN + ". Port is already in use (PortInUseException).",
-                        e);
-            } else {
-                logger.debug("##USB-conn## Exception while connecting serial port: {}", e.getMessage());
-                throw new OWNException("Failed to connect to serial port " + portN, e);
-            }
+            logger.debug("##USB-conn## Exception while connecting serial port: {}", e.getMessage());
+            throw new OWNException("Failed to connect to serial port " + portN, e);
         }
-        SerialPort sp = connectPort.getSerialPortInstance();
 
         // try {
         // sp.enableReceiveThreshold(1); // makes read() blocking until at least 1 char is
         // received
         // sp.disableReceiveTimeout(); // disable any read() timeout
         // sp.enableReceiveTimeout(SERIAL_RECEIVE_TIMEOUT);
-        logger.debug("##USB-conn## isReceiveThresholdEnabled={} v={}", sp.isReceiveThresholdEnabled(),
-                sp.getReceiveThreshold());
-        logger.debug("##USB-conn## isReceiveTimeoutEnabled={} v={}", sp.isReceiveTimeoutEnabled(),
-                sp.getReceiveTimeout());
-        logger.debug("##USB-conn## FlowControl: {}", sp.getFlowControlMode());
+        // logger.debug("##USB-conn## isReceiveThresholdEnabled={} v={}", sp.isReceiveThresholdEnabled(),
+        // sp.getReceiveThreshold());
+        // logger.debug("##USB-conn## isReceiveTimeoutEnabled={} v={}", sp.isReceiveTimeoutEnabled(),
+        // sp.getReceiveTimeout());
+        // logger.debug("##USB-conn## FlowControl: {}", sp.getFlowControlMode());
 
-        logger.info("##USB-conn## === CONNECTED TO SERIAL PORT {} ===", connectPort.getSerialPortInstance().getName());
-        return connectPort;
+        logger.info("##USB-conn## === CONNECTED TO SERIAL PORT {} ===", ident.getName());
+        return sp;
     }
 
     private void disconnectSerialPort() {
         if (serialPort != null) {
-            serialPort.disconnect();
+            serialPort.close();
             logger.debug("##USB-conn## Serial port {} DISCONNECTED", portName);
             serialPort = null;
         }
     }
 
-    private String listSerialPorts() {
-        StringBuilder sb = new StringBuilder();
-        Enumeration<?> portList = CommPortIdentifier.getPortIdentifiers();
-        boolean first = true;
-        while (portList.hasMoreElements()) {
-            CommPortIdentifier id = (CommPortIdentifier) portList.nextElement();
-            if (id.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                if (!first) {
-                    sb.append(", ");
-                }
-                sb.append(id.getName());
-                first = false;
-            }
+    private String listSerialPorts(SerialPortManager portManager) {
+        String result = portManager.getIdentifiers().map(id -> id.getName()).collect(Collectors.joining(", "));
+        if (result.length() == 0) {
+            return "-NO SERIAL PORTS FOUND-";
+        } else {
+            return result;
         }
-        if (sb.length() == 0) {
-            sb.append("-NO SERIAL PORTS FOUND-");
-        }
-        return sb.toString();
     }
 
     @Override
@@ -393,7 +391,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     }
 
     @Override
-    public void serialEvent(SerialPortEvent event) {
+    public void serialEvent(@NonNull SerialPortEvent event) {
         int eventType = event.getEventType();
         switch (eventType) {
             case SerialPortEvent.DATA_AVAILABLE:
@@ -467,4 +465,5 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         // e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
         return Integer.signum(vals1.length - vals2.length);
     }
+
 }
