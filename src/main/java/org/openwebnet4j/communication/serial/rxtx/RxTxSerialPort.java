@@ -35,7 +35,28 @@ import gnu.io.SerialPortEvent;
 @NonNullByDefault
 public class RxTxSerialPort implements SerialPort {
 
+    private class RxTxEvListener implements gnu.io.SerialPortEventListener {
+
+        @Nullable
+        SerialPortEventListener lsnr;
+
+        void subscribe(SerialPortEventListener listener) {
+            lsnr = listener;
+        }
+
+        @Override
+        public void serialEvent(@Nullable SerialPortEvent ev) {
+            if (ev != null && lsnr != null) {
+                lsnr.serialEvent(new RxTxSerialPortEvent(ev));
+            }
+
+        }
+
+    }
+
     private final gnu.io.SerialPort sp;
+    @Nullable
+    RxTxEvListener massiL = null;
 
     /**
      * Constructor.
@@ -73,15 +94,10 @@ public class RxTxSerialPort implements SerialPort {
 
     @Override
     public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
-        sp.addEventListener(new gnu.io.SerialPortEventListener() {
-            @Override
-            public void serialEvent(final @Nullable SerialPortEvent event) {
-                if (event == null) {
-                    return;
-                }
-                listener.serialEvent(new RxTxSerialPortEvent(event));
-            }
-        });
+        massiL = new RxTxEvListener();
+        massiL.subscribe(listener);
+        sp.notifyOnDataAvailable(true);
+        sp.addEventListener(massiL);
     }
 
     @Override

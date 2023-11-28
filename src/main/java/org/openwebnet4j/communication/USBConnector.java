@@ -102,7 +102,18 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
         try {
             // send supervisor to receive all events from devices
+
+            /// RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // String frameStr = GatewayMgmt.requestSupervisor().getFrameValue();
+            // cmdChannel.sendFrame(frameStr);
+            // hsLogger.info("MASSSSSSSSSSSIIIIIIIIIIIIII (HS) USB HS==>>>> `{}`", frameStr);
+            // Thread.sleep(50); // we must wait few ms for the answer to be ready
+            // String resp = cmdChannel.readFrames();
+            // hsLogger.info("MASSSSSSSSSSSIIIIIIIIIIIIII (HS) USB <<<<==HS `{}`", resp);
+            /// END----RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             sendCommandSynchInternal(GatewayMgmt.requestSupervisor().getFrameValue());
+
         } catch (IOException | FrameException e) {
             throw new OWNException("Failed to set supervisor to ZigBee USB Gateway on serial port: " + portName, e);
         }
@@ -112,6 +123,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
 
     private void checkFirmwareVersion() throws OWNException {
         try {
+
             Response res = sendCommandSynchInternal(GatewayMgmt.requestFirmwareVersion().getFrameValue());
             if (res != null) {
                 OpenMessage msg = res.getResponseMessages().get(0);
@@ -163,9 +175,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             }
         }
         try {
-            // send requestKeepConnect to see if USB stick is ready to receive commands
+            // send requestKeepConnect (*13*60*##) to see if USB stick is ready to receive commands
             GatewayMgmt frame = GatewayMgmt.requestKeepConnect();
-            cmdChannel.sendFrame(GatewayMgmt.requestKeepConnect().getFrameValue());
+            cmdChannel.sendFrame(frame.getFrameValue());
 
             hsLogger.info("(HS) USB HS==>>>> `{}`", frame.getFrameValue());
             Thread.sleep(50); // we must wait few ms for the answer to be ready

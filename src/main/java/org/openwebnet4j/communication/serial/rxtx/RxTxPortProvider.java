@@ -43,7 +43,7 @@ public class RxTxPortProvider implements SerialPortProvider {
         String portPathAsString = port.getPath();
         try {
             CommPortIdentifier ident = CommPortIdentifier.getPortIdentifier(portPathAsString);
-            return new SerialPortIdentifierImpl(ident);
+            return new RxTxSerialPortIdentifier(ident);
         } catch (NoSuchPortException e) {
             logger.debug("No SerialPortIdentifier found for: {}", portPathAsString, e);
             return null;
@@ -59,7 +59,7 @@ public class RxTxPortProvider implements SerialPortProvider {
         Stream<CommPortIdentifier> scanIds = Collections.list(identifiers).stream();
 
         return scanIds.filter(id -> id.getPortType() == CommPortIdentifier.PORT_SERIAL)
-                .map(sid -> new SerialPortIdentifierImpl(sid));
+                .map(sid -> new RxTxSerialPortIdentifier(sid));
     }
 
 }

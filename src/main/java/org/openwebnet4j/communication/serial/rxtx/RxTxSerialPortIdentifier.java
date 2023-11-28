@@ -29,7 +29,7 @@ import gnu.io.CommPortIdentifier;
  * @author M. Valla - Initial contribution, inspired by OH Serial Transport
  */
 @NonNullByDefault
-public class SerialPortIdentifierImpl implements SerialPortIdentifier {
+public class RxTxSerialPortIdentifier implements SerialPortIdentifier {
 
     final CommPortIdentifier id;
 
@@ -38,7 +38,7 @@ public class SerialPortIdentifierImpl implements SerialPortIdentifier {
      *
      * @param id the underlying comm port identifier implementation
      */
-    public SerialPortIdentifierImpl(final CommPortIdentifier id) {
+    public RxTxSerialPortIdentifier(final CommPortIdentifier id) {
         this.id = id;
     }
 
