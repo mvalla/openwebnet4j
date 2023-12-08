@@ -407,6 +407,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         int eventType = event.getEventType();
         switch (eventType) {
             case SerialPortEvent.DATA_AVAILABLE:
+            case 16:
                 String frame = null;
                 logger.debug("##USB-conn## START Processing DATA_AVAILABLE event...");
                 do {

@@ -30,7 +30,8 @@ import org.eclipse.jdt.annotation.Nullable;
 @NonNullByDefault
 public class SerialPortManager {
 
-    private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.rxtx.RxTxPortProvider";
+    // private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.rxtx.RxTxPortProvider";
+    private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.jserialcomm.JSerialCommPortProvider";
 
     @Nullable
     private SerialPortProvider provider;

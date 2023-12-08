@@ -41,8 +41,4 @@ public class RxTxSerialPortEvent implements SerialPortEvent {
         return event.getEventType();
     }
 
-    @Override
-    public boolean getNewValue() {
-        return event.getNewValue();
-    }
 }

@@ -33,4 +33,8 @@ public class PortInUseException extends Exception {
     public PortInUseException(Exception cause) {
         super(cause);
     }
+
+    public PortInUseException(String message) {
+        super(message);
+    }
 }

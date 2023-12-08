@@ -12,33 +12,33 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  */
-package org.openwebnet4j.communication.serial;
+package org.openwebnet4j.communication.serial.jserialcomm;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.openwebnet4j.communication.serial.SerialPortEvent;
 
 /**
- * Interface for a serial port event.
+ * Specific serial port event implementation.
  *
  * @author M. Valla - Initial contribution, inspired by OH Serial Transport
  */
 @NonNullByDefault
-public interface SerialPortEvent {
-    final int DATA_AVAILABLE = 1;
-    final int OUTPUT_BUFFER_EMPTY = 2;
-    final int CTS = 3;
-    final int DSR = 4;
-    final int RI = 5;
-    final int CD = 6;
-    final int OE = 7;
-    final int PE = 8;
-    final int FE = 9;
-    final int BI = 10;
+public class JSerialCommSerialPortEvent implements SerialPortEvent {
+
+    private final com.fazecast.jSerialComm.SerialPortEvent event;
 
     /**
-     * Get the type of the event.
+     * Constructor.
      *
-     * @return the event type
+     * @param event the underlying event implementation
      */
-    int getEventType();
+    public JSerialCommSerialPortEvent(final com.fazecast.jSerialComm.SerialPortEvent event) {
+        this.event = event;
+    }
+
+    @Override
+    public int getEventType() {
+        return event.getEventType();
+    }
 
 }
