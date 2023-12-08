@@ -4,7 +4,7 @@
 
 	<groupId>io.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.11.0</version>
+	<version>0.11.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
     <name>openwebnet4j OpenWebNet Java library</name>
