@@ -47,6 +47,12 @@ public class JSerialCommSerialPortIdentifier implements SerialPortIdentifier {
 
     @Override
     public SerialPort open(String owner, int timeout) throws PortInUseException {
+        // sp.setComPortTimeouts(com.fazecast.jSerialComm.SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 200, 0);
+        // sp.setComPortTimeouts(com.fazecast.jSerialComm.SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+
+        System.out.println("jSerialComm SerialPort.getReadTimeout() = " + sp.getReadTimeout());
+        System.out.println("jSerialComm SerialPort.getPortDescription() = " + sp.getPortDescription());
+
         boolean success = sp.openPort();
         if (success) {
             return new JSerialCommSerialPort(sp);

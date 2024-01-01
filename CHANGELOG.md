@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.12.0-SNAPSHOT] - 2024-xx-xx
+
+### Added
+- TODO  support for other serial implementations via Service Provider Interface (SPI)
+- TESTING serial implementation using jSerialComm lib
+
+### Changed
+- TODO updated copyright year 
+
+
 ## [0.11.0] - 2023-11-19
 
 ### Added

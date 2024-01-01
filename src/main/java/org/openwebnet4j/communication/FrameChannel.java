@@ -24,6 +24,8 @@ import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fazecast.jSerialComm.SerialPortTimeoutException;
+
 /**
  * Class that wraps input/output streams to send and receive frames from a OpenWebNet gateway
  *
@@ -82,18 +84,18 @@ public class FrameChannel {
             int size = readUntilDelimiter(in, buf);
             if (size > 0) {
                 String longFrame = new String(buf, 0, size);
-                logger.trace("-FC-{}   <---   {}", name, longFrame);
+                logger.debug("-FC-{}   <---   {}", name, longFrame);
                 // This is a fix to a bug on older Zigbee gateways in the response to device info
                 // 2-UNITS where an ACK is added after each unit and not just at the end
                 if (longFrame.contains("#9*66*")) { // it's a response to device info
                     // perform another read to receive more 2-UNITS info, if any
                     if ((size = readUntilDelimiter(in, buf)) > 0) {
                         String otherFrame = new String(buf, 0, size);
-                        logger.trace("-FC-{}   <---   {}", name, otherFrame);
+                        logger.debug("-FC-{}   <---   {}", name, otherFrame);
                         longFrame += otherFrame;
                         if (OpenMessage.FRAME_ACK.equals(otherFrame) && (size = readUntilDelimiter(in, buf)) > 0) {
                             otherFrame = new String(buf, 0, size);
-                            logger.trace("-FC-{}   <---   {}", name, otherFrame);
+                            logger.debug("-FC-{}   <---   {}", name, otherFrame);
                             longFrame += otherFrame;
                             if (longFrame.regionMatches(0, otherFrame, 0, 12)) {
                                 // frames refer to same ZigBee device: remove first ACK
@@ -112,7 +114,7 @@ public class FrameChannel {
                 // end-of-fix
 
                 if (longFrame.contains(OpenMessage.FRAME_END)) {
-                    logger.trace("-FC-{} <------- {}", name, longFrame);
+                    logger.debug("-FC-{} <------- {}", name, longFrame);
                     String[] frames = longFrame.split(OpenMessage.FRAME_END);
                     // add each single frame to the queue
                     for (String singleFrame : frames) {
@@ -139,29 +141,37 @@ public class FrameChannel {
      * @throws IOException in case of problems with the InputStream
      */
     private int readUntilDelimiter(InputStream is, byte[] buffer) throws IOException {
-        logger.trace("-FC-{} Trying readUntilDelimiter...", name);
+        logger.debug("-FC-{} Trying readUntilDelimiter...", name);
         int numBytes = 0;
         int cint = 0;
         char cchar = ' ';
         Boolean hashFound = false;
         // reads one char each cycle and stop when the sequence ends with ## (OpenWebNet delimiter)
-        do {
-            cint = is.read();
-            if (cint == -1) {
-                logger.trace("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
-                return numBytes;
-            } else {
-                buffer[numBytes++] = (byte) cint;
-                cchar = (char) cint;
-                if (cchar == '#' && hashFound == false) { // Found first #
-                    hashFound = true;
-                } else if (cchar == '#') { // Found second #, frame terminated correctly -> EXIT
-                    break;
-                } else if (cchar != '#') { // Append char and start again finding the first #
-                    hashFound = false;
+        try {
+            do {
+                cint = is.read();
+                if (cint == -1) {
+                    logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
+                    return numBytes;
+                } else {
+                    buffer[numBytes++] = (byte) cint;
+
+                    String read = new String(buffer, 0, numBytes);
+                    // logger.debug("read so far: {}", read);
+
+                    cchar = (char) cint;
+                    if (cchar == '#' && hashFound == false) { // Found first #
+                        hashFound = true;
+                    } else if (cchar == '#') { // Found second #, frame terminated correctly -> EXIT
+                        break;
+                    } else if (cchar != '#') { // Append char and start again finding the first #
+                        hashFound = false;
+                    }
                 }
-            }
-        } while (true);
+            } while (true);
+        } catch (SerialPortTimeoutException spte) {
+            return -1;
+        }
         return numBytes;
     }
 

@@ -48,7 +48,7 @@ public class JSerialCommSerialPort implements SerialPort {
         @Override
         public int getListeningEvents() {
             return com.fazecast.jSerialComm.SerialPort.LISTENING_EVENT_DATA_AVAILABLE
-                    | com.fazecast.jSerialComm.SerialPort.LISTENING_EVENT_DATA_RECEIVED
+                    // | com.fazecast.jSerialComm.SerialPort.LISTENING_EVENT_DATA_RECEIVED
                     | com.fazecast.jSerialComm.SerialPort.LISTENING_EVENT_PORT_DISCONNECTED;
         }
 
