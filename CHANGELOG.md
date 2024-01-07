@@ -7,8 +7,8 @@
 - TESTING serial implementation using jSerialComm lib
 
 ### Changed
-- TODO updated copyright year 
-
+- updated copyright year 
+- updated maven-javadoc-plugin
 
 ## [0.11.0] - 2023-11-19
 

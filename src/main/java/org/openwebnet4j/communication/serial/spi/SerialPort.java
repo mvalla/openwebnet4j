@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -41,7 +41,7 @@ public interface SerialPort extends Closeable {
      * @param dataBits the number of data bits
      * @param stopBits the number of stop bits
      * @param parity the parity
-     * @returns true if parameters could be set successfully
+     * @return true if parameters could be set successfully
      */
     public boolean setSerialPortParams(int baudrate, int dataBits, int stopBits, int parity);
 
@@ -53,7 +53,7 @@ public interface SerialPort extends Closeable {
      * After the port is closed, no more event will be generated.
      *
      * @param listener the listener
-     * @returns false if too many listeners has been added
+     * @return false if too many listeners has been added
      */
     public boolean addEventListener(SerialPortEventListener listener);
 
