@@ -12,27 +12,20 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  */
-package org.openwebnet4j.communication.serial;
+
+package org.openwebnet4j.communication.serial.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Interface for a serial port event.
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public interface SerialPortEvent {
-    final int DATA_AVAILABLE = 1;
-    final int OUTPUT_BUFFER_EMPTY = 2;
-    final int CTS = 3;
-    final int DSR = 4;
-    final int RI = 5;
-    final int CD = 6;
-    final int OE = 7;
-    final int PE = 8;
-    final int FE = 9;
-    final int BI = 10;
+    final int EVENT_DATA_AVAILABLE = 1;
+    final int EVENT_PORT_DISCONNECTED = 268435456;
 
     /**
      * Get the type of the event.

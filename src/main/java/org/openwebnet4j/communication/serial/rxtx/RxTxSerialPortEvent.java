@@ -15,12 +15,12 @@
 package org.openwebnet4j.communication.serial.rxtx;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.openwebnet4j.communication.serial.SerialPortEvent;
+import org.openwebnet4j.communication.serial.spi.SerialPortEvent;
 
 /**
  * Specific serial port event implementation.
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public class RxTxSerialPortEvent implements SerialPortEvent {

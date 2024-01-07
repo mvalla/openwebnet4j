@@ -15,23 +15,25 @@
 package org.openwebnet4j.communication.serial;
 
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openwebnet4j.communication.serial.spi.SerialPort;
+import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 
 /**
- * Class to manage Serial Port
+ * Class to find available serial ports via a {@link SerialPortProvider} implementation
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public class SerialPortManager {
 
-    // private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.rxtx.RxTxPortProvider";
-    private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.jserialcomm.JSerialCommPortProvider";
+    private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider";
+    // private static final String DEFAULT_PROVIDER =
+    // "org.openwebnet4j.communication.serial.jserialcomm.JSerialCommPortProvider";
 
     @Nullable
     private SerialPortProvider provider;
@@ -58,33 +60,33 @@ public class SerialPortManager {
     }
 
     /**
-     * Gets a serial port identifier for a given name.
+     * Returns a serial port given a port name.
      *
      * @param name the name
      * @return a serial port identifier or null
      */
-    public @Nullable SerialPortIdentifier getIdentifier(final String name) {
-        final Optional<SerialPortIdentifier> opt = getIdentifiers().filter(id -> id.getName().equals(name)).findFirst();
-        if (opt.isPresent()) {
-            return opt.get();
+    public @Nullable SerialPort getSerialPort(final String name) {
+        if (provider != null) {
+            return provider.getSerialPort(name);
         } else {
             return null;
         }
     }
 
     /**
-     * Gets the discovered serial port identifiers.
+     * Returns a stream of available serial ports.
      *
-     * {@link SerialPortProvider}s may not be able to discover any or all identifiers.
-     * When the port name is known, the preferred way to get an identifier is by using {@link #getIdentifier(String)}.
+     * {@link SerialPortProvider}s may not be able to list any or all serial ports.
+     * When the port name is known, the preferred way to get a serial port is by using {@link #getSerialPort(String)}.
      *
-     * @return stream of discovered serial port identifiers
+     * @return stream of available serial ports
      */
-    public Stream<SerialPortIdentifier> getIdentifiers() {
+    public Stream<SerialPort> getSerialPorts() {
         if (provider != null) {
-            return provider.getSerialPortIdentifiers();
+            return provider.getSerialPorts();
         } else {
             return Stream.empty();
         }
     }
+
 }

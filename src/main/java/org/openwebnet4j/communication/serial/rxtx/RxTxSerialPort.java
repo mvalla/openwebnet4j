@@ -19,13 +19,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.TooManyListenersException;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openwebnet4j.communication.serial.SerialPort;
-import org.openwebnet4j.communication.serial.SerialPortEventListener;
-import org.openwebnet4j.communication.serial.UnsupportedCommOperationException;
+import org.openwebnet4j.communication.serial.spi.SerialPort;
+import org.openwebnet4j.communication.serial.spi.SerialPortEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.PortInUseException;
 import gnu.io.SerialPortEvent;
+import gnu.io.UnsupportedCommOperationException;
 
 /**
  * Specific serial port implementation.
@@ -34,6 +40,8 @@ import gnu.io.SerialPortEvent;
  */
 @NonNullByDefault
 public class RxTxSerialPort implements SerialPort {
+
+    private static final Logger logger = LoggerFactory.getLogger(RxTxSerialPort.class);
 
     private class RxTxEvListener implements gnu.io.SerialPortEventListener {
 
@@ -49,60 +57,102 @@ public class RxTxSerialPort implements SerialPort {
             if (ev != null && lsnr != null) {
                 lsnr.serialEvent(new RxTxSerialPortEvent(ev));
             }
-
         }
-
     }
 
-    private final gnu.io.SerialPort sp;
+    private final gnu.io.CommPortIdentifier cpid;
+    private gnu.io.@Nullable SerialPort sp = null;
     @Nullable
-    RxTxEvListener massiL = null;
+    RxTxEvListener rxtxListener = null;
 
-    /**
-     * Constructor.
-     *
-     * @param sp the underlying serial port implementation
-     */
-    public RxTxSerialPort(final gnu.io.SerialPort sp) {
-        this.sp = sp;
+    public RxTxSerialPort(final CommPortIdentifier cpid) {
+        this.cpid = cpid;
+    }
+
+    @Override
+    public boolean open() {
+        CommPort cp;
+        try {
+            cp = cpid.open("openwebnet4j", 1000);
+        } catch (PortInUseException e) {
+            logger.error("PortInUseException while opening port: " + e.getMessage());
+            return false;
+        }
+        if (cp instanceof gnu.io.SerialPort) {
+            sp = (gnu.io.SerialPort) cp;
+            return true;
+        } else {
+            logger.error("Error while opening port: we expect a serial port but port is of type {}", cp.getClass());
+            return false;
+        }
     }
 
     @Override
     public void close() {
-        sp.close();
+        gnu.io.@Nullable SerialPort lsp = sp;
+        if (lsp != null) {
+            lsp.close();
+        }
     }
 
     @Override
-    public void setSerialPortParams(int baudrate, int dataBits, int stopBits, int parity)
-            throws UnsupportedCommOperationException {
-        try {
-            sp.setSerialPortParams(baudrate, dataBits, stopBits, parity);
-        } catch (gnu.io.UnsupportedCommOperationException ex) {
-            throw new UnsupportedCommOperationException(ex);
+    public boolean setSerialPortParams(int baudrate, int dataBits, int stopBits, int parity) {
+        gnu.io.@Nullable SerialPort lsp = sp;
+        if (lsp != null) {
+            try {
+                lsp.setSerialPortParams(baudrate, dataBits, stopBits, parity);
+                return true;
+            } catch (UnsupportedCommOperationException e) {
+                logger.error("Exception while setting port params: " + e.getMessage());
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 
     @Override
     public @Nullable InputStream getInputStream() throws IOException {
-        return sp.getInputStream();
+        gnu.io.@Nullable SerialPort lsp = sp;
+        if (lsp != null) {
+            return lsp.getInputStream();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public @Nullable OutputStream getOutputStream() throws IOException {
-        return sp.getOutputStream();
+        gnu.io.@Nullable SerialPort lsp = sp;
+        if (lsp != null) {
+            return lsp.getOutputStream();
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public void addEventListener(SerialPortEventListener listener) throws TooManyListenersException {
-        massiL = new RxTxEvListener();
-        massiL.subscribe(listener);
-        sp.notifyOnDataAvailable(true);
-        sp.addEventListener(massiL);
+    public boolean addEventListener(@NonNull SerialPortEventListener listener) {
+        gnu.io.@Nullable SerialPort lsp = sp;
+        if (lsp != null) {
+            rxtxListener = new RxTxEvListener();
+            rxtxListener.subscribe(listener);
+            try {
+                lsp.notifyOnDataAvailable(true);
+                lsp.addEventListener(rxtxListener);
+                return true;
+            } catch (TooManyListenersException e) {
+                logger.error("Exception while adding event listener: " + e.getMessage());
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
-    public String getName() {
-        return sp.getName();
+    public @Nullable String getName() {
+        return cpid.getName();
     }
 
 }

@@ -17,14 +17,14 @@ package org.openwebnet4j.communication.serial;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * General exception for serial port management.
+ * Exception for serial port management
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public class SerialPortException extends Exception {
 
-    private static final long serialVersionUID = -2345485650743122283L;
+    private static final long serialVersionUID = -2343335650743122283L;
 
     public SerialPortException(String message, Exception cause) {
         super(message, cause);

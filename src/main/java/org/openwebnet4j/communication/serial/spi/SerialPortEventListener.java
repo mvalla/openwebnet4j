@@ -12,17 +12,18 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  */
-package org.openwebnet4j.communication.serial;
+package org.openwebnet4j.communication.serial.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Interface of a serial port event listener.
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public interface SerialPortEventListener {
+
     /**
      * Notify about a serial event.
      *

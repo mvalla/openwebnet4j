@@ -12,35 +12,34 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  */
-package org.openwebnet4j.communication.serial;
+package org.openwebnet4j.communication.serial.spi;
 
-import java.net.URI;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Defines an interface for providers to handle serial connections.
+ * Defines an interface for providers that return serial port connections.
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public interface SerialPortProvider {
 
     /**
-     * Gets the {@link SerialPortIdentifier} if it is available or null otherwise.
+     * Returns a {@link SerialPort} based on portName if it is available or null otherwise.
      *
-     * @param portName The ports name.
-     * @return The created {@link SerialPortIdentifier}.
+     * @param portName The requested port name.
+     * @return The {@link SerialPort} that was found corresponding to portName.
      */
-    @Nullable
-    SerialPortIdentifier getPortIdentifier(URI portName);
+    public @Nullable SerialPort getSerialPort(String portName);
 
     /**
-     * Gets all the available {@link SerialPortIdentifier}s for this {@link SerialPortProvider}.
+     * Gets all the available {@link SerialPort}s found by this {@link SerialPortProvider}.
      *
      * @return The available ports
      */
-    Stream<SerialPortIdentifier> getSerialPortIdentifiers();
+    public Stream<SerialPort> getSerialPorts();
+
 }

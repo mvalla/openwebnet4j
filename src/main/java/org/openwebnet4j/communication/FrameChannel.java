@@ -24,8 +24,6 @@ import org.openwebnet4j.message.OpenMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fazecast.jSerialComm.SerialPortTimeoutException;
-
 /**
  * Class that wraps input/output streams to send and receive frames from a OpenWebNet gateway
  *
@@ -143,35 +141,37 @@ public class FrameChannel {
     private int readUntilDelimiter(InputStream is, byte[] buffer) throws IOException {
         logger.debug("-FC-{} Trying readUntilDelimiter...", name);
         int numBytes = 0;
-        int cint = 0;
+        int cint = 0, available = 0;
         char cchar = ' ';
         Boolean hashFound = false;
         // reads one char each cycle and stop when the sequence ends with ## (OpenWebNet delimiter)
-        try {
-            do {
-                cint = is.read();
-                if (cint == -1) {
-                    logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
-                    return numBytes;
-                } else {
-                    buffer[numBytes++] = (byte) cint;
+        do {
+            available = is.available();
+            if (available == 0) {
+                logger.debug("-FC-{} available()=0 in readUntilDelimiter() (nothing more to read)", name);
+                return -1;
+            }
+            cint = is.read();
+            if (cint == -1) {
+                logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);
+                return numBytes;
+            } else {
+                buffer[numBytes++] = (byte) cint;
 
-                    String read = new String(buffer, 0, numBytes);
-                    // logger.debug("read so far: {}", read);
+                // String read = new String(buffer, 0, numBytes);
+                // logger.debug("read so far: {}", read);
 
-                    cchar = (char) cint;
-                    if (cchar == '#' && hashFound == false) { // Found first #
-                        hashFound = true;
-                    } else if (cchar == '#') { // Found second #, frame terminated correctly -> EXIT
-                        break;
-                    } else if (cchar != '#') { // Append char and start again finding the first #
-                        hashFound = false;
-                    }
+                cchar = (char) cint;
+                if (cchar == '#' && hashFound == false) { // Found first #
+                    hashFound = true;
+                } else if (cchar == '#') { // Found second #, frame terminated correctly -> EXIT
+                    break;
+                } else if (cchar != '#') { // Append char and start again finding the first #
+                    hashFound = false;
                 }
-            } while (true);
-        } catch (SerialPortTimeoutException spte) {
-            return -1;
-        }
+            }
+        } while (true);
+
         return numBytes;
     }
 
