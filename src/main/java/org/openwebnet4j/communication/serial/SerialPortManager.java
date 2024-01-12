@@ -20,8 +20,11 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider;
 import org.openwebnet4j.communication.serial.spi.SerialPort;
 import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to find available serial ports via a {@link SerialPortProvider} implementation
@@ -31,46 +34,82 @@ import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 @NonNullByDefault
 public class SerialPortManager {
 
-    private static final String DEFAULT_PROVIDER = "org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider";
-    // private static final String DEFAULT_PROVIDER =
-    // "org.openwebnet4j.communication.serial.jserialcomm.JSerialCommPortProvider";
+    private final Logger logger = LoggerFactory.getLogger(SerialPortManager.class);
 
-    @Nullable
+    // private static final String DEFAULT_PROVIDER =
+    // "org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider";
+
     private SerialPortProvider provider;
 
+    /**
+     * Constructor. Will use first available {@link SerialPortProvider} implementations, or use default implementation
+     * if no implementation can be found
+     *
+     */
     public SerialPortManager() throws SerialPortException {
-        loadProvider(DEFAULT_PROVIDER);
+        provider = getFirstProvider();
     }
 
+    private SerialPortProvider getFirstProvider() throws SerialPortException {
+        ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
+
+        /// REMOVE.ME
+        printProviders(loader);
+
+        Iterator<SerialPortProvider> it = loader.iterator();
+        while (it.hasNext()) {
+            SerialPortProvider prv = it.next();
+            return prv;
+        }
+        logger.info("**************** SerialPortManager *** Loading DEFAULT SerialPortProvider");
+        return new RxTxSerialPortProvider();
+        // throw new SerialPortException("No SerialPortProvider found");
+    }
+
+    /**
+     * Constructor. Will load given {@link SerialPortProvider} implementation.
+     *
+     * @param providerName class name (FQCL) of {@link SerialPortProvider} implementation to be used
+     * @throws SerialPortException in case no {@link SerialPortProvider} implementation with given class name
+     *             can be found
+     */
     public SerialPortManager(String providerName) throws SerialPortException {
-        loadProvider(providerName);
+        provider = getProvider(providerName);
     }
 
-    private void loadProvider(String providerName) throws SerialPortException {
+    private SerialPortProvider getProvider(String providerName) throws SerialPortException {
         ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
         Iterator<SerialPortProvider> it = loader.iterator();
         while (it.hasNext()) {
-            SerialPortProvider provider = it.next();
-            if (providerName.equals(provider.getClass().getName())) {
-                this.provider = provider;
-                return;
+            SerialPortProvider prv = it.next();
+            if (providerName.equals(prv.getClass().getName())) {
+                return prv;
             }
         }
         throw new SerialPortException("SerialPortProvider " + providerName + " not found");
     }
 
+    // FIXME REMOVE.ME
+    private void printProviders(ServiceLoader<SerialPortProvider> ldr) {
+        Iterator<SerialPortProvider> it2 = ldr.iterator();
+        logger.info("**************** SerialPortManager *** Looking for SerialPortProviders...");
+        while (it2.hasNext()) {
+            SerialPortProvider prv2 = it2.next();
+            logger.info("**************** SerialPortManager *** FOUND SerialPortProvider: " + prv2);
+        }
+        logger.info("**************** SerialPortManager *** ...finished");
+        ldr.reload();
+    }
+    // END-REMOVE.ME
+
     /**
      * Returns a serial port given a port name.
      *
      * @param name the name
-     * @return a serial port identifier or null
+     * @return a serial port identifier or null if the port is not available
      */
     public @Nullable SerialPort getSerialPort(final String name) {
-        if (provider != null) {
-            return provider.getSerialPort(name);
-        } else {
-            return null;
-        }
+        return provider.getSerialPort(name);
     }
 
     /**
@@ -82,11 +121,7 @@ public class SerialPortManager {
      * @return stream of available serial ports
      */
     public Stream<SerialPort> getSerialPorts() {
-        if (provider != null) {
-            return provider.getSerialPorts();
-        } else {
-            return Stream.empty();
-        }
+        return provider.getSerialPorts();
     }
 
 }

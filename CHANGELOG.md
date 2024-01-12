@@ -10,6 +10,7 @@
 - updated copyright year 
 - updated maven-javadoc-plugin
 
+
 ## [0.11.0] - 2023-11-19
 
 ### Added
