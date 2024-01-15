@@ -75,6 +75,7 @@ public class BUSConnector extends OpenConnector {
     private Socket monSk;
 
     private Timer monKeepaliveTimer;
+    private Timer handshakeTimeout;
 
     int port;
     String host;
@@ -88,6 +89,9 @@ public class BUSConnector extends OpenConnector {
 
     public BUSConnector(String host, int port, String pwd) {
         super();
+        // FIXME remove WARN
+        logger.warn(
+                "*********************************************\n*********************************************\n  BUSConnector 0.12.0-SNAPSHOT \n*********************************************\n*********************************************\n");
         this.host = host;
         this.port = port;
         this.pwd = pwd;
@@ -264,7 +268,8 @@ public class BUSConnector extends OpenConnector {
     }
 
     private void startHandshakeTimeout(FrameChannel frCh) throws OWNAuthException {
-        Timer handshakeTimeout = new Timer();
+        stopHandshakeTimeout();
+        handshakeTimeout = new Timer();
         handshakeTimeout.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -278,51 +283,69 @@ public class BUSConnector extends OpenConnector {
         }, HANDSHAKE_TIMEOUT);
     }
 
+    private void stopHandshakeTimeout() {
+        if (handshakeTimeout != null) {
+            logger.debug("##BUS-conn## stopped handshakeTimeout timer");
+            handshakeTimeout.cancel();
+            handshakeTimeout = null;
+        }
+    }
+
     private void doHandshake(FrameChannel frCh, String type) throws IOException, OWNAuthException {
         logger.debug("(HS) starting HANDSHAKE on channel {}... ", frCh.getName());
         startHandshakeTimeout(frCh);
         String fr;
+
         // STEP-1: wait for ACK from GW
         hsLogger.debug("(HS) ... STEP-1: receive ACK from GW");
         fr = frCh.readFrames();
         hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
         if (!(OpenMessage.FRAME_ACK.equals(fr))) {
             hsLogger.warn("(HS) ... STEP-1: HANDSHAKE FAILED, no ACK recevied, received: {}", fr);
+            stopHandshakeTimeout();
             throw new OWNAuthException("Could not open BUS-" + type + " connection to " + host + ":" + port
                     + " (no ACK received at STEP-1, received: " + fr + ")");
         }
         hsLogger.debug("(HS) ... STEP-1: first ACK received");
+
         // STEP-2: send session request and check for ACK/NACK/NONCE/HMAC from GW
         String session = (type == MON_TYPE ? MON_SESSION : CMD_SESSION);
         hsLogger.debug("(HS) ... STEP-2: send session request {} ... ", session);
         frCh.sendFrame(session);
         hsLogger.info("(HS) BUS-{} HS==>>>> `{}`", type, session);
         fr = frCh.readFrames();
-        hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
-        if (OpenMessage.FRAME_NACK.equals(fr) && type == CMD_TYPE) {
-            // try alt CMD session
-            hsLogger.debug("(HS) ... STEP-2: received NACK, trying CMD_SESSION_ALT ...");
-            frCh.sendFrame(CMD_SESSION_ALT);
-            hsLogger.info("(HS) {} HS==>>>> `{}`", frCh.getName(), CMD_SESSION_ALT);
-            fr = frCh.readFrames();
-            hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
-        }
-        if (OpenMessage.FRAME_ACK.equals(fr)) {
-            // STEP-2: NO_AUTH - Free beer and party, the connection is unauthenticated!
-            frCh.handshakeCompleted = true;
-            hsLogger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
-        } else if (fr.matches("\\*#\\d+##")) {
-            // STEP-2: OPEN_AUTH passwd nonce received
-            doOPENHandshake(fr, frCh);
-            frCh.handshakeCompleted = true;
-        } else if (fr.equals(HMAC_SHA1) || fr.equals(HMAC_SHA2)) {
-            // STEP-2: HMAC_AUTH type received
-            doHMACHandshake(fr, frCh);
-            frCh.handshakeCompleted = true;
+        if (fr == null) {
+            hsLogger.warn("(HS) ... STEP-2: cannot authenticate with gateway (null answer)");
+            stopHandshakeTimeout();
+            throw new OWNAuthException("Cannot authenticate with gateway: handshake failed at STEP-2 (null answer)");
         } else {
-            hsLogger.warn("(HS) ... STEP-2: cannot authenticate with gateway (unexpected answer: `{}`)", fr);
-            throw new OWNAuthException(
-                    "Cannot authenticate with gateway: handshake failed at STEP-2 (unexpected answer: " + fr + ")");
+            hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
+            if (OpenMessage.FRAME_NACK.equals(fr) && type == CMD_TYPE) {
+                // try alt CMD session
+                hsLogger.debug("(HS) ... STEP-2: received NACK, trying CMD_SESSION_ALT ...");
+                frCh.sendFrame(CMD_SESSION_ALT);
+                hsLogger.info("(HS) {} HS==>>>> `{}`", frCh.getName(), CMD_SESSION_ALT);
+                fr = frCh.readFrames();
+                hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
+            }
+            if (OpenMessage.FRAME_ACK.equals(fr)) {
+                // STEP-2: NO_AUTH - Free beer and party, the connection is unauthenticated!
+                frCh.handshakeCompleted = true;
+                hsLogger.debug("(HS) ... STEP-2: NO_AUTH: second ACK received, GW has no pwd ==HANDSHAKE COMPLETED==");
+            } else if (fr.matches("\\*#\\d+##")) {
+                // STEP-2: OPEN_AUTH passwd nonce received
+                doOPENHandshake(fr, frCh);
+                frCh.handshakeCompleted = true;
+            } else if (fr.equals(HMAC_SHA1) || fr.equals(HMAC_SHA2)) {
+                // STEP-2: HMAC_AUTH type received
+                doHMACHandshake(fr, frCh);
+                frCh.handshakeCompleted = true;
+            } else {
+                hsLogger.warn("(HS) ... STEP-2: cannot authenticate with gateway (unexpected answer: `{}`)", fr);
+                stopHandshakeTimeout();
+                throw new OWNAuthException(
+                        "Cannot authenticate with gateway: handshake failed at STEP-2 (unexpected answer: " + fr + ")");
+            }
         }
     }
 
@@ -335,6 +358,7 @@ public class BUSConnector extends OpenConnector {
             pwdMessage = OpenMessage.FRAME_START_DIM + Auth.calcOpenPass(pwd, nonce) + OpenMessage.FRAME_END;
         } catch (NumberFormatException e) {
             hsLogger.warn("(HS) ... STEP-3: OPEN_AUTH: invalid gateway password. Password must contain only digits");
+            stopHandshakeTimeout();
             throw new OWNAuthException("Invalid gateway password. Password must contain only digits (OPEN_AUTH)");
         }
         hsLogger.debug("(HS) ... STEP-3: OPEN_AUTH: sending encoded pwd ... ");
@@ -347,6 +371,7 @@ public class BUSConnector extends OpenConnector {
             return;
         } else {
             hsLogger.warn("(HS) ... STEP-3: OPEN_AUTH: pwd NOT ACCEPTED");
+            stopHandshakeTimeout();
             throw new OWNAuthException("Password not accepted by gateway, check password configuration (OPEN_AUTH)");
         }
     }
