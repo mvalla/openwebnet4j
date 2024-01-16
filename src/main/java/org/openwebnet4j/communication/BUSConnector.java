@@ -357,9 +357,11 @@ public class BUSConnector extends OpenConnector {
         try {
             pwdMessage = OpenMessage.FRAME_START_DIM + Auth.calcOpenPass(pwd, nonce) + OpenMessage.FRAME_END;
         } catch (NumberFormatException e) {
-            hsLogger.warn("(HS) ... STEP-3: OPEN_AUTH: invalid gateway password. Password must contain only digits");
+            hsLogger.warn(
+                    "(HS) ... STEP-3: OPEN_AUTH: invalid gateway password. An OPEN password must contain only digits");
             stopHandshakeTimeout();
-            throw new OWNAuthException("Invalid gateway password. Password must contain only digits (OPEN_AUTH)");
+            throw new OWNAuthException(
+                    "Invalid gateway password. An OPEN password must contain only digits (OPEN_AUTH)");
         }
         hsLogger.debug("(HS) ... STEP-3: OPEN_AUTH: sending encoded pwd ... ");
         frCh.sendFrame(pwdMessage);
