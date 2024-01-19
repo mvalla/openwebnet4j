@@ -39,6 +39,8 @@ public class FrameChannel {
     private String name;
     protected boolean handshakeCompleted = false;
 
+    protected boolean blockingMode = false;
+
     private final Logger logger = LoggerFactory.getLogger(FrameChannel.class);
 
     protected FrameChannel(InputStream in, OutputStream out, String name) {
@@ -63,14 +65,16 @@ public class FrameChannel {
             out.flush();
             logger.info("-FC-{} -------> {}", name, frame);
 
-            // FIXME remove me!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            int time = 500;
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            logger.info(" FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SLEPT {}ms...", time);
+            /*
+             * // FIXME -SPI- remove THREAD SLEEP !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+             * int time = 100;
+             * try {
+             * Thread.sleep(time);
+             * } catch (InterruptedException e) {
+             * e.printStackTrace();
+             * }
+             * logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SLEPT {}ms...", time);
+             */
 
         } else {
             throw new IOException("Cannot sendFrame, OutputStream is null");
@@ -161,11 +165,15 @@ public class FrameChannel {
         Boolean hashFound = false;
         // reads one char each cycle and stop when the sequence ends with ## (OpenWebNet delimiter)
         do {
-            available = is.available();
-            if (available == 0) {
-                logger.debug("-FC-{} available()=0 in readUntilDelimiter() (nothing more to read)", name);
-                return -1;
+
+            if (!blockingMode) {
+                available = is.available();
+                if (available == 0) {
+                    logger.debug("-FC-{} available()=0 in readUntilDelimiter() (nothing more to read)", name);
+                    return -1;
+                }
             }
+
             cint = is.read();
             if (cint == -1) {
                 logger.debug("-FC-{} read() in readUntilDelimiter() returned -1 (end of stream)", name);

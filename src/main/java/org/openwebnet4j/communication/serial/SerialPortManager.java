@@ -53,7 +53,7 @@ public class SerialPortManager {
     private SerialPortProvider getFirstProvider() throws SerialPortException {
         ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
 
-        /// REMOVE.ME
+        // FIXME -SPI- REMOVE.ME
         printProviders(loader);
 
         Iterator<SerialPortProvider> it = loader.iterator();
@@ -89,7 +89,7 @@ public class SerialPortManager {
         throw new SerialPortException("SerialPortProvider " + providerName + " not found");
     }
 
-    // FIXME REMOVE.ME
+    // FIXME -SPI- REMOVE.ME
     private void printProviders(ServiceLoader<SerialPortProvider> ldr) {
         Iterator<SerialPortProvider> it2 = ldr.iterator();
         logger.info("**************** SerialPortManager *** Looking for SerialPortProviders...");

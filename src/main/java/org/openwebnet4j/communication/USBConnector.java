@@ -202,9 +202,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     }
 
     private SerialPort connectSerialPort(String portN) throws OWNException {
-        // FIXME remove
+        // FIXME -SPI- remove
         try {
-            // FIXME If I call RXTXVersion.getVersion(), it throws NoClassDefError each time gnu.io
+            // FIXME -SPI- If I call RXTXVersion.getVersion(), it throws NoClassDefError each time gnu.io
             // is called again
             // logger.debug("RXTXVersion: {}", RXTXVersion.getVersion());
         } catch (NoClassDefFoundError e) {
@@ -213,7 +213,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             throw new OWNException(
                     "Serial connection requires RXTX libraries to be available, but they could not be found!", e);
         }
-        // FIXME remove -- END
+        // FIXME -SPI- remove -- END
 
         SerialPortManager portManager;
         try {

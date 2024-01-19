@@ -89,7 +89,7 @@ public class BUSConnector extends OpenConnector {
 
     public BUSConnector(String host, int port, String pwd) {
         super();
-        // FIXME remove WARN
+        // FIXME -SPI- remove WARN
         logger.warn(
                 "*********************************************\n*********************************************\n  BUSConnector 0.12.0-SNAPSHOT \n*********************************************\n*********************************************\n");
         this.host = host;
@@ -241,7 +241,7 @@ public class BUSConnector extends OpenConnector {
 
     private void stopMonKeepaliveTimer() {
         if (monKeepaliveTimer != null) {
-            logger.debug("##BUS-conn## stop keepalive timer");
+            logger.debug("##BUS-conn## stopped MON keepalive timer");
             monKeepaliveTimer.cancel();
         }
     }
@@ -258,10 +258,16 @@ public class BUSConnector extends OpenConnector {
         logger.debug("##BUS-conn## {} socket connected", type);
         if (type.equals(MON_TYPE)) {
             monChannel = new FrameChannel(sk.getInputStream(), sk.getOutputStream(), "BUS-" + MON_TYPE);
+
+            monChannel.blockingMode = true;
+
             monSk = sk;
             return monChannel;
         } else {
             cmdChannel = new FrameChannel(sk.getInputStream(), sk.getOutputStream(), "BUS-" + CMD_TYPE);
+
+            cmdChannel.blockingMode = true;
+
             cmdSk = sk;
             return cmdChannel;
         }
@@ -298,6 +304,18 @@ public class BUSConnector extends OpenConnector {
 
         // STEP-1: wait for ACK from GW
         hsLogger.debug("(HS) ... STEP-1: receive ACK from GW");
+
+        // FIXME -SPI- remove THREAD SLEEP !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        /*
+         * int time = 100;
+         * try {
+         * Thread.sleep(time);
+         * } catch (InterruptedException e) {
+         * e.printStackTrace();
+         * }
+         * logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SLEPT {}ms...", time);
+         */
+
         fr = frCh.readFrames();
         hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
         if (!(OpenMessage.FRAME_ACK.equals(fr))) {
