@@ -99,7 +99,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         try {
             // send supervisor to receive all events from devices
 
-            /// RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            /// FIXME RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // String frameStr = GatewayMgmt.requestSupervisor().getFrameValue();
             // cmdChannel.sendFrame(frameStr);
             // hsLogger.info("MASSSSSSSSSSSIIIIIIIIIIIIII (HS) USB HS==>>>> `{}`", frameStr);

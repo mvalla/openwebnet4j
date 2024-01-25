@@ -18,7 +18,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openwebnet4j.communication.serial.spi.SerialPortEvent;
 
 /**
- * Specific serial port event implementation.
+ * Specific SerialPortEvent implementation based on RxTx gnu.io.SerialPortEvent.
  *
  * @author M. Valla - Initial contribution
  */

@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Defines an interface for providers that return serial port connections.
+ * Defines an interface for providers to return available serial port connections.
  *
  * @author M. Valla - Initial contribution
  */

@@ -34,9 +34,9 @@ import gnu.io.SerialPortEvent;
 import gnu.io.UnsupportedCommOperationException;
 
 /**
- * Specific serial port implementation.
+ * Specific SerialPort implementation based on RxTx gnu.io.SerialPort and gnu.io.CommPortIdentifier.
  *
- * @author M. Valla - Initial contribution, inspired by OH Serial Transport
+ * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
 public class RxTxSerialPort implements SerialPort {

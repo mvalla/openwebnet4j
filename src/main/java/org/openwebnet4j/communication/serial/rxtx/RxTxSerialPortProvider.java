@@ -29,6 +29,7 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 
 /**
+ * Specific SerialPortProvider implementation based on RxTx gnu.io.CommPortIdentifier.
  *
  * @author M. Valla - Initial contribution
  */
