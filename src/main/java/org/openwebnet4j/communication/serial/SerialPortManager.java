@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider;
 import org.openwebnet4j.communication.serial.spi.SerialPort;
 import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 import org.slf4j.Logger;
@@ -56,14 +55,23 @@ public class SerialPortManager {
         // FIXME -SPI- REMOVE.ME
         printProviders(loader);
 
+        SerialPortProvider prv;
         Iterator<SerialPortProvider> it = loader.iterator();
+        logger.info("**************** SerialPortManager *** Getting first SerialPortProvider...");
         while (it.hasNext()) {
-            SerialPortProvider prv = it.next();
+            prv = it.next();
+            logger.info("**************** SerialPortManager *** FOUND first SerialPortProvider via ServiceLoader: {}",
+                    prv);
+            logger.info("*************************************************************************************");
             return prv;
         }
-        logger.info("**************** SerialPortManager *** Loading DEFAULT SerialPortProvider");
-        return new RxTxSerialPortProvider();
-        // throw new SerialPortException("No SerialPortProvider found");
+        logger.info("**************** SerialPortManager *** NO SerialPortProvider found via ServiceLoader!");
+
+        // prv = new RxTxSerialPortProvider();
+        // logger.info("**************** SerialPortManager *** Using DEFAULT SerialPortProvider: {}", prv);
+        // logger.info("*************************************************************************************");
+        // return prv;
+        throw new SerialPortException("No SerialPortProvider found");
     }
 
     /**
@@ -92,12 +100,12 @@ public class SerialPortManager {
     // FIXME -SPI- REMOVE.ME
     private void printProviders(ServiceLoader<SerialPortProvider> ldr) {
         Iterator<SerialPortProvider> it2 = ldr.iterator();
-        logger.info("**************** SerialPortManager *** Looking for SerialPortProviders...");
+        logger.info("****#### SerialPortManager *** Listing SerialPortProviders...");
         while (it2.hasNext()) {
             SerialPortProvider prv2 = it2.next();
-            logger.info("**************** SerialPortManager *** FOUND SerialPortProvider: " + prv2);
+            logger.info("****#### SerialPortManager *** FOUND SerialPortProvider: " + prv2);
         }
-        logger.info("**************** SerialPortManager *** ...finished");
+        logger.info("****#### SerialPortManager *** ...FINISHED listing!");
         ldr.reload();
     }
     // END-REMOVE.ME

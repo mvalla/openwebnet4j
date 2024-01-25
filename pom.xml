@@ -220,6 +220,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.openwebnet4j.bundle.Activator</Bundle-Activator>
                         <Import-Package>gnu.io;version="[3.12,6)",*</Import-Package>
+                        
+                        <!-- <Bundle-Version>$(replace;$(project.version);-SNAPSHOT;"").$(tstamp;yyyyMMdd-HHmm)</Bundle-Version>
+                       --> 
+                        <Bundle-Version>$(replace;$(project.version);-SNAPSHOT;"").$(tstamp;yyyyMMdd-HHmm)</Bundle-Version>
                     </instructions>
                 </configuration>
             </plugin>
