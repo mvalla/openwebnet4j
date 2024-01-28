@@ -16,9 +16,11 @@ package org.openwebnet4j;
 
 import java.nio.ByteBuffer;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.communication.USBConnector;
+import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.OpenMessage;
@@ -40,8 +42,15 @@ public class USBGateway extends OpenGateway {
     private int receivedProducts = 0; // number of products returned from PRODUCT INFORMATION
     // requests during a device discovery
 
+    // FIXME change to private
+    public SerialPortProvider serialPortProvider;
+
     public USBGateway(String serialPortName) {
         this.serialPortName = serialPortName;
+    }
+
+    public void setSerialPortProvider(@NonNull SerialPortProvider provider) {
+        serialPortProvider = provider;
     }
 
     /**
@@ -55,8 +64,12 @@ public class USBGateway extends OpenGateway {
 
     @Override
     protected void initConnector() {
-        connector = new USBConnector(serialPortName);
+        USBConnector tmpConn = new USBConnector(serialPortName);
+        tmpConn.setSerialPortProvider(serialPortProvider);
+        connector = tmpConn;
         logger.info("##USB## Init USB ({})...", serialPortName);
+        logger.debug("##USB## CONNECTOR -- SerialPortProvider = {}...", tmpConn.serialPortProvider);
+
     }
 
     @Override

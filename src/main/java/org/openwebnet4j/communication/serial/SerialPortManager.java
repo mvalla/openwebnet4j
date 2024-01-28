@@ -16,11 +16,9 @@ package org.openwebnet4j.communication.serial;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-import org.openwebnet4j.communication.serial.spi.SerialPort;
+import org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider;
 import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,25 +29,25 @@ import org.slf4j.LoggerFactory;
  * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
-public class SerialPortManager {
+public class SerialPortManager { // FIXME rename SerialPortProviderSPIFactory
 
     private final Logger logger = LoggerFactory.getLogger(SerialPortManager.class);
 
     // private static final String DEFAULT_PROVIDER =
     // "org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider";
 
-    private SerialPortProvider provider;
+    // private SerialPortProvider provider;
 
     /**
      * Constructor. Will use first available {@link SerialPortProvider} implementations, or use default implementation
      * if no implementation can be found
      *
      */
-    public SerialPortManager() throws SerialPortException {
-        provider = getFirstProvider();
+    public SerialPortManager() {
+        // provider = getFirstProvider();
     }
 
-    private SerialPortProvider getFirstProvider() throws SerialPortException {
+    public SerialPortProvider getFirstProvider() throws SerialPortException {
         ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
 
         // FIXME -SPI- REMOVE.ME
@@ -67,11 +65,11 @@ public class SerialPortManager {
         }
         logger.info("**************** SerialPortManager *** NO SerialPortProvider found via ServiceLoader!");
 
-        // prv = new RxTxSerialPortProvider();
-        // logger.info("**************** SerialPortManager *** Using DEFAULT SerialPortProvider: {}", prv);
-        // logger.info("*************************************************************************************");
-        // return prv;
-        throw new SerialPortException("No SerialPortProvider found");
+        prv = new RxTxSerialPortProvider();
+        logger.info("**************** SerialPortManager *** Using DEFAULT SerialPortProvider: {}", prv);
+        logger.info("*************************************************************************************");
+        return prv;
+        // throw new SerialPortException("No SerialPortProvider found");
     }
 
     /**
@@ -81,9 +79,9 @@ public class SerialPortManager {
      * @throws SerialPortException in case no {@link SerialPortProvider} implementation with given class name
      *             can be found
      */
-    public SerialPortManager(String providerName) throws SerialPortException {
-        provider = getProvider(providerName);
-    }
+    // public SerialPortManager(String providerName) throws SerialPortException {
+    // provider = getProvider(providerName);
+    // }
 
     private SerialPortProvider getProvider(String providerName) throws SerialPortException {
         ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
@@ -116,9 +114,9 @@ public class SerialPortManager {
      * @param name the name
      * @return a serial port identifier or null if the port is not available
      */
-    public @Nullable SerialPort getSerialPort(final String name) {
-        return provider.getSerialPort(name);
-    }
+    // public @Nullable SerialPort getSerialPort(final String name) {
+    // return provider.getSerialPort(name);
+    // }
 
     /**
      * Returns a stream of available serial ports.
@@ -128,8 +126,8 @@ public class SerialPortManager {
      *
      * @return stream of available serial ports
      */
-    public Stream<SerialPort> getSerialPorts() {
-        return provider.getSerialPorts();
-    }
+    // public Stream<SerialPort> getSerialPorts() {
+    // return provider.getSerialPorts();
+    // }
 
 }

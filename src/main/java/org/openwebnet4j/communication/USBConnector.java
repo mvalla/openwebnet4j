@@ -23,6 +23,7 @@ import org.openwebnet4j.communication.serial.SerialPortManager;
 import org.openwebnet4j.communication.serial.spi.SerialPort;
 import org.openwebnet4j.communication.serial.spi.SerialPortEvent;
 import org.openwebnet4j.communication.serial.spi.SerialPortEventListener;
+import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 import org.openwebnet4j.message.AckOpenMessage;
 import org.openwebnet4j.message.Automation;
 import org.openwebnet4j.message.BaseOpenMessage;
@@ -62,6 +63,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private final String portName;
     private SerialPort serialPort;
 
+    // FIXME set to private
+    public SerialPortProvider serialPortProvider;
+
     private Response currentResponse;
     private final Object requestSentSynchObj = new Object(); // Synch object to synchronise sending a request frame and
     // processing its answer
@@ -69,6 +73,11 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     public USBConnector(String portName) {
         super();
         this.portName = portName;
+    }
+
+    public void setSerialPortProvider(@NonNull SerialPortProvider serialPortProvider) {
+        this.serialPortProvider = serialPortProvider;
+
     }
 
     @Override
@@ -215,22 +224,38 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
         // FIXME -SPI- remove -- END
 
-        SerialPortManager portManager;
-        try {
-            portManager = new SerialPortManager();
-        } catch (SerialPortException e) {
-            logger.error(
-                    "##USB-conn## Serial connection requires a SerialPortProvider class, but it could not be found!");
-            throw new OWNException("Serial connection requires a SerialPortProvider class, but it could not be found!",
-                    e);
+        /*
+         * SerialPortManager portManager;
+         * try {
+         * portManager = new SerialPortManager();
+         * } catch (SerialPortException e) {
+         * logger.error(
+         * "##USB-conn## Serial connection requires a SerialPortProvider class, but it could not be found!");
+         * throw new OWNException("Serial connection requires a SerialPortProvider class, but it could not be found!",
+         * e);
+         * }
+         */
+
+        if (serialPortProvider == null) {
+            logger.info("##USB-conn## No SerialPortProvider set, trying to find one via SPI...");
+            // FIXME remove SerialPortException and return object or null
+            try {
+                SerialPortManager portManager = new SerialPortManager();
+                serialPortProvider = portManager.getFirstProvider();
+            } catch (SerialPortException e) {
+                logger.error("##USB-conn## could not find a SerialPortProvider via SPI");
+                throw new OWNException(
+                        "Serial connection requires a SerialPortProvider, but no provider could be found");
+            }
+
         }
 
         SerialPort tempSp = null;
         // see if serial port exists
-        tempSp = portManager.getSerialPort(portN);
+        tempSp = serialPortProvider.getSerialPort(portN);
         if (tempSp == null) {
             logger.warn("##USB-conn## Failed to connect to serial port {}: port cannot be found", portN);
-            String availPorts = listSerialPorts(portManager);
+            String availPorts = listSerialPorts(serialPortProvider);
             logger.warn("##USB-conn## Available serial ports are: {}", availPorts);
             throw new OWNException(
                     "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts);
@@ -275,13 +300,14 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
     }
 
-    private String listSerialPorts(SerialPortManager portManager) {
-        String result = portManager.getSerialPorts().map(sp -> sp.getName()).collect(Collectors.joining(", "));
+    private String listSerialPorts(@NonNull SerialPortProvider provider) {
+        String result = provider.getSerialPorts().map(sp -> sp.getName()).collect(Collectors.joining(", "));
         if (result.length() == 0) {
             return "-NO SERIAL PORTS FOUND-";
         } else {
             return result;
         }
+
     }
 
     @Override
