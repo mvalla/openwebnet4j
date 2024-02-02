@@ -42,7 +42,7 @@ public class USBGateway extends OpenGateway {
     private int receivedProducts = 0; // number of products returned from PRODUCT INFORMATION
     // requests during a device discovery
 
-    // FIXME change to private
+    // FIXME -SPI- change to private
     public SerialPortProvider serialPortProvider;
 
     public USBGateway(String serialPortName) {

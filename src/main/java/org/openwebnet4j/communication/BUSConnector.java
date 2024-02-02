@@ -304,18 +304,6 @@ public class BUSConnector extends OpenConnector {
 
         // STEP-1: wait for ACK from GW
         hsLogger.debug("(HS) ... STEP-1: receive ACK from GW");
-
-        // FIXME -SPI- remove THREAD SLEEP !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        /*
-         * int time = 100;
-         * try {
-         * Thread.sleep(time);
-         * } catch (InterruptedException e) {
-         * e.printStackTrace();
-         * }
-         * logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SLEPT {}ms...", time);
-         */
-
         fr = frCh.readFrames();
         hsLogger.info("(HS) {} <<<<==HS `{}`", frCh.getName(), fr);
         if (!(OpenMessage.FRAME_ACK.equals(fr))) {

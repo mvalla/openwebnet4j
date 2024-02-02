@@ -21,7 +21,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *
  * @author M. Valla - Initial contribution
  */
-@NonNullByDefault // FIXME remove
+@NonNullByDefault // FIXME -SPI- remove SerialPortException
 public class SerialPortException extends Exception {
 
     private static final long serialVersionUID = -2343335650743122283L;

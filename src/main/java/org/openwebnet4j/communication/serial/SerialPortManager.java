@@ -29,10 +29,11 @@ import org.slf4j.LoggerFactory;
  * @author M. Valla - Initial contribution
  */
 @NonNullByDefault
-public class SerialPortManager { // FIXME rename SerialPortProviderSPIFactory
+public class SerialPortManager { // FIXME -SPI- rename SerialPortProviderSPIFactory
 
     private final Logger logger = LoggerFactory.getLogger(SerialPortManager.class);
 
+    // FIXME -SPI- cleanup
     // private static final String DEFAULT_PROVIDER =
     // "org.openwebnet4j.communication.serial.rxtx.RxTxSerialPortProvider";
 

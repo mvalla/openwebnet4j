@@ -63,7 +63,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private final String portName;
     private SerialPort serialPort;
 
-    // FIXME set to private
+    // FIXME -SPI- set to private?
     public SerialPortProvider serialPortProvider;
 
     private Response currentResponse;
@@ -107,18 +107,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         }
         try {
             // send supervisor to receive all events from devices
-
-            /// FIXME RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // String frameStr = GatewayMgmt.requestSupervisor().getFrameValue();
-            // cmdChannel.sendFrame(frameStr);
-            // hsLogger.info("MASSSSSSSSSSSIIIIIIIIIIIIII (HS) USB HS==>>>> `{}`", frameStr);
-            // Thread.sleep(50); // we must wait few ms for the answer to be ready
-            // String resp = cmdChannel.readFrames();
-            // hsLogger.info("MASSSSSSSSSSSIIIIIIIIIIIIII (HS) USB <<<<==HS `{}`", resp);
-            /// END----RIPRISTINA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
             sendCommandSynchInternal(GatewayMgmt.requestSupervisor().getFrameValue());
-
         } catch (IOException | FrameException e) {
             throw new OWNException("Failed to set supervisor to ZigBee USB Gateway on serial port: " + portName, e);
         }
@@ -211,34 +200,9 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     }
 
     private SerialPort connectSerialPort(String portN) throws OWNException {
-        // FIXME -SPI- remove
-        try {
-            // FIXME -SPI- If I call RXTXVersion.getVersion(), it throws NoClassDefError each time gnu.io
-            // is called again
-            // logger.debug("RXTXVersion: {}", RXTXVersion.getVersion());
-        } catch (NoClassDefFoundError e) {
-            logger.error(
-                    "##USB-conn## Serial connection requires RXTX libraries to be available, but they could not be found!");
-            throw new OWNException(
-                    "Serial connection requires RXTX libraries to be available, but they could not be found!", e);
-        }
-        // FIXME -SPI- remove -- END
-
-        /*
-         * SerialPortManager portManager;
-         * try {
-         * portManager = new SerialPortManager();
-         * } catch (SerialPortException e) {
-         * logger.error(
-         * "##USB-conn## Serial connection requires a SerialPortProvider class, but it could not be found!");
-         * throw new OWNException("Serial connection requires a SerialPortProvider class, but it could not be found!",
-         * e);
-         * }
-         */
-
         if (serialPortProvider == null) {
             logger.info("##USB-conn## No SerialPortProvider set, trying to find one via SPI...");
-            // FIXME remove SerialPortException and return object or null
+            // FIXME -SPI- remove SerialPortException and return object or null
             try {
                 SerialPortManager portManager = new SerialPortManager();
                 serialPortProvider = portManager.getFirstProvider();
@@ -260,6 +224,8 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             throw new OWNException(
                     "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts);
         } else {
+            // FIXME -SPI- remove this part (getPortType, owner, isCurrentlyOwner) or make it work again
+
             // logger.debug("##USB-conn## SerialPort: name={} wner={}", tempSp.getName());
 
             // if (ident.getPortType() != CommPortIdentifier.PORT_SERIAL) {
@@ -274,19 +240,19 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
              */
 
             if (tempSp.open()) {
-                logger.debug("##USB-conn## SerialPort connected");
+                logger.debug("##USB-conn## [{}] SerialPort connected", portN);
                 if (tempSp.setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
                         SerialPort.PARITY_NONE)) {
-                    logger.debug("##USB-conn## SerialPort connection params set");
-                    logger.info("##USB-conn## === CONNECTED TO SERIAL PORT {} ===", tempSp.getName());
+                    logger.debug("##USB-conn## [{}] SerialPort connection params set", portN);
+                    logger.info("##USB-conn## [{}] === CONNECTED TO SERIAL PORT ===", tempSp.getName());
                     return tempSp;
                 } else {
-                    logger.error("##USB-conn## Failed setting params for serial port {}", tempSp.getName());
+                    logger.error("##USB-conn## [{}] Failed setting params for serial port", portN);
                     throw new OWNException("Failed setting params for port: " + portN);
                 }
             } else {
-                logger.error("##USB-conn## Could not open serial port {}", tempSp.getName());
-                throw new OWNException("Failed to open serial port {} (port already in use?)" + portN);
+                logger.error("##USB-conn## [{}] Could not open serial port", portN);
+                throw new OWNException("Failed to open serial port " + portN + " (port already in use?)");
             }
         }
 

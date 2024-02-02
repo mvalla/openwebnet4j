@@ -64,18 +64,6 @@ public class FrameChannel {
             out.write(frame.getBytes());
             out.flush();
             logger.info("-FC-{} -------> {}", name, frame);
-
-            /*
-             * // FIXME -SPI- remove THREAD SLEEP !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-             * int time = 100;
-             * try {
-             * Thread.sleep(time);
-             * } catch (InterruptedException e) {
-             * e.printStackTrace();
-             * }
-             * logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! SLEPT {}ms...", time);
-             */
-
         } else {
             throw new IOException("Cannot sendFrame, OutputStream is null");
         }
