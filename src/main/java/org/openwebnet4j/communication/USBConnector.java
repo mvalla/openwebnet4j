@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.openwebnet4j.communication.serial.SerialPortException;
-import org.openwebnet4j.communication.serial.SerialPortManager;
+import org.eclipse.jdt.annotation.Nullable;
+import org.openwebnet4j.communication.serial.SerialPortProviderSPIFactory;
 import org.openwebnet4j.communication.serial.spi.SerialPort;
 import org.openwebnet4j.communication.serial.spi.SerialPortEvent;
 import org.openwebnet4j.communication.serial.spi.SerialPortEventListener;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class USBConnector extends OpenConnector implements SerialPortEventListener {
 
     private static final int SERIAL_SPEED = 19200; // UART baud as declared in the OWN specs
-    private static final int SERIAL_PORT_OPEN_TIMEOUT = 1000; // UART baud as declared in the OWN specs
+    private static final int SERIAL_PORT_OPEN_TIMEOUT = 1000;
 
     private final Logger logger = LoggerFactory.getLogger(USBConnector.class);
     private final Logger msgLogger = LoggerFactory.getLogger(logger.getName() + ".message");
@@ -63,8 +63,7 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
     private final String portName;
     private SerialPort serialPort;
 
-    // FIXME -SPI- set to private?
-    public SerialPortProvider serialPortProvider;
+    private SerialPortProvider serialPortProvider;
 
     private Response currentResponse;
     private final Object requestSentSynchObj = new Object(); // Synch object to synchronise sending a request frame and
@@ -75,9 +74,22 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
         this.portName = portName;
     }
 
-    public void setSerialPortProvider(@NonNull SerialPortProvider serialPortProvider) {
-        this.serialPortProvider = serialPortProvider;
+    /**
+     * Sets a {@link SerialPortProvider} to use to obtain available serial ports
+     *
+     * @param provider the {@link SerialPortProvider} to set
+     */
+    public void setSerialPortProvider(@NonNull SerialPortProvider provider) {
+        serialPortProvider = provider;
+    }
 
+    /**
+     * Gets the current {@link SerialPortProvider}
+     *
+     * @return {@link SerialPortProvider} currently set
+     */
+    public @Nullable SerialPortProvider getSerialPortProvider() {
+        return serialPortProvider;
     }
 
     @Override
@@ -201,17 +213,10 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
 
     private SerialPort connectSerialPort(String portN) throws OWNException {
         if (serialPortProvider == null) {
-            logger.info("##USB-conn## No SerialPortProvider set, trying to find one via SPI...");
-            // FIXME -SPI- remove SerialPortException and return object or null
-            try {
-                SerialPortManager portManager = new SerialPortManager();
-                serialPortProvider = portManager.getFirstProvider();
-            } catch (SerialPortException e) {
-                logger.error("##USB-conn## could not find a SerialPortProvider via SPI");
-                throw new OWNException(
-                        "Serial connection requires a SerialPortProvider, but no provider could be found");
-            }
+            logger.debug("##USB-conn## No SerialPortProvider set, getting it via SPI/default...");
 
+            SerialPortProviderSPIFactory portManager = new SerialPortProviderSPIFactory();
+            serialPortProvider = portManager.getProvider();
         }
 
         SerialPort tempSp = null;
@@ -224,21 +229,6 @@ public class USBConnector extends OpenConnector implements SerialPortEventListen
             throw new OWNException(
                     "Failed to connect to serial port " + portN + ". Available serial ports are: " + availPorts);
         } else {
-            // FIXME -SPI- remove this part (getPortType, owner, isCurrentlyOwner) or make it work again
-
-            // logger.debug("##USB-conn## SerialPort: name={} wner={}", tempSp.getName());
-
-            // if (ident.getPortType() != CommPortIdentifier.PORT_SERIAL) {
-            // logger.error("##USB-conn## Port {} is not a serial port", ident.getName());
-            // throw new OWNException("Failed to connect to port " + portN + " (not a serial port).");
-            // }
-            /*
-             * if (ident.isCurrentlyOwned()) {
-             * logger.debug("##USB-conn## Serial port {} is already in use", ident.getName());
-             * throw new OWNException("Failed to connect to serial port " + portN + ". Port is already in use.");
-             * }
-             */
-
             if (tempSp.open()) {
                 logger.debug("##USB-conn## [{}] SerialPort connected", portN);
                 if (tempSp.setSerialPortParams(SERIAL_SPEED, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,

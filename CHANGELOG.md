@@ -3,8 +3,8 @@
 ## [0.12.0-SNAPSHOT] - 2024-xx-xx
 
 ### Added
-- TODO  support for other serial implementations via Service Provider Interface (SPI)
-- TESTING serial implementation using jSerialComm lib
+- support for other serial implementations via Service Provider Interface (SPI) / injection. Added default serial implementation using RXTX (NRJavaSerial).
+- more @NonNull annotations
 
 ### Changed
 - updated copyright year 

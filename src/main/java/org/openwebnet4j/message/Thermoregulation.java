@@ -94,7 +94,7 @@ public class Thermoregulation extends BaseOpenMessage {
         WEEKLY(9004),
         SCENARIO(9005),
 
-        // TODO
+        // TODO Thermo support Holiday WHAT
         HOLIDAY(9006);
 
         private static Map<Integer, WhatThermo> mapping;

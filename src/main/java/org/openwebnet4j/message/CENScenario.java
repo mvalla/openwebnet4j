@@ -92,9 +92,8 @@ public class CENScenario extends CEN {
     }
 
     public enum CENPressure implements Pressure {
-        /** This is START_PRESSURE TODO */
-        START_PRESSURE(0),
         /** TODO javadoc */
+        START_PRESSURE(0),
         RELEASE_SHORT_PRESSURE(1),
         RELEASE_EXTENDED_PRESSURE(2),
         EXTENDED_PRESSURE(3);

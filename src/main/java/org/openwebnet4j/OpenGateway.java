@@ -81,6 +81,9 @@ public abstract class OpenGateway implements ConnectorListener {
                 }
             }
         } catch (OWNException e) {
+            // FIXME is it correct to log at error level here? for example during USB discovery an attempt to connect to
+            // a serial port that has no stick should not be logged at error level. Maybe is better to just catch the
+            // error or catch at lower levels
             logger.error("Error while connecting to Gateway: {}", e.getMessage());
             notifyListeners((listener) -> listener.onConnectionError(e));
             throw e;

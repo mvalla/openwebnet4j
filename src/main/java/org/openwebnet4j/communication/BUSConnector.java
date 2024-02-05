@@ -89,9 +89,6 @@ public class BUSConnector extends OpenConnector {
 
     public BUSConnector(String host, int port, String pwd) {
         super();
-        // FIXME -SPI- remove WARN
-        logger.warn(
-                "*********************************************\n*********************************************\n  BUSConnector 0.12.0-SNAPSHOT \n*********************************************\n*********************************************\n");
         this.host = host;
         this.port = port;
         this.pwd = pwd;
