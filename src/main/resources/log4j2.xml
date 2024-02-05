@@ -6,7 +6,7 @@
         </Console>
     </Appenders>
     <Loggers>  
-        <!--  <Logger name="org.openwebnet4j.communication" level="WARN" />   -->
+        <!--  <Logger name="org.openwebnet4j.communication" level="WARN" />  -->   
     
         <Root level="DEBUG">
             <AppenderRef ref="Console" />

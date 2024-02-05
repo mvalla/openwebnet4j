@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.0] - 2024-02-05
+
+### Added
+- support for other serial implementations via Service Provider Interface (SPI) ServiceLoader or via injection. Added default serial implementation using RXTX (NRJavaSerial). Fixes #34.
+- more @NonNull annotations
+
+### Changed
+- updated copyright year 
+- updated maven-javadoc-plugin
+
+
 ## [0.11.0] - 2023-11-19
 
 ### Added

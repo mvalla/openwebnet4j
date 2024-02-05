@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -94,7 +94,7 @@ public class Thermoregulation extends BaseOpenMessage {
         WEEKLY(9004),
         SCENARIO(9005),
 
-        // TODO
+        // TODO Thermo support Holiday WHAT
         HOLIDAY(9006);
 
         private static Map<Integer, WhatThermo> mapping;
