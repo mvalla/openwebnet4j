@@ -4,7 +4,7 @@
 
 	<groupId>io.github.openwebnet4j</groupId>
 	<artifactId>openwebnet4j</artifactId>
-	<version>0.11.1-SNAPSHOT</version>
+	<version>0.12.0</version>
 	<packaging>jar</packaging>
 
     <name>openwebnet4j OpenWebNet Java library</name>
@@ -84,6 +84,18 @@
             <artifactId>org.osgi.core</artifactId>
             <version>6.0.0</version>
         </dependency>
+<!--
+<dependency>
+  <groupId>org.osgi</groupId>
+  <artifactId>osgi.annotation</artifactId>
+  <version>6.0.0</version>
+</dependency>
+-->
+<dependency>
+    <groupId>biz.aQute.bnd</groupId>
+    <artifactId>biz.aQute.bnd.annotation</artifactId>
+    <version>7.0.0</version>
+</dependency>
 
         <!-- ==== JUNIT 5 ==== -->
         <dependency>
@@ -144,7 +156,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.3</version>
                 <configuration>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                     <source>8</source>
@@ -208,6 +220,10 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Activator>org.openwebnet4j.bundle.Activator</Bundle-Activator>
                         <Import-Package>gnu.io;version="[3.12,6)",*</Import-Package>
+                        
+                        <!-- <Bundle-Version>$(replace;$(project.version);-SNAPSHOT;"").$(tstamp;yyyyMMdd-HHmm)</Bundle-Version>
+                       --> 
+                        <Bundle-Version>$(replace;$(project.version);-SNAPSHOT;"").$(tstamp;yyyyMMdd-HHmm)</Bundle-Version>
                     </instructions>
                 </configuration>
             </plugin>

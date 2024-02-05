@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.

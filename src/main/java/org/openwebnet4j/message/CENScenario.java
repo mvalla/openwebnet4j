@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -92,9 +92,8 @@ public class CENScenario extends CEN {
     }
 
     public enum CENPressure implements Pressure {
-        /** This is START_PRESSURE TODO */
-        START_PRESSURE(0),
         /** TODO javadoc */
+        START_PRESSURE(0),
         RELEASE_SHORT_PRESSURE(1),
         RELEASE_EXTENDED_PRESSURE(2),
         EXTENDED_PRESSURE(3);

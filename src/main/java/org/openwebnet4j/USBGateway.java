@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -16,9 +16,12 @@ package org.openwebnet4j;
 
 import java.nio.ByteBuffer;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openwebnet4j.communication.OWNException;
 import org.openwebnet4j.communication.Response;
 import org.openwebnet4j.communication.USBConnector;
+import org.openwebnet4j.communication.serial.spi.SerialPortProvider;
 import org.openwebnet4j.message.BaseOpenMessage;
 import org.openwebnet4j.message.GatewayMgmt;
 import org.openwebnet4j.message.OpenMessage;
@@ -29,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class {@link USBGateway} to connect to ZigBee USB Gateways using {@link USBConnector}
  *
- * @author M. Valla - Initial contribution
+ * @author M. Valla - Initial contribution. Added SPI and SerialPortProvider injection.
  */
 public class USBGateway extends OpenGateway {
 
@@ -40,8 +43,28 @@ public class USBGateway extends OpenGateway {
     private int receivedProducts = 0; // number of products returned from PRODUCT INFORMATION
     // requests during a device discovery
 
+    private SerialPortProvider serialPortProvider;
+
     public USBGateway(String serialPortName) {
         this.serialPortName = serialPortName;
+    }
+
+    /**
+     * Sets a {@link SerialPortProvider} to use to obtain available serial ports
+     *
+     * @param provider the {@link SerialPortProvider} to set
+     */
+    public void setSerialPortProvider(@NonNull SerialPortProvider provider) {
+        serialPortProvider = provider;
+    }
+
+    /**
+     * Gets the current {@link SerialPortProvider}
+     *
+     * @return {@link SerialPortProvider} currently set
+     */
+    public @Nullable SerialPortProvider getSerialPortProvider() {
+        return serialPortProvider;
     }
 
     /**
@@ -55,8 +78,12 @@ public class USBGateway extends OpenGateway {
 
     @Override
     protected void initConnector() {
-        connector = new USBConnector(serialPortName);
+        USBConnector tmpConn = new USBConnector(serialPortName);
+        tmpConn.setSerialPortProvider(serialPortProvider);
+        connector = tmpConn;
         logger.info("##USB## Init USB ({})...", serialPortName);
+        logger.debug("##USB## CONNECTOR -- SerialPortProvider = {}...", tmpConn.getSerialPortProvider());
+
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2023 Contributors to the openwebnet4j project
+ * Copyright (c) 2020-2024 Contributors to the openwebnet4j project
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information.
@@ -140,8 +140,7 @@ public class EnergyManagement extends BaseOpenMessage {
      * @return message
      */
     public static EnergyManagement requestActivePower(String where) {
-        return new EnergyManagement(
-                format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.ACTIVE_POWER.value()));
+        return new EnergyManagement(format(FORMAT_DIMENSION_REQUEST, WHO, where, DimEnergyMgmt.ACTIVE_POWER.value()));
     }
 
     /**
@@ -158,14 +157,8 @@ public class EnergyManagement extends BaseOpenMessage {
         if (t < 0 || t > 255) {
             t = 0;
         }
-        return new EnergyManagement(
-                format(
-                        FORMAT_DIMENSION_WRITING_1P_1V,
-                        WHO,
-                        where,
-                        DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(),
-                        1,
-                        t));
+        return new EnergyManagement(format(FORMAT_DIMENSION_WRITING_1P_1V, WHO, where,
+                DimEnergyMgmt.ACTIVE_POWER_NOTIFICATION_TIME.value(), 1, t));
     }
 
     /**

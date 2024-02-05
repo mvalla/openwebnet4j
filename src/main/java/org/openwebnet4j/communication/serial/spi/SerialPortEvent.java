@@ -12,18 +12,26 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  */
-package org.openwebnet4j.message;
+
+package org.openwebnet4j.communication.serial.spi;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * WHERE for Auxiliary frames
+ * Interface for a serial port event.
  *
- * @author G.Fabiani- Initial contribution
+ * @author M. Valla - Initial contribution
  */
-public class WhereAuxiliary extends Where {
-    public static final Where GENERAL = new WhereAuxiliary("0");
+@NonNullByDefault
+public interface SerialPortEvent {
+    final int EVENT_DATA_AVAILABLE = 1;
+    final int EVENT_PORT_DISCONNECTED = 268435456;
 
-    public WhereAuxiliary(String w) throws NullPointerException {
-        // TODO check range for WHERE
-        super(w);
-    }
+    /**
+     * Get the type of the event.
+     *
+     * @return the event type
+     */
+    int getEventType();
+
 }
