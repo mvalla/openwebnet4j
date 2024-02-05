@@ -1,9 +1,9 @@
 # Changelog
 
-## [0.12.0-SNAPSHOT] - 2024-xx-xx
+## [0.12.0] - 2024-02-05
 
 ### Added
-- support for other serial implementations via Service Provider Interface (SPI) / injection. Added default serial implementation using RXTX (NRJavaSerial).
+- support for other serial implementations via Service Provider Interface (SPI) ServiceLoader or via injection. Added default serial implementation using RXTX (NRJavaSerial). Fixes #34.
 - more @NonNull annotations
 
 ### Changed

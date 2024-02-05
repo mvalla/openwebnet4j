@@ -64,7 +64,7 @@ public class SerialPortProviderSPIFactory {
      * Return given {@link SerialPortProvider} implementation loaded via SPI, or null if it cannot be found.
      *
      * @param providerName class name (FQCL) of {@link SerialPortProvider} implementation to be loaded
-     * @returns {@link SerialPortProvider} implementation found via SPI, or null
+     * @return {@link SerialPortProvider} implementation found via SPI, or null
      */
     public @Nullable SerialPortProvider getProvider(String providerName) {
         ServiceLoader<SerialPortProvider> loader = ServiceLoader.load(SerialPortProvider.class);
