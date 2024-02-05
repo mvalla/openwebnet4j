@@ -7,7 +7,7 @@
 - more @NonNull annotations
 
 ### Changed
-- updated copyright year 
+- updated copyright year to 2024
 - updated maven-javadoc-plugin
 
 
