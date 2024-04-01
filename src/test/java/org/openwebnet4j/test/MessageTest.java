@@ -42,6 +42,7 @@ import org.openwebnet4j.message.Thermoregulation;
 import org.openwebnet4j.message.Thermoregulation.Function;
 import org.openwebnet4j.message.Thermoregulation.OperationMode;
 import org.openwebnet4j.message.Thermoregulation.WhatThermo;
+import org.openwebnet4j.message.Thermoregulation.WhatThermoType;
 import org.openwebnet4j.message.UnsupportedFrameException;
 import org.openwebnet4j.message.WhereAlarm;
 import org.openwebnet4j.message.WhereLightAutom;
@@ -366,11 +367,101 @@ public class MessageTest {
             assertEquals(Thermoregulation.DimThermo.COMPLETE_PROBE_STATUS, thermoMsg.getDim());
             assertNotNull(thermoMsg.getDimValues());
             assertEquals("1048", thermoMsg.getDimValues()[0]);
+
             // temperature encoding tests
             assertEquals(-4.8, Thermoregulation.parseTemperature(thermoMsg));
             System.out.println("Temperature: " + Thermoregulation.parseTemperature(thermoMsg) + "°C");
             assertEquals("1214", Thermoregulation.encodeTemperature(-21.4));
             System.out.println(thermoMsg.toStringVerbose());
+
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*13012*#0##");
+            assertEquals(Who.THERMOREGULATION, thermoMsg.getWho());
+            assertTrue(thermoMsg.isCommand());
+            assertEquals("#0", thermoMsg.getWhere().value());
+            WhatThermo wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(13012, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(OperationMode.VACATION, wt.getMode());
+            assertEquals(12, wt.vacationDays());
+
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*3000*#0##");
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(3000, wt.value());
+            assertTrue(thermoMsg.isCommand());
+            assertEquals(WhatThermoType.VACATION_DEACTIVATION, wt.getType());
+
+            thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*115#1102*#0##");
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(115, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.HOLIDAY, wt.getType());
+            assertEquals(OperationMode.HOLIDAY, wt.getMode());
+            assertNotNull(thermoMsg.getWhatParams());
+            assertEquals("1102", thermoMsg.getWhatParams()[0]);
+
+            thermoMsg = Thermoregulation.requestWriteFunction("2", Function.COOLING);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(202, wt.value());
+            assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(WhatThermoType.PROTECTION, wt.getType());
+            assertEquals(OperationMode.PROTECTION, wt.getMode());
+
+            thermoMsg = Thermoregulation.requestWriteMode("2", OperationMode.OFF, Function.HEATING, 0);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(103, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.OFF, wt.getType());
+            assertEquals(OperationMode.OFF, wt.getMode());
+
+            thermoMsg = Thermoregulation.requestWriteMode("2", OperationMode.AUTO, Function.HEATING, 0);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(111, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.AUTO, wt.getType());
+            assertEquals(OperationMode.AUTO, wt.getMode());
+
+            thermoMsg = Thermoregulation.requestWriteMode("2", OperationMode.MANUAL, Function.HEATING, 17.5);
+            assertFalse(thermoMsg.isCommand());
+            assertTrue(thermoMsg.isDimWriting());
+            assertEquals(Thermoregulation.DimThermo.TEMP_SETPOINT, thermoMsg.getDim());
+            assertNotNull(thermoMsg.getDimValues());
+            assertEquals("0175", thermoMsg.getDimValues()[0]);
+
+            thermoMsg = Thermoregulation.requestWriteWeeklyScenarioMode("#0", OperationMode.WEEKLY, Function.HEATING,
+                    2);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(1102, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.WEEKLY, wt.getType());
+            assertEquals(OperationMode.WEEKLY, wt.getMode());
+            assertEquals(2, wt.programNumber());
+
+            thermoMsg = Thermoregulation.requestWriteHolidayMode("#0", Function.HEATING, 3);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(115, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.HOLIDAY, wt.getType());
+            assertEquals(OperationMode.HOLIDAY, wt.getMode());
+            assertNotNull(thermoMsg.getWhatParams());
+            assertEquals("3103", thermoMsg.getWhatParams()[0]);
+
+            thermoMsg = Thermoregulation.requestWriteVacationMode("#0", Function.HEATING, 12, 2);
+            assertTrue(thermoMsg.isCommand());
+            wt = (WhatThermo) thermoMsg.getWhat();
+            assertEquals(13012, wt.value());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.VACATION, wt.getType());
+            assertEquals(OperationMode.VACATION, wt.getMode());
+            assertEquals(12, wt.vacationDays());
+            assertNotNull(thermoMsg.getWhatParams());
+            assertEquals("3102", thermoMsg.getWhatParams()[0]);
+
         } catch (FrameException e) {
             Assertions.fail();
         }
@@ -504,55 +595,85 @@ public class MessageTest {
     @Test
     public void testWhatThermo() {
         Thermoregulation thermoMsg;
+
         try {
             thermoMsg = (Thermoregulation) BaseOpenMessage.parse("*4*2215*#0##");
             WhatThermo wt = (WhatThermo) thermoMsg.getWhat();
             assertEquals(2215, wt.value());
-            assertEquals(OperationMode.SCENARIO_15, wt.getMode());
             assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(OperationMode.SCENARIO, wt.getMode());
+            assertEquals(15, wt.programNumber());
+
+            // central unit info
+            wt = thermoMsg.new WhatThermo(20);
+            assertEquals(20, wt.value());
+            // FIXME assertEquals(WhatThermo.Type.REMOTE_CONTROL_DISABLED, wt.type);
+            assertNull(wt.getFunction());
+            assertNull(wt.getMode());
+
+            // vacation deactivation
+            wt = thermoMsg.new WhatThermo(3000);
+            assertEquals(3000, wt.value());
+            assertEquals(WhatThermoType.VACATION_DEACTIVATION, wt.getType());
+            assertEquals(Function.GENERIC, wt.getFunction());
+            assertNull(wt.getMode());
 
             // basic functions 0,1
-            wt = WhatThermo.fromValue(0);
-            assertEquals(Function.COOLING, wt.getFunction());
+            wt = thermoMsg.new WhatThermo(0);
             assertEquals(0, wt.value());
-            wt = WhatThermo.fromValue(1);
-            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(WhatThermoType.CONDITIONING, wt.getType());
+            assertEquals(Function.COOLING, wt.getFunction());
+            wt = thermoMsg.new WhatThermo(1);
             assertEquals(1, wt.value());
+            assertEquals(WhatThermoType.HEATING, wt.getType());
+            assertEquals(Function.HEATING, wt.getFunction());
 
             // PROTECTION
-            wt = WhatThermo.fromValue(302);
+            wt = thermoMsg.new WhatThermo(302);
+            assertEquals(302, wt.value());
+            assertEquals(WhatThermoType.PROTECTION, wt.getType());
             assertEquals(Function.GENERIC, wt.getFunction());
             assertEquals(OperationMode.PROTECTION, wt.getMode());
-            assertEquals(302, wt.value());
-            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // OFF
-            wt = WhatThermo.fromValue(203);
+            wt = thermoMsg.new WhatThermo(203);
+            assertEquals(203, wt.value());
+            assertEquals(WhatThermoType.OFF, wt.getType());
             assertEquals(Function.COOLING, wt.getFunction());
             assertEquals(OperationMode.OFF, wt.getMode());
-            assertEquals(203, wt.value());
-            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
             // MANUAL
-            wt = WhatThermo.fromValue(110);
+            wt = thermoMsg.new WhatThermo(110);
+            assertEquals(110, wt.value());
+            assertEquals(WhatThermoType.MANUAL, wt.getType());
             assertEquals(Function.HEATING, wt.getFunction());
             assertEquals(OperationMode.MANUAL, wt.getMode());
-            assertEquals(110, wt.value());
-            assertFalse(WhatThermo.isComplex(wt.getMode().mode()));
-            // SCENARIO
-            wt = WhatThermo.fromValue(1202);
-            assertEquals(Function.HEATING, wt.getFunction());
-            assertEquals(OperationMode.SCENARIO_2, wt.getMode());
-            assertEquals("SCENARIO", wt.getMode().mode());
-            assertEquals(1202, wt.value());
-            assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
-            assertEquals(2, wt.getMode().programNumber());
             // WEEKLY
-            wt = WhatThermo.fromValue(2102);
+            wt = thermoMsg.new WhatThermo(2103);
+            assertEquals(2103, wt.value());
+            assertEquals(WhatThermoType.WEEKLY, wt.getType());
             assertEquals(Function.COOLING, wt.getFunction());
-            assertEquals(OperationMode.WEEKLY_2, wt.getMode());
-            assertEquals("WEEKLY", wt.getMode().mode());
-            assertEquals(2102, wt.value());
-            assertTrue(WhatThermo.isComplex(wt.getMode().mode()));
-            assertEquals(2, wt.getMode().programNumber());
+            assertEquals(OperationMode.WEEKLY, wt.getMode());
+            assertEquals(3, wt.programNumber());
+            // SCENARIO
+            wt = thermoMsg.new WhatThermo(1202);
+            assertEquals(1202, wt.value());
+            assertEquals(WhatThermoType.SCENARIO, wt.getType());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(OperationMode.SCENARIO, wt.getMode());
+            assertEquals(2, wt.programNumber());
+            // HOLIDAY
+            wt = thermoMsg.new WhatThermo(115);
+            assertEquals(115, wt.value());
+            assertEquals(WhatThermoType.HOLIDAY, wt.getType());
+            assertEquals(Function.HEATING, wt.getFunction());
+            assertEquals(OperationMode.HOLIDAY, wt.getMode());
+            // VACATION
+            wt = thermoMsg.new WhatThermo(23011);
+            assertEquals(23011, wt.value());
+            assertEquals(WhatThermoType.VACATION, wt.getType());
+            assertEquals(Function.COOLING, wt.getFunction());
+            assertEquals(OperationMode.VACATION, wt.getMode());
+            assertEquals(11, wt.vacationDays());
+
         } catch (FrameException e) {
             Assertions.fail();
         }

@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.13.0-SNAPSHOT] - 2024-0x-xx
+
+### Added
+- Thermoregulation requestHolidayMode / requestVacationMode / requestWriteWeeklyScenarioMode methods
+
+### Changed
+- improved support for HOLIDAY and VACATION modes
+- re-factored WhatThermo as class
+- re-factored OperatioMode enum
+- OperationMode.PROGRAM is now OperationMode.AUTO
+- DEPRECATED WhereThermo.isComplex()
+- DEPRECATED WhereThermo.fromModeAndFunction
+- DEPRECATED OperationMode mode/isScenario/isWeekely/isVacation methods
+- removed method WhereThermo.setValue()
+- removed deprecated method BaseOpenMessage.getCommandParams()
+
+
 ## [0.12.0] - 2024-02-05
 
 ### Added

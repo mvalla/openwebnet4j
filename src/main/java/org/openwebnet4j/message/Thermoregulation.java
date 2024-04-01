@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openwebnet4j.OpenDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * OpenWebNet Thermoregulation messages (WHO=4)
  *
- * @author M. Valla - Initial contribution
+ * @author M. Valla - Initial contribution. Added VACATION/HOLIDAY support; re-factoring of WhatThermo (as class) and
+ *         OperationMode enum.
  * @author G. Cocchi - Contribution for new lib
  * @author A. Conte - Completed Thermoregulation support
  */
@@ -37,8 +40,9 @@ public class Thermoregulation extends BaseOpenMessage {
 
     private static final Logger logger = LoggerFactory.getLogger(Thermoregulation.class);
 
-    private static final String WEEKLY_STRING = "WEEKLY";
-    private static final String SCENARIO_STRING = "SCENARIO";
+    private static final String MODE_WEEKLY_STR = "WEEKLY";
+    private static final String MODE_SCENARIO_STR = "SCENARIO";
+    public static final String MODE_VACATION_STR = "VACATION";
 
     // @formatter:off
     /*
@@ -52,10 +56,10 @@ public class Thermoregulation extends BaseOpenMessage {
      * f02 - PROTECTION
      * f03 - OFF
      * f10 - MANUAL
-     * f11 - PROGRAM
+     * f11 - PROGRAM (AUTO)
      * f15 - HOLIDAY
      * f3ddd - VACATION for ddd [000-999] days
-     * 3000 - VACATION disabled
+     * 3000 - LAST ACTIVATED PROGRAM/SCENARIO
      * f1pp - WEEKLY PROGRAM pp [01-03]
      * f2ss - SCENARIO ss [01-16]
      * ......
@@ -71,8 +75,10 @@ public class Thermoregulation extends BaseOpenMessage {
      * 40 - Release of sensor local adjustment
      */
     // @formatter:on
-    public enum WhatThermo implements What {
+
+    public enum WhatThermoType {
         CONDITIONING(0),
+
         HEATING(1),
         GENERIC(3),
 
@@ -86,36 +92,116 @@ public class Thermoregulation extends BaseOpenMessage {
         BATTERY_KO(31),
         RELEASE_SENSOR_LOCAL_ADJUST(40),
 
-        // these values do not exist in the WHAT table (Thermoregulation documentation pag. 5), for
-        // this reason they are greater than 9000
-        PROTECTION(9001),
-        OFF(9002),
-        MANUAL(9003),
-        WEEKLY(9004),
-        SCENARIO(9005),
+        VACATION_DEACTIVATION(3000),
 
-        // TODO Thermo support Holiday WHAT
-        HOLIDAY(9006);
+        // these values do not exist in the WHAT table (Thermoregulation docs pag. 5), are defined here to be selected
+        // from OperationMode in the WhatThermo constructor
+        PROTECTION(9002),
+        OFF(9003),
+        MANUAL(9010),
+        AUTO(9011),
+        HOLIDAY(9015),
 
-        private static Map<Integer, WhatThermo> mapping;
+        WEEKLY(9100),
+        SCENARIO(9200),
+        VACATION(12000);
 
         private int value;
-        private Function function;
-        private OperationMode mode;
 
-        private WhatThermo(int value) {
+        private @Nullable static Map<Integer, WhatThermoType> mapping;
+
+        private WhatThermoType(int value) {
             this.value = value;
-            this.function = Function.GENERIC;
-            this.mode = OperationMode.MANUAL;
         }
 
+        private static void initMapping() {
+            mapping = new HashMap<Integer, WhatThermoType>();
+            for (WhatThermoType t : values()) {
+                mapping.put(t.value, t);
+            }
+        }
+
+        public @Nullable static WhatThermoType fromValue(int i) {
+            if (mapping == null) {
+                initMapping();
+            }
+            Optional<WhatThermoType> wtt = Arrays.stream(values()).filter(val -> val.value == i).findFirst();
+            return wtt.orElse(null);
+        }
+    }
+
+    public class WhatThermo implements What {
+
+        private final WhatThermoType type;
+        private Function function;
+        private OperationMode mode;
+        private final int value;
+
+        /**
+         * Constructor for WhatThermo object with OperationMode and the Function calculated from a WHAT int
+         *
+         * @param value e.g. 3215
+         */
+        public WhatThermo(int value) {
+            this.value = value;
+            if (value <= 40) {
+                // WHAT less than 40 (defined in WhatThermoType enum) represent states (e.g.: Battery KO (31)).
+                this.type = WhatThermoType.fromValue(value);
+
+                // for WHAT=0 and WHAT=1 update Function field accordingly
+                if (this.type == WhatThermoType.HEATING) {
+                    this.function = Function.HEATING;
+                }
+                if (this.type == WhatThermoType.CONDITIONING) {
+                    this.function = Function.COOLING;
+                }
+            } else if (value == 3000) {
+                this.type = WhatThermoType.VACATION_DEACTIVATION;
+                this.function = Function.GENERIC;
+            } else {
+                // WHAT like 105, 3215... represent a combination of function and mode: first digit is Function,
+                // remaining digits are OperationMode
+                int num = value, divisor = 1;
+                while (num >= 10) { // divide by 10 until num is equal to first digit
+                    num /= 10;
+                    divisor *= 10;
+                }
+                this.function = Function.fromValue(num);
+                this.mode = OperationMode.fromValue(value - num * divisor);
+                this.type = WhatThermoType.fromValue(9000 + mode.value);
+            }
+
+        }
+
+        @Deprecated
         public void setModeAndFuntion(OperationMode newMode, Function newFunction) {
             this.mode = newMode;
             this.function = newFunction;
         }
 
-        public void setValue(int i) {
-            this.value = i;
+        /*
+         * @Deprecated
+         * public void setValue(int i) {
+         * this.value = i;
+         * }
+         */
+
+        /**
+         * Return the {@link WhatThermoType} for this WHAT
+         *
+         * @return the {@link WhatThermoType}
+         */
+        public WhatThermoType getType() {
+            return this.type;
+        }
+
+        /**
+         * Return the Function for this WHAT
+         *
+         * @return the Function
+         */
+        public Function getFunction() {
+            return this.function;
         }
 
         /**
@@ -128,64 +214,14 @@ public class Thermoregulation extends BaseOpenMessage {
         }
 
         /**
-         * Return the Function for this WHAT
-         *
-         * @return the Function
-         */
-        public Function getFunction() {
-            return this.function;
-        }
-
-        private static void initMapping() {
-            mapping = new HashMap<Integer, WhatThermo>();
-            for (WhatThermo w : values()) {
-                mapping.put(w.value, w);
-            }
-        }
-
-        /**
-         * Return a WhatThermo with OperationMode and the Function calculated from a WHAT int
-         *
-         * @param i e.g. 3215
-         * @return WhatThermo with OperationMode and Function (e.g. Function=GENERIC(3) and
-         *         OperationMode=SCENARIO_15(215))
-         */
-        public static WhatThermo fromValue(int i) {
-            if (mapping == null) {
-                initMapping();
-            }
-            WhatThermo result = WhatThermo.GENERIC;
-            // WHAT less than 40 (defined in WhatThermo enum) represent states (e.g.: Battery KO (31))
-            if (i <= 40) {
-                // these are defined in the Enum
-                result = mapping.get(i);
-                // for WHAT=0 and WHAT=1 update Function field accordingly
-                if (result == WhatThermo.HEATING) {
-                    result.setModeAndFuntion(OperationMode.MANUAL, Function.HEATING);
-                }
-                if (result == WhatThermo.CONDITIONING) {
-                    result.setModeAndFuntion(OperationMode.MANUAL, Function.COOLING);
-                }
-            } else {
-                // instead here arrives WHAT like 105, 3215... which represent a combination
-                // of mode and function: the first digit is the Function, the rest of the
-                // string is the OperationMode.
-                String what = String.valueOf(i);
-                result.value = i;
-                result.setModeAndFuntion(OperationMode.fromValue(what.substring(1)),
-                        Function.fromValue(Integer.parseInt(what.substring(0, 1))));
-            }
-            return result;
-        }
-
-        /**
          * Return a WHAT String composing {@link OperationMode} and {@link Function}
          *
          * @param mode (e.g. WEEKLY_2)
          * @param function (e.g. COOLING)
          * @return WHAT String (e.g. 2102)
          */
-        static String fromModeAndFunction(OperationMode mode, Function function) {
+        @Deprecated
+        String fromModeAndFunction(OperationMode mode, Function function) {
             String what = function.value().toString();
 
             if (mode != OperationMode.MANUAL) {
@@ -201,8 +237,25 @@ public class Thermoregulation extends BaseOpenMessage {
          * @param what String representing a WHAT mode
          * @return true if the WHAT String parameter is a complex WHAT
          */
-        public static Boolean isComplex(String what) {
-            return what.equalsIgnoreCase(WEEKLY_STRING) || what.equalsIgnoreCase(SCENARIO_STRING);
+        @Deprecated
+        public Boolean isComplex(String what) {
+            return what.equalsIgnoreCase(MODE_WEEKLY_STR) || what.equalsIgnoreCase(MODE_SCENARIO_STR);
+        }
+
+        /**
+         * Return the Program Number associated to a WEEKLY or SCENARIO {@link OperationMode}
+         *
+         * @return Integer the program number (e.g. 2102 --> 2, 1216 --> 16)
+         */
+        public int programNumber() {
+            return value % 100;
+        }
+
+        /**
+         * Return vacation days associated to VACATION {@link OperationMode}
+         */
+        public int vacationDays() {
+            return value % 1000;
         }
 
         @Override
@@ -212,11 +265,143 @@ public class Thermoregulation extends BaseOpenMessage {
 
         @Override
         public String toString() {
-            if (value <= 40) {
-                return name();
+            if (value <= 40 || value == 3000) {
+                return type.name();
             } else {
                 return function + "-" + mode;
             }
+        }
+    }
+
+    /**
+     * {@link OperationMode} enumeration
+     */
+    public enum OperationMode {
+        /**
+         * {@link OperationMode} PROTECTION
+         */
+        PROTECTION(2),
+        /**
+         * {@link OperationMode} OFF
+         */
+        OFF(3),
+        /**
+         * {@link OperationMode} MANUAL
+         */
+        MANUAL(10),
+        /**
+         * {@link OperationMode} AUTO
+         */
+        AUTO(11),
+        /**
+         * {@link OperationMode} HOLIDAY
+         */
+        HOLIDAY(15),
+        /**
+         * {@link OperationMode} WEEKLY
+         */
+        WEEKLY(100),
+        /**
+         * {@link OperationMode} SCENARIO
+         */
+        SCENARIO(200),
+        /**
+         * {@link OperationMode} VACATION
+         */
+        VACATION(3000);
+
+        private int value;
+
+        private OperationMode(int value) {
+            this.value = value;
+        }
+
+        public static OperationMode fromValue(int value) {
+            /// 2, 3, 10, 11, 15, 3xxx, 1xx, 2xx
+            int val = value;
+            if (value >= 3000) {
+                val = 3000;
+            } else if (value >= 100) {
+                val = value - (value % 100);
+            }
+            final int vv = val;
+            Optional<OperationMode> m = Arrays.stream(values()).filter(e -> vv == e.value).findFirst();
+            return m.orElse(null);
+        }
+
+        /**
+         * Returns the value for this {@link OperationMode}
+         *
+         * @return value
+         */
+        public int value() {
+            return value;
+        }
+
+        /**
+         * @deprecated --> use Enum.name() instead
+         *             The mode string for this OperationMode object: MANUAL, OFF, WEEKLY, PROGRAM, HOLIDAY, PROTECTION,
+         *             etc.
+         */
+        @Deprecated
+        public String mode() {
+            return this.name();
+        }
+
+        /**
+         * @deprecated
+         *             Return if current {@link OperationMode} is SCENARIO
+         *
+         * @return Boolean (e.g. 2102 = true, 103 = false)
+         */
+        @Deprecated
+        public Boolean isScenario() {
+            return mode() == MODE_SCENARIO_STR;
+        }
+
+        /**
+         * @deprecated
+         *             Return if current {@link OperationMode} is WEEKLY
+         *
+         * @return Boolean (e.g. 3101 = true, 110 = false)
+         */
+        @Deprecated
+        public Boolean isWeekly() {
+            return mode() == MODE_WEEKLY_STR;
+        }
+
+        /**
+         * @deprecated
+         *             Return if current {@link OperationMode} is VACATION
+         *
+         * @return Boolean
+         */
+        @Deprecated
+        public Boolean isVacation() {
+            return mode() == MODE_VACATION_STR;
+        }
+
+    }
+
+    public enum Function {
+        HEATING(1),
+        COOLING(2),
+        GENERIC(3);
+
+        private final Integer value;
+
+        private Function(Integer value) {
+            this.value = value;
+        }
+
+        public static Function fromValue(Integer i) {
+            Optional<Function> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
+                    .findFirst();
+            return m.orElse(null);
+        }
+
+        public Integer value() {
+            return value;
         }
     }
 
@@ -266,122 +451,6 @@ public class Thermoregulation extends BaseOpenMessage {
             Optional<FanCoilSpeed> fcs = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
                     .findFirst();
             return fcs.orElse(null);
-        }
-
-        public Integer value() {
-            return value;
-        }
-    }
-
-    /**
-     * OperationMode enumeration: these values are the suffix for WHAT.
-     * Each item is made by (value, mode) where:
-     * - "value" is the suffix. E.g. x210 means SCENARIO 10 (210) in 'x' function
-     * (where 'x' can be Heating=1, Cooling=2 or Generic=3)
-     * - "mode" is the corresponding base mode (like MANUAL, OFF, WEEKLY)
-     */
-    public enum OperationMode {
-        PROTECTION("02", "PROTECTION"),
-        OFF("03", "OFF"),
-
-        MANUAL("10", "MANUAL"),
-        PROGRAM("11", "PROGRAM"),
-        HOLIDAY("15", "HOLIDAY"),
-
-        WEEKLY_1("101", WEEKLY_STRING),
-        WEEKLY_2("102", WEEKLY_STRING),
-        WEEKLY_3("103", WEEKLY_STRING),
-
-        SCENARIO_1("201", SCENARIO_STRING),
-        SCENARIO_2("202", SCENARIO_STRING),
-        SCENARIO_3("203", SCENARIO_STRING),
-        SCENARIO_4("204", SCENARIO_STRING),
-        SCENARIO_5("205", SCENARIO_STRING),
-        SCENARIO_6("206", SCENARIO_STRING),
-        SCENARIO_7("207", SCENARIO_STRING),
-        SCENARIO_8("208", SCENARIO_STRING),
-        SCENARIO_9("209", SCENARIO_STRING),
-        SCENARIO_10("210", SCENARIO_STRING),
-        SCENARIO_11("211", SCENARIO_STRING),
-        SCENARIO_12("212", SCENARIO_STRING),
-        SCENARIO_13("213", SCENARIO_STRING),
-        SCENARIO_14("214", SCENARIO_STRING),
-        SCENARIO_15("215", SCENARIO_STRING),
-        SCENARIO_16("216", SCENARIO_STRING);
-
-        private final String value;
-        private final String mode;
-
-        private OperationMode(String value, String mode) {
-            this.value = value;
-            this.mode = mode;
-        }
-
-        public static OperationMode fromValue(String i) {
-            Optional<OperationMode> m = Arrays.stream(values()).filter(val -> i.equalsIgnoreCase(val.value))
-                    .findFirst();
-            return m.orElse(null);
-        }
-
-        public String value() {
-            return value;
-        }
-
-        public String mode() {
-            return mode;
-        }
-
-        /**
-         * Return if current {@link OperationMode} is a SCENARIO
-         *
-         * @return Boolean (e.g. 2102 = true, 103 = false)
-         */
-        public Boolean isScenario() {
-            return mode == SCENARIO_STRING;
-        }
-
-        /**
-         * Return if current {@link OperationMode} is a WEEKLY
-         *
-         * @return Boolean (e.g. 3101 = true, 110 = false)
-         */
-        public Boolean isWeekly() {
-            return mode == WEEKLY_STRING;
-        }
-
-        /**
-         * Return the Program Number associated to a WEEKLY or SCENARIO {@link OperationMode}
-         *
-         * @return Integer (e.g. 2102 = 2, 1216 = 16, 103 = 0)
-         */
-        public Integer programNumber() {
-            if (isWeekly()) {
-                // "weekly" range is [101, 103] so must substract 100 to get program number in range [1, 3]
-                return Integer.parseInt(value) - 100;
-            } else if (isScenario()) {
-                // "scenario" range is [201, 216] so must substract 200 to get program number in range [1, 3]
-                return Integer.parseInt(value) - 200;
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    public enum Function {
-        HEATING(1),
-        COOLING(2),
-        GENERIC(3);
-
-        private final Integer value;
-
-        private Function(Integer value) {
-            this.value = value;
-        }
-
-        public static Function fromValue(Integer i) {
-            Optional<Function> m = Arrays.stream(values()).filter(val -> i.intValue() == val.value.intValue())
-                    .findFirst();
-            return m.orElse(null);
         }
 
         public Integer value() {
@@ -467,7 +536,7 @@ public class Thermoregulation extends BaseOpenMessage {
 
     @Override
     protected What whatFromValue(int i) {
-        return WhatThermo.fromValue(i);
+        return new WhatThermo(i);
     }
 
     @Override
@@ -476,8 +545,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to set set point temperature T<code>*#4*where*#14*T*M##
-     * </code>.
+     * OpenWebNet message to set set point temperature T <code>*#4*where*#14*T*M##</code>.
      *
      * @param where WHERE string
      * @param newSetPointTemperature temperature T between 5.0&deg;C and 40.0&deg;C (with 0.5&deg; step)
@@ -520,8 +588,12 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * OpenWebNet message to set the function (HEATING, COOLING, GENERIC). HEATING <code>
-     * *4*102*where##</code> COOLING <code>*4*202*where##</code> GENERIC <code>*4*302*where##</code>
+     * OpenWebNet message to set the function (HEATING, COOLING, GENERIC):
+     * <ul>
+     * <li>HEATING <code>*4*102*where##</code></li>
+     * <li>COOLING <code>*4*202*where##</code></li>
+     * <li>GENERIC <code>*4*302*where##</code></li>
+     * </ul>
      *
      * @param where WHERE string
      * @param newFunction {@link Function} (HEATING, COOLING, GENERIC)
@@ -530,19 +602,23 @@ public class Thermoregulation extends BaseOpenMessage {
     public static Thermoregulation requestWriteFunction(String where, Thermoregulation.Function newFunction) {
 
         return new Thermoregulation(format(FORMAT_REQUEST_WHAT_STR, WHO,
-                WhatThermo.fromModeAndFunction(OperationMode.PROTECTION, newFunction), where));
+                "" + (newFunction.value * 100 + OperationMode.PROTECTION.value), where));
     }
 
     /**
-     * OpenWebNet message to set the {@link OperationMode} (MANUAL, PROTECTION, OFF). MANUAL
-     * <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature) PROTECTION <code>*4*302*where##
-     * </code> (generic protection) OFF <code>*4*303*where##</code> (generic OFF)
+     * OpenWebNet message to change the {@link OperationMode} to MANUAL, PROTECTION, OFF, AUTO:
+     * <ul>
+     * <li>MANUAL -> <code>*#4*where*#14*T*M##</code> (requestWriteSetPointTemperature)</li>
+     * <li>PROTECTION -> <code>*4*302*where##</code> (generic PROTECTION)</li>
+     * <li>OFF -> <code>*4*303*where##</code> (generic OFF)</li>
+     * <li>AUTO -> <code>*4*311*where##</code> (generic AUTO/PROGRAM)</li>
+     * </ul>
      *
      * @param where WHERE string
      * @param newOperationMode {@link OperationMode}
      * @param currentFunction current zone {@link Function} (HEATING/COOLING/GENERIC)
      * @param setPointTemperature temperature T between 5.0&deg;C and 40.0&deg;C (with 0.5&deg; step) to be set
-     *            when switching to function=MANUAL
+     *            when switching to mode=MANUAL
      * @return message
      */
     public static Thermoregulation requestWriteMode(String where, Thermoregulation.OperationMode newOperationMode,
@@ -556,8 +632,60 @@ public class Thermoregulation extends BaseOpenMessage {
             }
         } else {
             return new Thermoregulation(format(FORMAT_REQUEST_WHAT_STR, WHO,
-                    WhatThermo.fromModeAndFunction(newOperationMode, currentFunction), where));
+                    "" + (currentFunction.value * 100 + newOperationMode.value), where));
         }
+    }
+
+    /**
+     * OpenWebNet message to set Central Unit {@link OperationMode} to HOLIDAY mode until midnight. The specified weekly
+     * program will be activated at the end of holiday. Example: <code>*4*115#3103*where##</code>.
+     *
+     * @param where WHERE string
+     * @param currentFunction current CU {@link Function}
+     * @param returnWeeklyProgram 1..3 weekly program the CU will return to at the end of holiday
+     * @return message
+     */
+    public @NonNull static Thermoregulation requestWriteHolidayMode(String where,
+            Thermoregulation.Function currentFunction, int returnWeeklyProgram) {
+        return new Thermoregulation(format(FORMAT_REQUEST_PARAM_STR, WHO,
+                "" + (currentFunction.value * 100 + OperationMode.HOLIDAY.value), 3100 + returnWeeklyProgram, where));
+    }
+
+    /**
+     * OpenWebNet message to set Central Unit {@link OperationMode} to WEEKLY or SCENARIO with specific program/scenario
+     * number. For example:
+     * <ul>
+     * <li>WEEKLY -> <code>*4*3102*where##</code> weekly program number 2</li>
+     * <li>SCENARIO -> <code>*4*3213*where##</code> scenario number 13</li>
+     * </ul>
+     *
+     * @param where WHERE string
+     * @param newOperationMode {@link OperationMode} (WEEKLY or SCENARIO)
+     * @param currentFunction current {@link Function} (HEATING/COOLING/GENERIC)
+     * @param program weekly program 1..3 or scenario 1..16
+     *
+     * @return message
+     */
+    public static Thermoregulation requestWriteWeeklyScenarioMode(String where,
+            Thermoregulation.OperationMode newOperationMode, Thermoregulation.Function currentFunction, int program) {
+        return new Thermoregulation(format(FORMAT_REQUEST_WHAT_STR, WHO,
+                ("" + currentFunction.value) + (newOperationMode.value + program), where));
+    }
+
+    /**
+     * OpenWebNet message to set Central Unit {@link OperationMode} to VACATION mode for N days. The specified weekly
+     * program will be activated at the end of vacation. Example: <code>*4*33002#3103*where##</code>.
+     *
+     * @param where WHERE string
+     * @param currentFunction current CU {@link Function}
+     * @param vacationDays number of vacation days (1..255)
+     * @param returnWeeklyProgram 1..3 weekly program the CU will return to at the end of vacation
+     * @return message
+     */
+    public @NonNull static Thermoregulation requestWriteVacationMode(String where,
+            Thermoregulation.Function currentFunction, int vacationDays, int returnWeeklyProgram) {
+        return new Thermoregulation(format(FORMAT_REQUEST_PARAM_STR, WHO,
+                ("" + currentFunction.value) + (3000 + vacationDays), 3100 + returnWeeklyProgram, where));
     }
 
     /**
@@ -741,7 +869,7 @@ public class Thermoregulation extends BaseOpenMessage {
     }
 
     /**
-     * Encodes temperature from double to BTicino format
+     * Encodes temperature from double to BTicino temperature format
      *
      * @param temp temperature
      * @return String encoded temperature
@@ -792,14 +920,14 @@ public class Thermoregulation extends BaseOpenMessage {
      * Parse valve status (CV and HV) from Thermoregulation message (dimension: 19)
      *
      * @param msg Thermoregulation message
-     * @param what Look for COOLING (CV) or HEATING (HV) valve
+     * @param whatType Look for COOLING (CV) or HEATING (HV) valve
      * @return parsed valve status as {@link ValveOrActuatorStatus}
      * @throws NumberFormatException in case of invalid status
      * @throws FrameException in case of error in message
      */
-    public static ValveOrActuatorStatus parseValveStatus(Thermoregulation msg, WhatThermo what)
+    public static ValveOrActuatorStatus parseValveStatus(Thermoregulation msg, WhatThermoType whatType)
             throws NumberFormatException, FrameException {
-        if (what != WhatThermo.CONDITIONING && what != WhatThermo.HEATING) {
+        if (whatType != WhatThermoType.CONDITIONING && whatType != WhatThermoType.HEATING) {
             throw new FrameException("Only CONDITIONING and HEATING are allowed as what input parameter.");
         }
 
@@ -807,10 +935,10 @@ public class Thermoregulation extends BaseOpenMessage {
         logger.debug("====parseValveStatus {} --> : CV <{}> HV <{}>", msg.getFrameValue(), values[0], values[1]);
 
         if (msg.getDim() == DimThermo.VALVES_STATUS) {
-            if (what == WhatThermo.CONDITIONING) {
+            if (whatType == WhatThermoType.CONDITIONING) {
                 return ValveOrActuatorStatus.fromValue(Integer.parseInt(values[0]));
             }
-            if (what == WhatThermo.HEATING) {
+            if (whatType == WhatThermoType.HEATING) {
                 return ValveOrActuatorStatus.fromValue(Integer.parseInt(values[1]));
             }
 
@@ -859,74 +987,6 @@ public class Thermoregulation extends BaseOpenMessage {
         }
     }
 
-    /*
-     * Parse mode from Thermoregulation msg (*4*what*where##)
-     *
-     * @param msg Thermoregulation message
-     *
-     * @return parsed mode as enumeration (MANUAL, PROTECTION, OFF)
-     *
-     * @throws FrameException
-     */
-    // public static OPERATION_MODE parseMode(Thermoregulation msg) throws FrameException {
-    // if (msg.getWhat() == null)
-    // throw new FrameException("Could not parse Mode from: " + msg.getFrameValue());
-    // WHAT w = WHAT.fromValue(msg.getWhat().value());
-    // switch (w) {
-    // case CONDITIONING:
-    // case HEATING:
-    // case GENERIC:
-    // return OPERATION_MODE.MANUAL;
-
-    // case PROTECTION_HEATING:
-    // case PROTECTION_CONDITIONING:
-    // case PROTECTION_GENERIC:
-    // return OPERATION_MODE.PROTECTION;
-
-    // case OFF_HEATING:
-    // case OFF_CONDITIONING:
-    // case OFF_GENERIC:
-    // return OPERATION_MODE.OFF;
-    // }
-
-    // throw new FrameException("Invalid Mode from: " + msg.getFrameValue());
-    // }
-
-    /*
-     * Parse fuction from Thermoregulation msg (*4*what*where##)
-     *
-     * @param msg Thermoregulation message
-     *
-     * @return parsed mode as enumeration (COOLING, HEATING, GENERIC)
-     *
-     * @throws FrameException
-     */
-    // public static FUNCTION parseFunction(Thermoregulation msg) throws FrameException {
-
-    // if (msg.getWhat() == null)
-    // throw new FrameException("Could not parse Fuction from: " + msg.getFrameValue());
-
-    // WHAT w = WHAT.fromValue(msg.getWhat().value());
-    // switch (w) {
-    // case CONDITIONING:
-    // case PROTECTION_CONDITIONING:
-    // case OFF_CONDITIONING:
-    // return FUNCTION.COOLING;
-
-    // case HEATING:
-    // case PROTECTION_HEATING:
-    // case OFF_HEATING:
-    // return FUNCTION.HEATING;
-
-    // case GENERIC:
-    // case PROTECTION_GENERIC:
-    // case OFF_GENERIC:
-    // return FUNCTION.GENERIC;
-    // }
-
-    // throw new FrameException("Invalid Fuction from: " + msg.getFrameValue());
-    // }
-
     @Override
     public OpenDeviceType detectDeviceType() {
         WhereThermo w = (WhereThermo) getWhere();
@@ -947,4 +1007,5 @@ public class Thermoregulation extends BaseOpenMessage {
             }
         }
     }
+
 }

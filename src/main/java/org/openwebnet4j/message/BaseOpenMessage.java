@@ -63,9 +63,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
     private String[] dimValues = null; // list of dimension values VAL1...VALn in the frame
     // *#WHO*WHERE*DIM...*VAL1*...*VALn##
 
-    @Deprecated
-    private int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
-    // *WHO*WHAT#PAR1...#PARn*WHERE##
+    /*
+     * @Deprecated
+     * private int[] commandParams = null; // list of command parameters PAR1...PARn in the frame
+     * // *WHO*WHAT#PAR1...#PARn*WHERE##
+     */
 
     private String[] whatParams = null; // list of What parameters PAR1...PARn in the frame
     // *WHO*WHAT#PAR1...#PARn*WHERE##
@@ -85,8 +87,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Parses the frame and returns a new {@link OpenMessage} object. To improve efficiency, this parser uses a "lazy
      * approach": inner parts (WHERE, WHAT, DIM, parameters, etc.) are not parsed/checked until requested. This means
-     * these
-     * parts of the frame may not be valid.
+     * these parts of the frame may not be valid.
      *
      * @param frame the frame String to parse
      * @return a new {@link OpenMessage} object representing the OpenWebNet frame
@@ -180,7 +181,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message WHAT or null if message has no valid WHAT part
+     * Returns WHAT part of this message, or null if message has no valid WHAT part
      *
      * @return message WHAT
      */
@@ -199,7 +200,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     }
 
     /**
-     * Returns message WHERE or null if message has no valid WHERE part
+     * Returns WHERE part of this message, or null if message has no valid WHERE part
      *
      * @return message WHERE
      */
@@ -339,23 +340,16 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 } else {
                     isCommandTranslation = false;
                 }
-                commandParams = new int[0];
                 whatParams = new String[0];
                 what = whatFromValue(Integer.parseInt(parts[partsIndex]));
                 if (what == null) {
                     throw new UnsupportedFrameException("Unsupported WHAT=" + whatStr);
                 }
                 if (parts.length > 1) { // copy What parameters into whatParams
-                    commandParams = new int[parts.length - partsIndex - 1];
-                    for (int i = 0; i < commandParams.length; i++) {
-                        commandParams[i] = Integer.parseInt(parts[i + partsIndex + 1]);
-                    }
-
                     whatParams = new String[parts.length - partsIndex - 1];
                     for (int i = 0; i < whatParams.length; i++) {
                         whatParams[i] = parts[i + partsIndex + 1];
                     }
-
                 }
             } catch (NumberFormatException e) {
                 throw new MalformedFrameException("Invalid integer format in WHAT=" + whatStr);
@@ -407,7 +401,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
     /**
      * Tries to return a {@link OpenDeviceType} based on frame value
      *
-     * @return recognized device type or null if not device can be recognized
+     * @return recognised device type or null if not device can be recognized
      * @throws FrameException in case of error in frame
      */
     @Nullable
@@ -434,22 +428,25 @@ public abstract class BaseOpenMessage extends OpenMessage {
         }
     }
 
-    /**
+    /*
      * Returns message command parameters (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if
      * no parameters are present
      *
-     * @deprecated Use {@link getWhatParams()} instead.
+     * DEPRECATED Use {@link getWhatParams()} instead.
      *
      * @return int[] of command parameters, or empty array if no parameters are present
+     *
      * @throws FrameException in case of error in frame
      */
-    @Deprecated
-    public int[] getCommandParams() throws FrameException {
-        if (commandParams == null) {
-            getWhat();
-        }
-        return commandParams;
-    }
+    /*
+     * DEPRECATED
+     * public int[] getCommandParams() throws FrameException {
+     * if (commandParams == null) {
+     * getWhat();
+     * }
+     * return commandParams;
+     * }
+     */
 
     /**
      * Returns What parameters from a command frame (*WHO*WHAT#Param1#Param2...#ParamN*...), or empty array if
