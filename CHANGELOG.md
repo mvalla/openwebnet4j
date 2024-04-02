@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.13.0-SNAPSHOT] - 2024-0x-xx
+## [0.13.0] - 2024-04-02
 
 ### Added
 - Thermoregulation requestHolidayMode / requestVacationMode / requestWriteWeeklyScenarioMode methods
@@ -14,7 +14,7 @@
 - DEPRECATED WhereThermo.fromModeAndFunction
 - DEPRECATED OperationMode mode/isScenario/isWeekely/isVacation methods
 - removed method WhereThermo.setValue()
-- removed deprecated method BaseOpenMessage.getCommandParams()
+- removed already deprecated method BaseOpenMessage.getCommandParams()
 
 
 ## [0.12.0] - 2024-02-05
