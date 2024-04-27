@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.14.0] - 2024-04-27
+
+### Added
+- DefaultMessage to handle unsupported WHOs
+
+### Changed
+- updated updated maven plugin: org.eclipse.jdt.annotation
+- class Where is not abstract anymore
+
+
 ## [0.13.0] - 2024-04-02
 
 ### Added
