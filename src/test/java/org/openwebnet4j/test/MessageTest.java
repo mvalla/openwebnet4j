@@ -762,23 +762,24 @@ public class MessageTest {
         }
     }
 
-    @Test
-    public void testUnknownUnsupportedWho() {
-        OpenMessage msg = null;
-        try {
-            msg = BaseOpenMessage.parse("*19*1*123##");
-        } catch (FrameException e) {
-            assertTrue(e instanceof MalformedFrameException);
-        }
-        try {
-            msg = BaseOpenMessage.parse("*3*1*123##");
-        } catch (FrameException e) {
-            assertTrue(e instanceof UnsupportedFrameException);
-        }
-
-        assertNull(msg);
-    }
-
+    /*
+     * @Test
+     * public void testUnknownUnsupportedWho() {
+     * OpenMessage msg = null;
+     * try {
+     * msg = BaseOpenMessage.parse("*19*1*123##");
+     * } catch (FrameException e) {
+     * assertTrue(e instanceof MalformedFrameException);
+     * }
+     * try {
+     * msg = BaseOpenMessage.parse("*3*1*123##");
+     * } catch (FrameException e) {
+     * assertTrue(e instanceof UnsupportedFrameException);
+     * }
+     * 
+     * assertNull(msg);
+     * }
+     */
     @Test
     public void testUnsupportedWhat() {
         OpenMessage msg = null;

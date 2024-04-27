@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 
 @NonNullByDefault
-public abstract class Where {
+public class Where {
     protected final String whereStr;
 
     public Where(String w) throws IllegalArgumentException {

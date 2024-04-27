@@ -106,7 +106,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
             return new AckOpenMessage(frame);
         }
         if (!frame.endsWith(OpenMessage.FRAME_END)) {
-            throw new MalformedFrameException("Frame does not end with terminator " + OpenMessage.FRAME_END);
+            throw new MalformedFrameException("Frame does not end with suffix '" + OpenMessage.FRAME_END + "'");
         }
         if (frame.startsWith(OpenMessage.FRAME_START_DIM)) {
             isCmd = false;
@@ -256,8 +256,7 @@ public abstract class BaseOpenMessage extends OpenMessage {
      * @param frame the frame string
      * @throws MalformedFrameException in case of error in frame
      */
-    private static BaseOpenMessage parseWho(String whoPart, String frame)
-            throws MalformedFrameException, UnsupportedFrameException {
+    private static BaseOpenMessage parseWho(String whoPart, String frame) throws MalformedFrameException {
         Who who = null;
         try {
             int whoInt = Integer.parseInt(whoPart);
@@ -309,14 +308,11 @@ public abstract class BaseOpenMessage extends OpenMessage {
                 baseopenmsg = new Alarm(frame);
                 break;
             default:
+                baseopenmsg = new DefaultMessage(frame);
                 break;
         }
-        if (baseopenmsg != null) {
-            baseopenmsg.who = who;
-            return baseopenmsg;
-        } else {
-            throw new UnsupportedFrameException("WHO not recognized/supported: " + who);
-        }
+        baseopenmsg.who = who;
+        return baseopenmsg;
     }
 
     /**
