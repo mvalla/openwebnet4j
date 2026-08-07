@@ -230,7 +230,7 @@ public class Lighting extends BaseOpenMessage {
         return getDim() == Lighting.DimLighting.DIMMER_LEVEL_100
                 || getDim() == Lighting.DimLighting.DIMMER_STATUS_LEVEL_100;
     }
-    
+
     /**
      * Parse dimmerLevel100 (DIM: 1 or DIM: 4)
      *
