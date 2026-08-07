@@ -294,7 +294,7 @@ public class MessageTest {
             Assertions.fail(e);
         }
     }
-    
+
     @Test
     public void testLightingCommandTranslationAndParams() {
         Lighting lightMsg;
