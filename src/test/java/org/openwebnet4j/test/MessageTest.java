@@ -269,6 +269,32 @@ public class MessageTest {
     }
 
     @Test
+    public void testLightingDimmerLevel100Status() {
+        try {
+            Lighting levelMessage = (Lighting) BaseOpenMessage.parse("*#1*0714*1*147*2##");
+            assertEquals(Lighting.DimLighting.DIMMER_LEVEL_100, levelMessage.getDim());
+            assertTrue(levelMessage.isDimmerLevel100());
+            assertEquals(47, levelMessage.parseDimmerLevel100());
+
+            Lighting onStatus = (Lighting) BaseOpenMessage.parse("*#1*0714*4*200*2##");
+            assertEquals(Lighting.DimLighting.DIMMER_STATUS_LEVEL_100, onStatus.getDim());
+            assertTrue(onStatus.isDimmerLevel100());
+            assertArrayEquals(new String[] { "200", "2" }, onStatus.getDimValues());
+            assertEquals(100, onStatus.parseDimmerLevel100());
+
+            Lighting partialStatus = (Lighting) BaseOpenMessage.parse("*#1*0714*4*110*2##");
+            assertEquals(10, partialStatus.parseDimmerLevel100());
+
+            Lighting offStatus = (Lighting) BaseOpenMessage.parse("*#1*0714*4*100*2##");
+            assertEquals(0, offStatus.parseDimmerLevel100());
+
+            Lighting invalidStatus = (Lighting) BaseOpenMessage.parse("*#1*0714*4*201*2##");
+            assertThrows(FrameException.class, invalidStatus::parseDimmerLevel100);
+        } catch (FrameException e) {
+            Assertions.fail(e);
+        }
+    }
+    @Test
     public void testLightingCommandTranslationAndParams() {
         Lighting lightMsg;
         try {
