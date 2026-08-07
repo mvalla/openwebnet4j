@@ -98,7 +98,8 @@ public class Lighting extends BaseOpenMessage {
     }
 
     public enum DimLighting implements Dim {
-        DIMMER_LEVEL_100(1);
+        DIMMER_LEVEL_100(1),
+        DIMMER_STATUS_LEVEL_100(4);
 
         @Nullable
         private static Map<Integer, DimLighting> mapping;
@@ -220,14 +221,23 @@ public class Lighting extends BaseOpenMessage {
         }
     }
 
-    /**
-     * Parse dimmerLevel100 (DIM: 1)
+     /**
+     * Returns whether this message contains a 100-level dimmer value.
+     *
+     * @return true for a DIM 1 level notification or a DIM 4 status notification
+     */
+    public boolean isDimmerLevel100() {
+        return getDim() == Lighting.DimLighting.DIMMER_LEVEL_100
+                || getDim() == Lighting.DimLighting.DIMMER_STATUS_LEVEL_100;
+    }
+     /**
+     *  Parse dimmerLevel100 (DIM: 1 or DIM: 4)
      *
      * @return corresponding int percentage (0-100)
      * @throws FrameException in case of frame error
      */
     public int parseDimmerLevel100() throws FrameException {
-        if (getDim() == Lighting.DimLighting.DIMMER_LEVEL_100) {
+        if (isDimmerLevel100()) {
             int level100 = Integer.parseInt(getDimValues()[0]);
             if (level100 >= DIMMER_LEVEL_100_OFF && level100 <= DIMMER_LEVEL_100_MAX) {
                 return level100 - 100;
