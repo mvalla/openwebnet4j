@@ -221,7 +221,7 @@ public class Lighting extends BaseOpenMessage {
         }
     }
 
-     /**
+    /**
      * Returns whether this message contains a 100-level dimmer value.
      *
      * @return true for a DIM 1 level notification or a DIM 4 status notification
@@ -230,8 +230,9 @@ public class Lighting extends BaseOpenMessage {
         return getDim() == Lighting.DimLighting.DIMMER_LEVEL_100
                 || getDim() == Lighting.DimLighting.DIMMER_STATUS_LEVEL_100;
     }
-     /**
-     *  Parse dimmerLevel100 (DIM: 1 or DIM: 4)
+    
+    /**
+     * Parse dimmerLevel100 (DIM: 1 or DIM: 4)
      *
      * @return corresponding int percentage (0-100)
      * @throws FrameException in case of frame error
