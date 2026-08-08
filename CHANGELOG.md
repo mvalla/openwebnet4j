@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.15.0] - 2026-08-08
+
+### Fixed
+- Support for DIM 4 lighting status frames (fixes #42)
+
+### Changed
+- updated copyright year to 2026
+- updated README and links to products
+- updated dependencies
+- updated maven plugins
+
+
 ## [0.14.0] - 2024-04-27
 
 ### Added
