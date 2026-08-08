@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.15.0] - 2026-08-08
+## [0.15.0] - 2026-08-09
 
 ### Fixed
 - Support for DIM 4 lighting status frames (fixes #42)
