@@ -1,8 +1,8 @@
 # openwebnet4j
 
-**openwebnet4j** is a Java library for the [Open Web Net](https://developer.legrand.com/documentation/open-web-net-for-myhome/) protocol.
+**openwebnet4j** is a Java library for the [Open Web Net](https://en.wikipedia.org/wiki/OpenWebNet) protocol.
 
-It enables a Java client to communicate locally with a gateway supporting the **Open Web Net** protocol and to control devices in a **BTicino/Legrand BUS/SCS system** ([MyHOME](https://www.bticino.com/products-catalogue/myhome_up-simple-home-automation-system/) &reg;) or **ZigBee wireless system** ([MyHOME Radio or MyHOME_Play](https://www.homesystems-legrandgroup.com/myhomeswupdate/MyHomePlay/BT-CASA_CONNESSA_LUCI_E_TAPPARELLE.pdf) &reg;, now out of production).
+It enables a Java client to communicate locally with a gateway supporting the **Open Web Net** protocol and to control devices in a **BTicino/Legrand BUS/SCS system** ([MyHOME](https://www.bticino.com/products/smart-home-and-home-automation-systems/home-automation-system-myhome-bus-solutions) &reg;) or **ZigBee wireless system** ([MyHOME Radio or MyHOME_Play](https://www.homesystems-legrandgroup.com/myhomeswupdate/MyHomePlay/BT-CASA_CONNESSA_LUCI_E_TAPPARELLE.pdf) &reg;, now out of production).
 
 Supported features:
 
@@ -15,15 +15,16 @@ Supported frames:
 * `WHO=1` Lighting
 * `WHO=2` Automation
 * `WHO=4` Thermoregulation
-* `WHO=5`  Alarm 
-* `WHO=9`  Auxiliary 
+* `WHO=5`  Alarm
+* `WHO=9`  Auxiliary
 * `WHO=13` Gateway Management
 * `WHO=15 & 25` CEN/CEN+ scenarios
 * `WHO=18` Energy Management
 
 Supported Open Web Net gateways:
-- **IP gateways** or scenario programmers, such as: BTicino F453 / [F454](https://catalogue.bticino.com/product/smart-home-solutions/my-home---home-automation-system/integration-and-control/BTI-F454-EN) / F455, [MyHOMEServer1](https://catalogue.bticino.com/product/smart-home-solutions/my-home---home-automation-system/integration-and-control/BTI-MYHOMESERVER1-EN),  MyHOME_Screen10, MH201 / MH202 / MH200N
-- **ZigBee USB Gateways**, such as: [BTicino 3578](https://catalogo.bticino.it/low_res/395950_501016_MQ00493_b_IT.pdf), also known as Legrand 088328, to connect to wireless devices
+- **IP gateways** or scenario programmers, such as: BTicino F453 / [F454](https://catalogo.bticino.it/prodotto/soluzioni-per-la-smart-home/my-home---sistema-domotico/integrazione-e-controllo/BTI-F454-IT) / F455, [MyHOMEServer1](https://catalogo.bticino.it/prodotto/soluzioni-per-la-smart-home/my-home---sistema-domotico/integrazione-e-controllo/BTI-MYHOMESERVER1-IT),  MyHOME_Screen10, MH201 / MH202 / MH200N
+    - newer IP gateways such as [BTicino F461](https://www.bticino.com/products/smart-home-and-home-automation-systems/home-automation-system-myhome-bus-solutions/integration-and-control/bt-f461) should also work
+- **ZigBee USB Gateways**, such as: [BTicino 3578](https://www.legrand.be/fr/catalogue/zigbee-interface-openzigbee-3578), also known as Legrand 088328, to connect to wireless devices
 
 The library is mainly used as protocol library by the [OpenWebNet (BTicino/Legrand) Binding](https://www.openhab.org/addons/bindings/openwebnet/) in the official distribution of the [openHAB](https://www.openhab.org/) open source home automation software.
 
@@ -40,11 +41,11 @@ The library is mainly used as protocol library by the [OpenWebNet (BTicino/Legra
 This library is available via Maven Central repository by adding the dependency in your POM.xml:
 
 ```xml   
-    <dependency>
-      <groupId>io.github.openwebnet4j</groupId>
-      <artifactId>openwebnet4j</artifactId>
-      <version>0.14.0</version>
-    </dependency>
+<dependency>
+    <groupId>io.github.openwebnet4j</groupId>
+    <artifactId>openwebnet4j</artifactId>
+    <version>0.15.0</version>
+</dependency>
 ```
 
 ## Usage example
