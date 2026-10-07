@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.16.0-beta.1] - 2026-09-27
+
+### Added
+- Format and range checks in WhereZigBee, support for broadcast addresses (0#UNIT#9), test cases
+- New method WhereZigBee.isGeneral()
+
+### Fixed
+- Correctly parse BUS/SCS Group #9 WHERE instead of ZigBee WHERE and added related test (fixes #44)
+
+### Changed
+- updated log4j dependencies
+
+
 ## [0.15.0] - 2026-08-09
 
 ### Fixed

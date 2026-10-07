@@ -758,7 +758,7 @@ public class MessageTest {
     }
 
     @Test
-    public void testZigBeeLightingWhere() {
+    public void testWhereZigBee() {
         Lighting lightMsg;
         try {
             lightMsg = (Lighting) BaseOpenMessage.parse("*1*1*702053501#9##");
@@ -768,6 +768,49 @@ public class MessageTest {
             assertEquals("702053501#9", wz.value());
             assertEquals(WhereZigBee.UNIT_01, wz.getUnit());
             assertEquals("7020535", wz.getAddr());
+            System.out.println(lightMsg.toStringVerbose());
+
+            wz = new WhereZigBee("0#01#9"); // broadcast
+            assertTrue(wz.isGeneral());
+            assertEquals("0#", wz.getAddr());
+            assertEquals("01", wz.getUnit());
+
+            wz = new WhereZigBee("32818402#9"); // unicast
+            assertFalse(wz.isGeneral());
+            assertEquals("328184", wz.getAddr());
+            assertEquals("02", wz.getUnit());
+
+            wz = new WhereZigBee("123456700#9"); // unicast, all units
+            assertFalse(wz.isGeneral());
+            assertEquals("1234567", wz.getAddr());
+            assertEquals(WhereZigBee.UNIT_ALL, wz.getUnit());
+
+            assertThrows(IllegalArgumentException.class, () -> new WhereZigBee("9#9"));
+            assertThrows(IllegalArgumentException.class, () -> new WhereZigBee("00#9"));
+            assertThrows(IllegalArgumentException.class, () -> new WhereZigBee("1234567xy#9"));
+
+        } catch (FrameException e) {
+            Assertions.fail();
+        }
+    }
+
+    @Test
+    public void testWhereGroup9() {
+        Lighting lightMsg;
+        try {
+            lightMsg = (Lighting) BaseOpenMessage.parse("*1*1*#9##");
+            assertNotNull(lightMsg);
+            assertEquals(Who.LIGHTING, lightMsg.getWho());
+            WhereLightAutom wl = (WhereLightAutom) (lightMsg.getWhere());
+            assertEquals("#9", wl.value());
+            assertFalse(wl.isAPL());
+            assertFalse(wl.isGeneral());
+            assertFalse(wl.isArea());
+            assertTrue(wl.isGroup());
+            assertEquals(-1, wl.getArea());
+            assertEquals(-1, wl.getPL());
+            assertEquals(9, wl.getGroup());
+            assertNull(wl.getBUSIfc());
             System.out.println(lightMsg.toStringVerbose());
         } catch (FrameException e) {
             Assertions.fail();

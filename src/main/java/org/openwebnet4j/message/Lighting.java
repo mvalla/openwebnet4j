@@ -304,7 +304,7 @@ public class Lighting extends BaseOpenMessage {
         if (whereStr == null) {
             throw new FrameException("Lighting frame has no WHERE part: " + whereStr);
         } else {
-            if (whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
+            if (whereStr.length() > 4 && whereStr.endsWith(WhereZigBee.ZB_NETWORK)) {
                 where = new WhereZigBee(whereStr);
             } else {
                 where = new WhereLightAutom(whereStr);
