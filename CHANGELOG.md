@@ -11,7 +11,7 @@
 
 ### Changed
 - updated log4j dependencies
-
+- downgraded maven-jar-plugin to 3.4.2 to avoid incompatibility with m2e Eclipse plugin
 
 ## [0.15.0] - 2026-08-09
 
