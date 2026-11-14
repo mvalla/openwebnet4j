@@ -112,7 +112,8 @@ public abstract class OpenConnector {
     // TODO add timeout??
     public synchronized Response sendCommandSynch(String frame) throws OWNException {
         if (!isCmdConnected()) {
-            throw new OWNException("CMD is not connected");
+            logger.info("##OPEN-conn## CMD is disconnected, trying to reconnect...");
+            openCmdConn();
         }
         try {
             return sendCommandSynchInternal(frame);
