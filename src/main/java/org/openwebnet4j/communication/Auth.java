@@ -21,9 +21,9 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Class contains helper methods for authenticating to a BUS OpenWebNet gateway using a numeric
  * (OPEN) or alphanumeric (HMAC) password. Encoding algorithm for OPEN numeric password can be found
- * at this link: https://rosettacode.org/wiki/OpenWebNet_Password#JavaScript HMAC authentication
+ * at this link: https://rosettacode.org/wiki/OpenWebNet_password; HMAC authentication
  * algorithm can be found at this Legrand/BTicino link:
- * https://developer.legrand.com/documentation/open-web-net-for-myhome/
+ * https://developer.legrand.com/local-interoperability/#PDF%20documentation
  *
  * @author M. Valla - Initial contribution
  */

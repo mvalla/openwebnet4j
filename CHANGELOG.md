@@ -1,17 +1,21 @@
 # Changelog
 
-## [0.16.0-beta.1] - 2026-09-27
+## [0.16.0] - 2026-11-14
 
 ### Added
 - Format and range checks in WhereZigBee, support for broadcast addresses (0#UNIT#9), test cases
 - New method WhereZigBee.isGeneral()
+- Test class OpenConnectorTest
 
 ### Fixed
 - Correctly parse BUS/SCS Group #9 WHERE instead of ZigBee WHERE and added related test (fixes #44)
+- OpenConnector.sendCommandSynch() now tries to open a new connection instead of throwing an OWNException to avoid blocking new commands after a previous sendCommand failed
 
 ### Changed
 - updated log4j dependencies
 - downgraded maven-jar-plugin to 3.4.2 to avoid incompatibility with m2e Eclipse plugin
+- upgraded central-publishing-maven-plugin to 0.12.0 to resolve publish error
+
 
 ## [0.15.0] - 2026-08-09
 
